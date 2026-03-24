@@ -12,7 +12,7 @@ import { clsx } from "clsx";
 import { 
   Monitor, AppWindow, PenTool, LayoutTemplate, Wrench, 
   ChevronDown, Check, ExternalLink, ArrowRight,
-  Smartphone, CalendarCheck
+  Smartphone, CalendarCheck, Zap
 } from "lucide-react";
 
 // --- Sub-components (Kept in-file for optimal single-page structure) ---
@@ -259,7 +259,7 @@ const Navbar = () => {
           LX CLOUDS
         </div>
         <nav className="hidden md:flex gap-8 items-center font-mono text-sm">
-          {["About","Services","Work"].map(l => (
+          {["About","Services","Work","Pricing"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`}
               className="transition-colors"
               style={{ color: scrolled ? undefined : "rgba(255,255,255,0.75)" }}
@@ -288,6 +288,59 @@ const SERVICES = [
   { icon: PenTool,       title: "UI/UX Design",               desc: "Intuitive, engaging, and beautiful interfaces tailored to your audience." },
   { icon: LayoutTemplate,title: "Landing Pages & Portfolios", desc: "High-converting marketing pages designed to captivate and convert." },
   { icon: Wrench,        title: "Maintenance & Support",      desc: "Keeping your digital presence secure, fast, and running flawlessly." }
+];
+
+const PRICING_PLANS = [
+  {
+    name: "Starter",
+    tagline: "Perfect for small businesses & personal brands",
+    price: "From €499",
+    period: "one-time",
+    highlight: false,
+    features: [
+      "Up to 5 pages",
+      "Fully responsive design",
+      "SEO foundations",
+      "Contact form",
+      "2 revision rounds",
+      "14-day delivery",
+    ],
+    cta: "Get Started",
+  },
+  {
+    name: "Pro",
+    tagline: "Best for growing businesses & custom apps",
+    price: "From €1,499",
+    period: "one-time",
+    highlight: true,
+    features: [
+      "Custom web application",
+      "User authentication",
+      "Database & API integration",
+      "Admin dashboard",
+      "3 revision rounds",
+      "Priority support",
+      "30-day post-launch care",
+    ],
+    cta: "Get a Quote",
+  },
+  {
+    name: "Custom",
+    tagline: "Mobile apps, booking systems & complex builds",
+    price: "Let's Talk",
+    period: "tailored to scope",
+    highlight: false,
+    features: [
+      "iOS & Android mobile apps",
+      "Booking & scheduling systems",
+      "Multi-role user systems",
+      "Third-party integrations",
+      "Ongoing maintenance plan",
+      "Dedicated project manager",
+      "SLA & priority hotline",
+    ],
+    cta: "Book a Call",
+  },
 ];
 
 const WHY_US = [
@@ -577,6 +630,125 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* PRICING SECTION */}
+        <section id="pricing" className="py-28 relative z-10 border-t border-border">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <div className="container mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <span className="font-mono text-xs tracking-widest uppercase mb-4 block" style={{ color: "var(--color-primary)" }}>
+                Transparent Pricing
+              </span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+                Simple, Honest Rates
+              </h2>
+              <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
+                No hidden fees. Every project is scoped carefully so you always know what you're getting.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
+              {PRICING_PLANS.map((plan, i) => (
+                <motion.div
+                  key={plan.name}
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.12, duration: 0.55 }}
+                  className="relative rounded-2xl flex flex-col overflow-hidden"
+                  style={plan.highlight ? {
+                    background: "linear-gradient(160deg, #0a2a17 0%, #072012 100%)",
+                    border: "1.5px solid rgba(0,255,136,0.45)",
+                    boxShadow: "0 0 40px rgba(0,255,136,0.12), 0 8px 32px rgba(0,0,0,0.35)",
+                  } : {
+                    background: "var(--color-background-secondary)",
+                    border: "1.5px solid var(--color-border)",
+                  }}
+                >
+                  {/* Popular badge */}
+                  {plan.highlight && (
+                    <div className="flex items-center justify-center gap-1.5 py-2"
+                      style={{ background: "rgba(0,255,136,0.12)", borderBottom: "1px solid rgba(0,255,136,0.25)" }}>
+                      <Zap className="w-3.5 h-3.5" style={{ color: "#00ff88" }} />
+                      <span className="font-mono text-xs tracking-widest uppercase font-semibold" style={{ color: "#00ff88" }}>
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="p-8 flex flex-col flex-1 gap-6">
+                    {/* Header */}
+                    <div>
+                      <h3 className="text-xl font-serif font-bold text-foreground">{plan.name}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground leading-snug">{plan.tagline}</p>
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <div className="text-3xl font-serif font-bold"
+                        style={{ color: plan.highlight ? "#00ff88" : "var(--color-foreground)" }}>
+                        {plan.price}
+                      </div>
+                      <div className="font-mono text-xs text-muted-foreground mt-1 uppercase tracking-wider">
+                        {plan.period}
+                      </div>
+                    </div>
+
+                    {/* Features */}
+                    <ul className="space-y-3 flex-1">
+                      {plan.features.map(f => (
+                        <li key={f} className="flex items-start gap-3 text-sm text-foreground/80">
+                          <Check className="w-4 h-4 mt-0.5 flex-shrink-0"
+                            style={{ color: plan.highlight ? "#00ff88" : "var(--color-primary)" }} />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* CTA */}
+                    <a href="#contact"
+                      className="mt-2 block text-center rounded-xl py-3 px-6 font-mono text-sm font-semibold tracking-wide transition-all duration-200"
+                      style={plan.highlight ? {
+                        background: "linear-gradient(135deg, #00c853, #00ff88)",
+                        color: "#031a0a",
+                        boxShadow: "0 4px 20px rgba(0,255,136,0.35)",
+                      } : {
+                        background: "transparent",
+                        border: "1.5px solid var(--color-border)",
+                        color: "var(--color-foreground)",
+                      }}
+                      onMouseEnter={e => {
+                        if (!plan.highlight) {
+                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(0,255,136,0.5)";
+                          (e.currentTarget as HTMLAnchorElement).style.color = "#00ff88";
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!plan.highlight) {
+                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--color-border)";
+                          (e.currentTarget as HTMLAnchorElement).style.color = "var(--color-foreground)";
+                        }
+                      }}
+                    >
+                      {plan.cta}
+                    </a>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Fine print */}
+            <p className="text-center text-xs text-muted-foreground mt-10 font-mono">
+              All prices are estimates. Final scope agreed before any work begins. &nbsp;·&nbsp; VAT may apply.
+            </p>
           </div>
         </section>
 
