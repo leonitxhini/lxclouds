@@ -48,6 +48,18 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
 
+## Artifacts
+
+### `artifacts/lx-clouds` (`@workspace/lx-clouds`)
+
+LX CLOUDS portfolio/agency website. A single-page React + Vite app with dark elegant green theme.
+
+- Brand colors: deep green-black backgrounds (#0A0F0A), emerald accent (#00C46A), neon glow (#00FF7F)
+- Fonts: Cormorant Garamond (headings), DM Sans (body), JetBrains Mono (labels/tags)
+- Sections: Hero with floating orbs, About, Services, Portfolio with filter, Why LX CLOUDS, Contact form, Footer
+- All data is static/hardcoded (no backend required)
+- Key packages: framer-motion, lucide-react, react-hook-form, zod, @hookform/resolvers
+
 ## Packages
 
 ### `artifacts/api-server` (`@workspace/api-server`)

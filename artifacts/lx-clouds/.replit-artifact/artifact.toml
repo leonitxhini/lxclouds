@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "LX CLOUDS Portfolio"
+version = "1.0.0"
+id = "artifacts/lx-clouds"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18699
+
+[services.development]
+run = "pnpm --filter @workspace/lx-clouds run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/lx-clouds", "run", "build" ]
+publicDir = "artifacts/lx-clouds/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18699"
+BASE_PATH = "/"

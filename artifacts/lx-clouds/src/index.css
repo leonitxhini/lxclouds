@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=JetBrains+Mono:wght@400&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-background-secondary: hsl(var(--background-secondary));
+  --color-surface: hsl(var(--surface));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-hover: hsl(var(--primary-hover));
+  --color-glow: hsl(var(--glow));
+  
+  --color-foreground: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+
+  /* Standard shadcn aliases mapping to our brand palette */
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  /* LX CLOUDS Brand Colors */
+  --background: 120 20% 5%; /* #0A0F0A */
+  --background-secondary: 120 27% 8%; /* #0F1A0F */
+  --surface: 120 26% 9%; /* #111D11 */
+  
+  --primary: 152 100% 38%; /* #00C46A */
+  --primary-hover: 141 73% 42%; /* #1DB954 */
+  --glow: 150 100% 50%; /* #00FF7F */
+  
+  --foreground: 136 100% 97%; /* #F0FFF4 */
+  --muted: 120 27% 8%; /* #0F1A0F */
+  --muted-foreground: 120 15% 61%; /* #8FA98F */
+  --border: 120 24% 16%; /* #1F331F */
+
+  /* Standard Shadcn Mappings */
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--background-secondary);
+  --secondary-foreground: var(--foreground);
+  --accent: var(--primary-hover);
+  --accent-foreground: var(--background);
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 136 100% 97%;
+  --input: var(--border);
+  --ring: var(--primary);
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-surface/40 border border-primary/15 backdrop-blur-xl shadow-lg shadow-black/40;
+  }
+}

@@ -1,0 +1,147 @@
+Build a complete, elegant, and professional portfolio/agency website for "LX CLOUDS" 
+(domain: lxclouds.com). This is both a personal brand and a company through which 
+the owner runs client projects — primarily building web apps and websites. The site 
+serves as a showcase to attract new clients by displaying previously built apps and 
+websites as live previews or visual case studies.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BRAND IDENTITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Name: LX CLOUDS
+- Domain: lxclouds.com
+- Tone: Serious, elegant, modern, trustworthy — like a boutique digital studio
+- Aesthetic: Dark theme with deep charcoal/near-black backgrounds and a rich, 
+  sophisticated green as the primary accent color
+- COLOR PALETTE (strictly follow these):
+    • Background primary:   #0A0F0A  (deep dark green-black)
+    • Background secondary: #0F1A0F  (slightly lighter dark green-black)
+    • Surface / cards:      #111D11  (dark forest tone for cards/glass)
+    • Primary accent:       #00C46A  (vibrant emerald green — CTAs, highlights)
+    • Secondary accent:     #1DB954  (slightly warmer green for hover states)
+    • Subtle glow/aura:     #00FF7F  (neon mint — used sparingly for glows only)
+    • Text primary:         #F0FFF4  (near-white with a cool green tint)
+    • Text secondary:       #8FA98F  (muted sage — for subtitles, meta text)
+    • Border/divider:       #1F331F  (dark green border, barely visible)
+- Feeling: Like a premium fintech or cybersecurity studio — dark, clean, precise
+- Typography: 
+    • Headings: "Cormorant Garamond" or "Playfair Display" — refined and elegant
+    • Body: "DM Sans" or "Sora" — clean and modern
+    • Accent/labels: "JetBrains Mono" — for tags, code-style labels, small caps
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VISUAL STYLE DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- All sections sit on very dark green-black backgrounds
+- Cards and panels use a frosted glassmorphism effect with a dark green tint:
+    background: rgba(0, 196, 106, 0.05);
+    border: 1px solid rgba(0, 196, 106, 0.15);
+    backdrop-filter: blur(12px);
+- Glow effects on hover: box-shadow: 0 0 24px rgba(0, 255, 127, 0.15)
+- Gradient text for the logo and main headline:
+    background: linear-gradient(135deg, #00C46A, #00FF7F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+- Subtle green noise/grain texture overlay on the hero background (5% opacity)
+- Floating particle/orb animation in the hero: soft glowing green orbs drifting
+  slowly, like clouds — ties into the "LX CLOUDS" brand name beautifully
+- Section dividers: thin 1px lines using the border color #1F331F
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGES & SECTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. HERO SECTION
+   - Full-screen dark hero with animated floating green glowing orbs/clouds
+   - Large gradient headline: "We Build Digital Experiences That Last"
+   - Subheadline in muted sage: "LX CLOUDS — Web Apps & Websites, Crafted with Precision"
+   - Two CTA buttons:
+     • Primary: filled with #00C46A, dark text, subtle glow on hover
+     • Secondary: ghost button with green border and text
+   - Smooth scroll indicator at the bottom (animated arrow in accent green)
+
+2. ABOUT / WHO WE ARE
+   - Short, confident description of LX CLOUDS as a boutique web studio
+   - Highlight: custom-built apps & websites, clean code, tailored solutions
+   - 3–4 sentences max, professional and direct
+   - Optional: a thin green left-border accent line next to the paragraph
+
+3. SERVICES SECTION
+   - Grid of 3–5 glass-style cards with green icon accents:
+     • Web Design & Development
+     • Web App Development
+     • UI/UX Design
+     • Landing Pages & Portfolio Sites
+     • Ongoing Maintenance & Support
+   - Each card: green-tinted icon, bold service name, 1-line description
+   - Hover: card lifts + subtle green glow border appears
+
+4. PORTFOLIO / SHOWCASE SECTION (Most Important)
+   - Project cards in a responsive grid
+   - Each card:
+     • Screenshot / preview image (placeholder via placehold.co)
+     • Project name in white
+     • Short description in sage text
+     • Monospace green tags (e.g. [Web App] [React] [Landing Page])
+     • "Live Preview" button (green filled) + optional "Details" button (ghost)
+   - Filter bar at top: All | Web Apps | Websites | Landing Pages
+     (filter buttons in monospace font, active state highlighted in green)
+   - Card hover: lift + green glow + overlay with quick description
+
+5. WHY LX CLOUDS (Trust Section)
+   - 4 differentiators in a horizontal or 2x2 grid:
+     • ✦ Clean, modern code
+     • ✦ Tailored to your brand
+     • ✦ Fast delivery
+     • ✦ Long-term support
+   - Use a small green diamond or custom SVG icon instead of emoji
+   - Subtle green gradient line separating this section
+
+6. CONTACT SECTION
+   - Elegant dark form: Name, Email, Message, Send button
+   - Input fields: dark background, green bottom-border on focus
+   - Send button: full green fill with glow on hover
+   - Headline: "Let's Build Something Together"
+   - Subtext: contact@lxclouds.com
+
+7. FOOTER
+   - Logo with gradient green text + tagline in sage
+   - Navigation links
+   - Thin green divider line at top
+   - © 2025 LX CLOUDS. All rights reserved.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TECHNICAL REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Framework: React (with Vite) or plain HTML/CSS/JS
+- Fully responsive: mobile, tablet, desktop
+- Sticky navbar that becomes more opaque with a dark green glass blur on scroll
+- Scroll-triggered entrance animations (fade-in + slide-up)
+  using Intersection Observer or Framer Motion / AOS
+- No Bootstrap — use custom CSS or Tailwind for a refined result
+- Google Fonts: Cormorant Garamond + DM Sans + JetBrains Mono
+- Placeholder images via https://placehold.co
+- Clean, well-commented code
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DESIGN DO's AND DON'Ts
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Deep dark backgrounds — almost black with a green tint
+✅ Consistent use of the exact green palette defined above
+✅ Glassmorphism cards with green-tinted borders
+✅ Subtle glows and particle animations tied to the "clouds" theme
+✅ Generous breathing room and whitespace between sections
+✅ Monospace font for tags and small technical labels
+❌ No bright white backgrounds anywhere
+❌ No blue, purple, or mixed accent colors
+❌ No neon-heavy or gaming aesthetics — this must stay elegant
+❌ No overcrowded layouts or cheap-looking gradients
+❌ No clipart, emoji, or generic icons
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL GOAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A potential client should land on this site and immediately feel:
+"This is a serious, premium studio. I trust them to build my project."
+The green palette should feel luxurious and distinctive — not "nature" or 
+"eco", but sophisticated, sharp, and tech-forward. Think: exclusive fintech 
+meets boutique creative studio.

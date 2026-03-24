@@ -1,0 +1,16 @@
+packages:
+  "framer-motion": "For premium scroll animations and floating hero orbs"
+  "lucide-react": "For icons in services, buttons, and contact forms"
+  "react-hook-form": "For elegant state management of the contact form"
+  "@hookform/resolvers": "For Zod validation integration with react-hook-form"
+  "zod": "For strict schema validation of the contact form"
+  "clsx": "For merging class names conditionally"
+  "tailwind-merge": "For intelligently resolving tailwind class conflicts"
+  "class-variance-authority": "For polished, variant-driven UI components"
+  "@radix-ui/react-slot": "For proper composability of the Button component"
+
+images: []
+
+notes:
+  - This is a purely static portfolio, API data is hardcoded via React Query hooks simulating network responses.
+  - Using smooth scrolling via native HTML/CSS for internal anchor links (#about, #contact).
