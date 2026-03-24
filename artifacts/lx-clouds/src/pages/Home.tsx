@@ -253,16 +253,9 @@ const Navbar = () => {
         : "bg-transparent border-transparent py-6"
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <div className="font-serif font-bold text-2xl tracking-widest" style={{
-          background: scrolled
-            ? "linear-gradient(135deg, #00b8d9, #a78bfa)"
-            : "linear-gradient(135deg, #00e5ff, #a78bfa)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-        }}>
-          LX CLOUDS
-        </div>
+        <a href="#" aria-label="LX CLOUDS home">
+          <img src="/logo.png" alt="LX CLOUDS" className="h-8 w-auto object-contain" />
+        </a>
         <nav className="hidden md:flex gap-8 items-center font-mono text-sm">
           {["About","Services","Work","Pricing"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`}
@@ -925,8 +918,8 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="py-16 border-t border-border bg-background relative z-10 text-center">
-        <div className="font-serif font-bold text-2xl tracking-widest text-transparent bg-clip-text bg-gradient-to-br from-primary to-glow mb-4">
-          LX CLOUDS
+        <div className="mb-4 flex justify-center">
+          <img src="/logo.png" alt="LX CLOUDS" className="h-8 w-auto object-contain" />
         </div>
         <p className="text-muted-foreground font-sans mb-8 tracking-wide">Crafting Digital Experiences That Last</p>
         <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mb-8" />
