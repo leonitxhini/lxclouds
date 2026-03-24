@@ -27,54 +27,115 @@ const NoiseOverlay = () => (
   </div>
 );
 
-const CLOUDS = [
-  { top: "12%",  width: 340, delay: 0,    duration: 60, startX: "-20%" },
-  { top: "28%",  width: 260, delay: 8,    duration: 75, startX: "110%" },
-  { top: "18%",  width: 200, delay: 15,   duration: 55, startX: "-10%" },
-  { top: "55%",  width: 300, delay: 5,    duration: 80, startX: "105%" },
-  { top: "68%",  width: 220, delay: 22,   duration: 65, startX: "-15%" },
-  { top: "42%",  width: 180, delay: 35,   duration: 70, startX: "108%" },
-  { top: "78%",  width: 280, delay: 12,   duration: 58, startX: "-12%" },
-];
-
-function Cloud({ top, width, delay, duration, startX }: {
-  top: string; width: number; delay: number; duration: number; startX: string;
-}) {
-  const h = Math.round(width * 0.42);
-  const fromX = startX.startsWith("-") ? `${startX}` : `${startX}`;
-  const toX   = startX.startsWith("-") ? "115%" : "-25%";
-
+/* Realistic volumetric cloud SVG paths */
+function CloudShape({ width, opacity = 1, tint = "white" }: { width: number; opacity?: number; tint?: string }) {
+  const h = Math.round(width * 0.55);
+  const id = `cg-${width}-${tint.replace('#','')}`;
   return (
-    <motion.div
-      className="absolute pointer-events-none"
-      style={{ top, left: 0, right: 0 }}
-      initial={{ x: fromX }}
-      animate={{ x: toX }}
-      transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
-    >
-      <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx={width * 0.5}  cy={h * 0.72} rx={width * 0.46} ry={h * 0.30} fill="white" fillOpacity="0.92" />
-        <ellipse cx={width * 0.32} cy={h * 0.50} rx={width * 0.22} ry={h * 0.32} fill="white" fillOpacity="0.95" />
-        <ellipse cx={width * 0.52} cy={h * 0.38} rx={width * 0.26} ry={h * 0.36} fill="white" fillOpacity="0.97" />
-        <ellipse cx={width * 0.72} cy={h * 0.52} rx={width * 0.20} ry={h * 0.28} fill="white" fillOpacity="0.93" />
-        <ellipse cx={width * 0.62} cy={h * 0.28} rx={width * 0.16} ry={h * 0.22} fill="white" fillOpacity="0.90" />
-      </svg>
-    </motion.div>
+    <svg width={width} height={h} viewBox={`0 0 200 110`} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity }}>
+      <defs>
+        <radialGradient id={`${id}-a`} cx="50%" cy="30%" r="60%">
+          <stop offset="0%" stopColor="white" stopOpacity="1" />
+          <stop offset="100%" stopColor={tint} stopOpacity="0.6" />
+        </radialGradient>
+        <radialGradient id={`${id}-b`} cx="50%" cy="70%" r="60%">
+          <stop offset="0%" stopColor={tint} stopOpacity="0.45" />
+          <stop offset="100%" stopColor={tint} stopOpacity="0.1" />
+        </radialGradient>
+        <filter id={`${id}-blur`} x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2.5" />
+        </filter>
+      </defs>
+      {/* Shadow / base layer */}
+      <ellipse cx="100" cy="92" rx="82" ry="16" fill={tint} fillOpacity="0.18" filter={`url(#${id}-blur)`} />
+      {/* Main cloud body */}
+      <ellipse cx="100" cy="78" rx="88" ry="28" fill={`url(#${id}-b)`} />
+      <ellipse cx="100" cy="74" rx="82" ry="25" fill="white" fillOpacity="0.88" />
+      {/* Middle puffs */}
+      <ellipse cx="58"  cy="62" rx="36" ry="34" fill="white" fillOpacity="0.92" />
+      <ellipse cx="100" cy="52" rx="44" ry="42" fill={`url(#${id}-a)`} />
+      <ellipse cx="148" cy="65" rx="32" ry="30" fill="white" fillOpacity="0.90" />
+      {/* Top highlight puffs */}
+      <ellipse cx="82"  cy="38" rx="28" ry="26" fill="white" fillOpacity="0.97" />
+      <ellipse cx="118" cy="34" rx="26" ry="24" fill="white" fillOpacity="0.95" />
+      <ellipse cx="100" cy="26" rx="22" ry="20" fill="white" fillOpacity="1"    />
+      {/* Specular highlight */}
+      <ellipse cx="90"  cy="20" rx="12" ry="8"  fill="white" fillOpacity="1"    />
+    </svg>
   );
 }
 
+function SmallCloud({ width, opacity = 1 }: { width: number; opacity?: number }) {
+  const id = `sc-${width}`;
+  return (
+    <svg width={width} height={Math.round(width * 0.45)} viewBox="0 0 140 63" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity }}>
+      <defs>
+        <radialGradient id={`${id}-g`} cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stopColor="white" stopOpacity="1" />
+          <stop offset="100%" stopColor="#b2f5d4" stopOpacity="0.5" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="70" cy="52" rx="60" ry="10" fill="#b2f5d4" fillOpacity="0.2" />
+      <ellipse cx="70" cy="48" rx="62" ry="15" fill="white" fillOpacity="0.82" />
+      <ellipse cx="44" cy="40" rx="26" ry="24" fill="white" fillOpacity="0.90" />
+      <ellipse cx="70" cy="34" rx="32" ry="29" fill={`url(#${id}-g)`} />
+      <ellipse cx="100" cy="42" rx="24" ry="20" fill="white" fillOpacity="0.88" />
+      <ellipse cx="64" cy="22" rx="18" ry="16" fill="white" fillOpacity="0.97" />
+      <ellipse cx="82" cy="18" rx="16" ry="14" fill="white" fillOpacity="1"    />
+      <ellipse cx="74" cy="12" rx="10" ry="8"  fill="white" fillOpacity="1"    />
+    </svg>
+  );
+}
+
+const CLOUD_LAYERS = [
+  // [top, width, delay, duration, goRight, opacity, big]
+  { top: "5%",   width: 520, delay: 0,   dur: 70,  right: true,  opacity: 0.96, big: true  },
+  { top: "8%",   width: 200, delay: 20,  dur: 55,  right: false, opacity: 0.80, big: false },
+  { top: "18%",  width: 420, delay: 10,  dur: 80,  right: false, opacity: 0.92, big: true  },
+  { top: "22%",  width: 160, delay: 38,  dur: 60,  right: true,  opacity: 0.75, big: false },
+  { top: "38%",  width: 480, delay: 5,   dur: 90,  right: true,  opacity: 0.88, big: true  },
+  { top: "44%",  width: 180, delay: 28,  dur: 65,  right: false, opacity: 0.70, big: false },
+  { top: "58%",  width: 380, delay: 15,  dur: 75,  right: false, opacity: 0.85, big: true  },
+  { top: "62%",  width: 140, delay: 45,  dur: 50,  right: true,  opacity: 0.65, big: false },
+  { top: "72%",  width: 460, delay: 8,   dur: 85,  right: true,  opacity: 0.90, big: true  },
+  { top: "80%",  width: 160, delay: 32,  dur: 58,  right: false, opacity: 0.72, big: false },
+];
+
 const CloudsBackground = () => (
-  <div
-    className="absolute inset-0 overflow-hidden pointer-events-none z-0"
-    style={{
-      background: "linear-gradient(160deg, #e8fff3 0%, #a8f0c8 25%, #3dba7e 55%, #1a8a52 80%, #0d6b3e 100%)",
-    }}
-  >
-    {/* Soft radial light burst in sky */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    {/* Sky: white top fading through mint to vivid green */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(255,255,255,0.55) 0%, transparent 70%)",
+      background: "linear-gradient(175deg, #ffffff 0%, #f0fff8 12%, #c8f5e0 28%, #5dd49a 50%, #1fb870 68%, #0d8a48 82%, #075c2e 100%)",
     }} />
-    {CLOUDS.map((c, i) => <Cloud key={i} {...c} />)}
+    {/* Radial sun glow at top-center */}
+    <div className="absolute inset-0" style={{
+      background: "radial-gradient(ellipse 70% 45% at 50% 5%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.3) 40%, transparent 75%)",
+    }} />
+    {/* Atmospheric haze mid-layer */}
+    <div className="absolute inset-0" style={{
+      background: "radial-gradient(ellipse 100% 40% at 50% 55%, rgba(200,255,228,0.35) 0%, transparent 70%)",
+    }} />
+
+    {/* Clouds */}
+    {CLOUD_LAYERS.map((c, i) => {
+      const fromX = c.right ? "-30%" : "110%";
+      const toX   = c.right ? "115%" : "-35%";
+      return (
+        <motion.div
+          key={i}
+          className="absolute pointer-events-none"
+          style={{ top: c.top, left: 0 }}
+          initial={{ x: fromX }}
+          animate={{ x: toX }}
+          transition={{ duration: c.dur, delay: c.delay, repeat: Infinity, ease: "linear" }}
+        >
+          {c.big
+            ? <CloudShape width={c.width} opacity={c.opacity} tint="#c8f5e0" />
+            : <SmallCloud width={c.width} opacity={c.opacity} />
+          }
+        </motion.div>
+      );
+    })}
   </div>
 );
 
