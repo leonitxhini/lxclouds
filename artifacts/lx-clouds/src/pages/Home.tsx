@@ -27,18 +27,54 @@ const NoiseOverlay = () => (
   </div>
 );
 
-const FloatingOrbs = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+const CLOUDS = [
+  { top: "12%",  width: 340, delay: 0,    duration: 60, startX: "-20%" },
+  { top: "28%",  width: 260, delay: 8,    duration: 75, startX: "110%" },
+  { top: "18%",  width: 200, delay: 15,   duration: 55, startX: "-10%" },
+  { top: "55%",  width: 300, delay: 5,    duration: 80, startX: "105%" },
+  { top: "68%",  width: 220, delay: 22,   duration: 65, startX: "-15%" },
+  { top: "42%",  width: 180, delay: 35,   duration: 70, startX: "108%" },
+  { top: "78%",  width: 280, delay: 12,   duration: 58, startX: "-12%" },
+];
+
+function Cloud({ top, width, delay, duration, startX }: {
+  top: string; width: number; delay: number; duration: number; startX: string;
+}) {
+  const h = Math.round(width * 0.42);
+  const fromX = startX.startsWith("-") ? `${startX}` : `${startX}`;
+  const toX   = startX.startsWith("-") ? "115%" : "-25%";
+
+  return (
     <motion.div
-      className="absolute top-[10%] left-[20%] w-[40vw] h-[40vw] rounded-full bg-primary/20 blur-[120px]"
-      animate={{ x: [0, 60, 0], y: [0, -30, 0] }}
-      transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-    />
-    <motion.div
-      className="absolute bottom-[10%] right-[10%] w-[35vw] h-[35vw] rounded-full bg-primary/15 blur-[140px]"
-      animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
-      transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-    />
+      className="absolute pointer-events-none"
+      style={{ top, left: 0, right: 0 }}
+      initial={{ x: fromX }}
+      animate={{ x: toX }}
+      transition={{ duration, delay, repeat: Infinity, ease: "linear" }}
+    >
+      <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx={width * 0.5}  cy={h * 0.72} rx={width * 0.46} ry={h * 0.30} fill="white" fillOpacity="0.92" />
+        <ellipse cx={width * 0.32} cy={h * 0.50} rx={width * 0.22} ry={h * 0.32} fill="white" fillOpacity="0.95" />
+        <ellipse cx={width * 0.52} cy={h * 0.38} rx={width * 0.26} ry={h * 0.36} fill="white" fillOpacity="0.97" />
+        <ellipse cx={width * 0.72} cy={h * 0.52} rx={width * 0.20} ry={h * 0.28} fill="white" fillOpacity="0.93" />
+        <ellipse cx={width * 0.62} cy={h * 0.28} rx={width * 0.16} ry={h * 0.22} fill="white" fillOpacity="0.90" />
+      </svg>
+    </motion.div>
+  );
+}
+
+const CloudsBackground = () => (
+  <div
+    className="absolute inset-0 overflow-hidden pointer-events-none z-0"
+    style={{
+      background: "linear-gradient(160deg, #e8fff3 0%, #a8f0c8 25%, #3dba7e 55%, #1a8a52 80%, #0d6b3e 100%)",
+    }}
+  >
+    {/* Soft radial light burst in sky */}
+    <div className="absolute inset-0" style={{
+      background: "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(255,255,255,0.55) 0%, transparent 70%)",
+    }} />
+    {CLOUDS.map((c, i) => <Cloud key={i} {...c} />)}
   </div>
 );
 
@@ -119,25 +155,27 @@ export default function Home() {
 
       <main>
         {/* HERO SECTION */}
-        <section
-          className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden"
-          style={{
-            backgroundImage: "url('/hero-bg.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          {/* Subtle overlay for text readability */}
-          <div className="absolute inset-0 bg-black/25 z-0" />
+        <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+          <CloudsBackground />
           <div className="container relative z-10 mx-auto px-6 flex flex-col items-center text-center">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight max-w-5xl leading-[1.1] text-white"
+              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight max-w-5xl leading-[1.1]"
+              style={{ color: "#0d4f2e", textShadow: "0 1px 2px rgba(255,255,255,0.4)" }}
             >
               We Build Digital Experiences <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 inline-block mt-2">
+              <span
+                className="inline-block mt-2"
+                style={{
+                  background: "linear-gradient(135deg, #ffffff, #d4f7e4)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 2px 8px rgba(0,80,30,0.25))",
+                }}
+              >
                 That Last
               </span>
             </motion.h1>
@@ -146,7 +184,8 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="mt-8 text-lg md:text-xl text-white/75 max-w-2xl font-sans"
+              className="mt-8 text-lg md:text-xl max-w-2xl font-sans font-medium"
+              style={{ color: "#1a5c38" }}
             >
               LX CLOUDS — Web Apps & Websites, Crafted with Precision
             </motion.p>
@@ -172,7 +211,7 @@ export default function Home() {
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/60"
+            className="absolute bottom-12 left-1/2 -translate-x-1/2" style={{ color: "#0d6b3e" }}
           >
             <ChevronDown className="w-8 h-8" />
           </motion.div>
