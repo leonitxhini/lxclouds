@@ -30,29 +30,25 @@ const NoiseOverlay = () => (
 
 const HeroBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    {/* Base — deep navy-indigo */}
+    {/* Base — pure ice white */}
     <div className="absolute inset-0" style={{
-      background: "linear-gradient(140deg, #060417 0%, #0a0625 40%, #0d0830 70%, #080520 100%)",
+      background: "linear-gradient(140deg, #f8fdff 0%, #eef8fd 35%, #e8f4fa 65%, #f2faff 100%)",
     }} />
-    {/* Large cyan glow behind illustration — right side */}
+    {/* Soft sky-cyan glow — right, behind illustration */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 65% 75% at 85% 55%, rgba(0,229,255,0.18) 0%, transparent 65%)",
+      background: "radial-gradient(ellipse 65% 75% at 85% 55%, rgba(0,180,220,0.14) 0%, transparent 65%)",
     }} />
-    {/* Vivid purple glow — center */}
+    {/* Pale lavender glow — center */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 50% 55% at 65% 45%, rgba(139,92,246,0.16) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 50% 55% at 60% 45%, rgba(160,200,255,0.10) 0%, transparent 60%)",
     }} />
-    {/* Cyan glow — upper-left behind text */}
+    {/* Ice-cyan glow — upper-left behind text */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 55% 60% at 10% 28%, rgba(0,200,255,0.12) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 55% 60% at 8% 25%, rgba(0,200,240,0.09) 0%, transparent 60%)",
     }} />
-    {/* Purple top-edge haze */}
+    {/* Faint sky-blue top haze */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(120,60,255,0.09) 0%, transparent 55%)",
-    }} />
-    {/* Deep purple bottom-right accent */}
-    <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 45% 40% at 100% 100%, rgba(168,85,247,0.10) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(100,180,240,0.07) 0%, transparent 55%)",
     }} />
   </div>
 );
@@ -253,7 +249,7 @@ const Navbar = () => {
     <header className={clsx(
       "fixed top-0 inset-x-0 z-40 transition-all duration-300 border-b",
       scrolled
-        ? "bg-background/90 backdrop-blur-md border-border/50 py-4 shadow-lg shadow-black/10"
+        ? "bg-white/90 backdrop-blur-md border-border/50 py-4 shadow-md shadow-sky-100/70"
         : "bg-transparent border-transparent py-6"
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
@@ -271,19 +267,14 @@ const Navbar = () => {
           {["About","Services","Work","Pricing"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`}
               className="transition-colors"
-              style={{ color: scrolled ? "rgba(220,230,255,0.8)" : "rgba(255,255,255,0.75)" }}
+              style={{ color: scrolled ? "rgba(10,18,42,0.80)" : "rgba(10,18,42,0.72)" }}
             >{l}</a>
           ))}
           <Button asChild size="sm" className="rounded-full px-6"
-            style={scrolled ? {
-              background: "rgba(0,229,255,0.10)",
-              border: "1.5px solid rgba(0,229,255,0.45)",
-              color: "#00e5ff",
-            } : {
-              background: "rgba(0,229,255,0.10)",
-              border: "1.5px solid rgba(0,229,255,0.45)",
-              color: "#00e5ff",
-              backdropFilter: "blur(8px)",
+            style={{
+              background: "rgba(0,163,204,0.12)",
+              border: "1.5px solid rgba(0,163,204,0.45)",
+              color: "#007aa3",
             }}>
             <a href="#contact">Let's Talk</a>
           </Button>
@@ -467,7 +458,7 @@ export default function Home() {
                 Boutique Web Studio
               </div>
 
-              <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-6xl lg:text-7xl text-white">
+              <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-6xl lg:text-7xl text-foreground">
                 We Build<br/>
                 <span style={{
                   background: "linear-gradient(115deg, #00e5ff 0%, #38bdf8 35%, #a78bfa 70%, #c4b5fd 100%)",
@@ -480,7 +471,7 @@ export default function Home() {
               </h1>
 
               <p className="mt-6 text-base md:text-lg max-w-md font-sans leading-relaxed"
-                style={{ color: "rgba(255,255,255,0.62)" }}>
+                style={{ color: "rgba(10,18,42,0.62)" }}>
                 LX CLOUDS crafts websites, web apps, mobile apps, and custom booking systems — designed with precision, built for growth, delivered with care.
               </p>
 
@@ -488,22 +479,22 @@ export default function Home() {
               <div className="mt-8 flex gap-8">
                 {[["50+","Projects Delivered"],["100%","Client Satisfaction"],["5★","Average Rating"]].map(([n,l]) => (
                   <div key={l}>
-                    <div className="text-2xl font-serif font-bold" style={{ color: "#00e5ff" }}>{n}</div>
-                    <div className="text-xs font-mono mt-0.5" style={{ color: "rgba(200,210,255,0.55)" }}>{l}</div>
+                    <div className="text-2xl font-serif font-bold" style={{ color: "#0099bb" }}>{n}</div>
+                    <div className="text-xs font-mono mt-0.5" style={{ color: "rgba(10,18,42,0.48)" }}>{l}</div>
                   </div>
                 ))}
               </div>
 
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg" className="group text-base font-sans px-8"
-                  style={{ background: "linear-gradient(135deg, #7c3aed, #00e5ff)", border: "none", color: "#ffffff", fontWeight: 700, boxShadow: "0 0 36px rgba(0,229,255,0.30)" }}>
+                  style={{ background: "linear-gradient(135deg, #0099cc, #00c9e8)", border: "none", color: "#ffffff", fontWeight: 700, boxShadow: "0 4px 24px rgba(0,163,204,0.30)" }}>
                   <a href="#work">
                     View Our Work
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"/>
                   </a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="text-base font-sans px-8"
-                  style={{ background: "rgba(168,85,247,0.07)", border: "1.5px solid rgba(168,85,247,0.40)", color: "rgba(255,255,255,0.88)", backdropFilter: "blur(8px)" }}>
+                  style={{ background: "rgba(0,163,204,0.07)", border: "1.5px solid rgba(0,163,204,0.40)", color: "#006688", backdropFilter: "blur(8px)" }}>
                   <a href="#contact">Get in Touch</a>
                 </Button>
               </div>
@@ -534,7 +525,7 @@ export default function Home() {
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            style={{ color: "rgba(0,229,255,0.65)" }}
+            style={{ color: "rgba(0,163,204,0.65)" }}
           >
             <ChevronDown className="w-7 h-7"/>
           </motion.div>
@@ -756,20 +747,20 @@ export default function Home() {
                   transition={{ delay: i * 0.1, duration: 0.45 }}
                   className="relative rounded-2xl flex flex-col overflow-hidden"
                   style={plan.highlight ? {
-                    background: "linear-gradient(160deg, #0e0630 0%, #130850 100%)",
-                    border: "1.5px solid rgba(0,229,255,0.50)",
-                    boxShadow: "0 0 40px rgba(0,229,255,0.12), 0 8px 32px rgba(0,0,0,0.50)",
+                    background: "linear-gradient(160deg, #daf3fb 0%, #c8edf7 100%)",
+                    border: "1.5px solid rgba(0,163,204,0.45)",
+                    boxShadow: "0 0 35px rgba(0,180,220,0.15), 0 8px 28px rgba(0,140,190,0.10)",
                   } : {
-                    background: "var(--color-background-secondary)",
+                    background: "var(--color-surface)",
                     border: "1.5px solid var(--color-border)",
                   }}
                 >
                   {/* Popular badge */}
                   {plan.highlight && (
                     <div className="flex items-center justify-center gap-1.5 py-2"
-                      style={{ background: "rgba(0,229,255,0.10)", borderBottom: "1px solid rgba(0,229,255,0.22)" }}>
-                      <Zap className="w-3.5 h-3.5" style={{ color: "#00e5ff" }} />
-                      <span className="font-mono text-xs tracking-widest uppercase font-semibold" style={{ color: "#00e5ff" }}>
+                      style={{ background: "rgba(0,163,204,0.12)", borderBottom: "1px solid rgba(0,163,204,0.25)" }}>
+                      <Zap className="w-3.5 h-3.5" style={{ color: "#0088aa" }} />
+                      <span className="font-mono text-xs tracking-widest uppercase font-semibold" style={{ color: "#0088aa" }}>
                         Most Popular
                       </span>
                     </div>
@@ -779,11 +770,11 @@ export default function Home() {
                     {/* Header */}
                     <div>
                       <h3 className="text-xl font-serif font-bold"
-                        style={{ color: plan.highlight ? "#ffffff" : "var(--color-foreground)" }}>
+                        style={{ color: plan.highlight ? "var(--color-foreground)" : "var(--color-foreground)" }}>
                         {plan.name}
                       </h3>
                       <p className="mt-1 text-sm leading-snug"
-                        style={{ color: plan.highlight ? "rgba(160,210,255,0.70)" : "var(--color-muted-foreground)" }}>
+                        style={{ color: plan.highlight ? "rgba(10,18,42,0.60)" : "var(--color-muted-foreground)" }}>
                         {plan.tagline}
                       </p>
                     </div>
@@ -791,11 +782,11 @@ export default function Home() {
                     {/* Price */}
                     <div>
                       <div className="text-3xl font-serif font-bold"
-                        style={{ color: plan.highlight ? "#00e5ff" : "var(--color-foreground)" }}>
+                        style={{ color: plan.highlight ? "#007099" : "var(--color-foreground)" }}>
                         {plan.price}
                       </div>
                       <div className="font-mono text-xs mt-1 uppercase tracking-wider"
-                        style={{ color: plan.highlight ? "rgba(160,220,255,0.60)" : "var(--color-muted-foreground)" }}>
+                        style={{ color: plan.highlight ? "rgba(10,18,42,0.55)" : "var(--color-muted-foreground)" }}>
                         {plan.period}
                       </div>
                     </div>
@@ -804,9 +795,9 @@ export default function Home() {
                     <ul className="space-y-3 flex-1">
                       {plan.features.map(f => (
                         <li key={f} className="flex items-start gap-3 text-sm"
-                          style={{ color: plan.highlight ? "rgba(210,240,255,0.90)" : "var(--color-foreground)" }}>
+                          style={{ color: plan.highlight ? "rgba(10,18,42,0.85)" : "var(--color-foreground)" }}>
                           <Check className="w-4 h-4 mt-0.5 flex-shrink-0"
-                            style={{ color: plan.highlight ? "#00e5ff" : "var(--color-primary)" }} />
+                            style={{ color: plan.highlight ? "#008aaa" : "var(--color-primary)" }} />
                           {f}
                         </li>
                       ))}
@@ -884,7 +875,7 @@ export default function Home() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-16"
                 >
-                  <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,196,106,0.2)]">
+                  <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,163,204,0.2)]">
                     <Check className="w-10 h-10" />
                   </div>
                   <h3 className="text-3xl font-serif font-bold text-foreground">Message Sent</h3>

@@ -39,28 +39,28 @@
 }
 
 :root {
-  /* LX CLOUDS Ice Style — deep navy-indigo dark theme */
-  --background: 248 55% 5%;           /* #060417 deep dark navy */
-  --background-secondary: 248 50% 8%; /* #0a0724 slightly lighter for sections */
-  --surface: 252 45% 11%;             /* #0f0c2e surface for cards */
+  /* LX CLOUDS Ice Style — pure white/frosted light theme */
+  --background: 200 60% 98%;           /* #f3fafd near-white ice */
+  --background-secondary: 202 55% 95%; /* #e7f4fb soft ice blue */
+  --surface: 0 0% 100%;                /* pure white for cards */
 
-  --primary: 188 100% 50%;            /* #00e5ff bright cyan */
-  --primary-hover: 191 95% 62%;       /* #30edff lighter cyan hover */
-  --glow: 188 100% 65%;               /* #52eeff glow */
+  --primary: 198 100% 40%;             /* #00a3cc vivid sky-cyan */
+  --primary-hover: 198 95% 50%;        /* #0bc5f0 lighter hover */
+  --glow: 200 100% 62%;                /* #3dd5ff soft glow */
 
-  --foreground: 220 60% 96%;          /* #f0f3ff near-white with cool tint */
-  --muted: 248 40% 12%;
-  --muted-foreground: 220 20% 58%;    /* #7a8cb5 blue-grey secondary text */
-  --border: 258 40% 20%;              /* #221844 purple-tinted border */
+  --foreground: 220 65% 10%;           /* #0a1226 dark navy text */
+  --muted: 202 45% 94%;
+  --muted-foreground: 215 30% 42%;     /* #566888 blue-grey secondary */
+  --border: 200 50% 86%;               /* #bce0ee light ice border */
 
   /* Standard Shadcn Mappings */
   --card: var(--surface);
   --card-foreground: var(--foreground);
-  --popover: 248 55% 7%;
+  --popover: 0 0% 100%;
   --popover-foreground: var(--foreground);
   --secondary: var(--background-secondary);
   --secondary-foreground: var(--foreground);
-  --accent: 272 80% 60%;              /* #a855f7 vivid purple accent */
+  --accent: 198 100% 40%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 70% 55%;
   --destructive-foreground: 0 0% 100%;
@@ -89,6 +89,6 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-surface/60 border border-border backdrop-blur-xl shadow-lg shadow-black/40;
+    @apply bg-white/80 border border-border/60 backdrop-blur-xl shadow-md shadow-sky-100/60;
   }
 }
