@@ -853,7 +853,7 @@ export default function Home() {
                 Let's Build Something <br className="hidden md:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-glow">Together</span>
               </h2>
-              <p className="mt-6 text-muted-foreground font-mono text-lg">contact@lxclouds.com</p>
+              <p className="mt-6 text-muted-foreground font-mono text-lg">info@lxclouds.com</p>
             </motion.div>
 
             <motion.div
