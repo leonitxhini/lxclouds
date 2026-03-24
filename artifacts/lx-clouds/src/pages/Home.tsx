@@ -30,20 +30,29 @@ const NoiseOverlay = () => (
 
 const HeroBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    {/* Base — medium-dark forest green, noticeably lighter than before */}
     <div className="absolute inset-0" style={{
-      background: "linear-gradient(135deg, #04100a 0%, #071a10 40%, #081f14 70%, #040e08 100%)",
+      background: "linear-gradient(140deg, #061c0e 0%, #0b2f17 40%, #0d3a1c 70%, #07200f 100%)",
     }} />
-    {/* Bright green glow — right where the illustration lives */}
+    {/* Large bright glow behind illustration — right side */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 60% 70% at 80% 55%, rgba(0,255,120,0.10) 0%, transparent 70%)",
+      background: "radial-gradient(ellipse 65% 75% at 82% 52%, rgba(0,255,100,0.22) 0%, transparent 65%)",
     }} />
-    {/* Deep green glow — upper-left */}
+    {/* Vibrant lime-green center pulse */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 50% 55% at 15% 35%, rgba(20,180,80,0.09) 0%, transparent 65%)",
+      background: "radial-gradient(ellipse 45% 50% at 68% 45%, rgba(50,255,120,0.14) 0%, transparent 60%)",
     }} />
-    {/* Subtle top haze */}
+    {/* Upper-left hero text glow */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 90% 35% at 50% 0%, rgba(0,200,80,0.06) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 55% 60% at 12% 30%, rgba(0,220,90,0.13) 0%, transparent 60%)",
+    }} />
+    {/* Top edge haze */}
+    <div className="absolute inset-0" style={{
+      background: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(0,210,80,0.10) 0%, transparent 55%)",
+    }} />
+    {/* Bottom-right corner accent */}
+    <div className="absolute inset-0" style={{
+      background: "radial-gradient(ellipse 40% 35% at 100% 100%, rgba(0,200,70,0.09) 0%, transparent 60%)",
     }} />
   </div>
 );
@@ -449,7 +458,7 @@ export default function Home() {
             >
               {/* eyebrow tag */}
               <div className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-mono tracking-widest uppercase"
-                style={{ background: "rgba(0,255,136,0.08)", border: "1px solid rgba(0,255,136,0.35)", color: "#00ff88" }}>
+                style={{ background: "rgba(0,255,136,0.14)", border: "1.5px solid rgba(0,255,136,0.55)", color: "#39ff88" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"/>
                 Boutique Web Studio
               </div>
@@ -457,11 +466,11 @@ export default function Home() {
               <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-6xl lg:text-7xl text-white">
                 We Build<br/>
                 <span style={{
-                  background: "linear-gradient(125deg, #00ff88 0%, #4ade80 50%, #86efac 100%)",
+                  background: "linear-gradient(115deg, #39ff88 0%, #00ff66 35%, #5fffaa 70%, #a0ffcc 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
-                  filter: "drop-shadow(0 0 20px rgba(0,255,136,0.4))",
+                  filter: "drop-shadow(0 0 28px rgba(0,255,120,0.6))",
                 }}>Digital Experiences</span><br/>
                 That Last.
               </h1>
@@ -506,9 +515,13 @@ export default function Home() {
               <motion.div
                 animate={{ y: [0, -14, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="w-full"
+                className="w-full flex items-center justify-center"
               >
-                <TechIllustration />
+                <img
+                  src="/hero-illustration.png"
+                  alt="LX CLOUDS — cloud, LX letters and laptop isometric illustration"
+                  className="w-full max-w-[560px] object-contain drop-shadow-[0_0_60px_rgba(0,255,100,0.35)]"
+                />
               </motion.div>
             </motion.div>
           </div>
@@ -517,7 +530,7 @@ export default function Home() {
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            style={{ color: "rgba(0,229,255,0.6)" }}
+            style={{ color: "rgba(0,255,120,0.7)" }}
           >
             <ChevronDown className="w-7 h-7"/>
           </motion.div>
