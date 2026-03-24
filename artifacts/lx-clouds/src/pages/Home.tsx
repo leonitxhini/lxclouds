@@ -27,117 +27,21 @@ const NoiseOverlay = () => (
   </div>
 );
 
-/* Realistic volumetric cloud SVG paths */
-function CloudShape({ width, opacity = 1, tint = "white" }: { width: number; opacity?: number; tint?: string }) {
-  const h = Math.round(width * 0.55);
-  const id = `cg-${width}-${tint.replace('#','')}`;
-  return (
-    <svg width={width} height={h} viewBox={`0 0 200 110`} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity }}>
-      <defs>
-        <radialGradient id={`${id}-a`} cx="50%" cy="30%" r="60%">
-          <stop offset="0%" stopColor="white" stopOpacity="1" />
-          <stop offset="100%" stopColor={tint} stopOpacity="0.6" />
-        </radialGradient>
-        <radialGradient id={`${id}-b`} cx="50%" cy="70%" r="60%">
-          <stop offset="0%" stopColor={tint} stopOpacity="0.45" />
-          <stop offset="100%" stopColor={tint} stopOpacity="0.1" />
-        </radialGradient>
-        <filter id={`${id}-blur`} x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="2.5" />
-        </filter>
-      </defs>
-      {/* Shadow / base layer */}
-      <ellipse cx="100" cy="92" rx="82" ry="16" fill={tint} fillOpacity="0.18" filter={`url(#${id}-blur)`} />
-      {/* Main cloud body */}
-      <ellipse cx="100" cy="78" rx="88" ry="28" fill={`url(#${id}-b)`} />
-      <ellipse cx="100" cy="74" rx="82" ry="25" fill="white" fillOpacity="0.88" />
-      {/* Middle puffs */}
-      <ellipse cx="58"  cy="62" rx="36" ry="34" fill="white" fillOpacity="0.92" />
-      <ellipse cx="100" cy="52" rx="44" ry="42" fill={`url(#${id}-a)`} />
-      <ellipse cx="148" cy="65" rx="32" ry="30" fill="white" fillOpacity="0.90" />
-      {/* Top highlight puffs */}
-      <ellipse cx="82"  cy="38" rx="28" ry="26" fill="white" fillOpacity="0.97" />
-      <ellipse cx="118" cy="34" rx="26" ry="24" fill="white" fillOpacity="0.95" />
-      <ellipse cx="100" cy="26" rx="22" ry="20" fill="white" fillOpacity="1"    />
-      {/* Specular highlight */}
-      <ellipse cx="90"  cy="20" rx="12" ry="8"  fill="white" fillOpacity="1"    />
-    </svg>
-  );
-}
-
-function SmallCloud({ width, opacity = 1 }: { width: number; opacity?: number }) {
-  const id = `sc-${width}`;
-  return (
-    <svg width={width} height={Math.round(width * 0.45)} viewBox="0 0 140 63" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity }}>
-      <defs>
-        <radialGradient id={`${id}-g`} cx="50%" cy="40%" r="55%">
-          <stop offset="0%" stopColor="white" stopOpacity="1" />
-          <stop offset="100%" stopColor="#b2f5d4" stopOpacity="0.5" />
-        </radialGradient>
-      </defs>
-      <ellipse cx="70" cy="52" rx="60" ry="10" fill="#b2f5d4" fillOpacity="0.2" />
-      <ellipse cx="70" cy="48" rx="62" ry="15" fill="white" fillOpacity="0.82" />
-      <ellipse cx="44" cy="40" rx="26" ry="24" fill="white" fillOpacity="0.90" />
-      <ellipse cx="70" cy="34" rx="32" ry="29" fill={`url(#${id}-g)`} />
-      <ellipse cx="100" cy="42" rx="24" ry="20" fill="white" fillOpacity="0.88" />
-      <ellipse cx="64" cy="22" rx="18" ry="16" fill="white" fillOpacity="0.97" />
-      <ellipse cx="82" cy="18" rx="16" ry="14" fill="white" fillOpacity="1"    />
-      <ellipse cx="74" cy="12" rx="10" ry="8"  fill="white" fillOpacity="1"    />
-    </svg>
-  );
-}
-
-const CLOUD_LAYERS = [
-  // [top, width, delay, duration, goRight, opacity, big]
-  { top: "5%",   width: 520, delay: 0,   dur: 70,  right: true,  opacity: 0.96, big: true  },
-  { top: "8%",   width: 200, delay: 20,  dur: 55,  right: false, opacity: 0.80, big: false },
-  { top: "18%",  width: 420, delay: 10,  dur: 80,  right: false, opacity: 0.92, big: true  },
-  { top: "22%",  width: 160, delay: 38,  dur: 60,  right: true,  opacity: 0.75, big: false },
-  { top: "38%",  width: 480, delay: 5,   dur: 90,  right: true,  opacity: 0.88, big: true  },
-  { top: "44%",  width: 180, delay: 28,  dur: 65,  right: false, opacity: 0.70, big: false },
-  { top: "58%",  width: 380, delay: 15,  dur: 75,  right: false, opacity: 0.85, big: true  },
-  { top: "62%",  width: 140, delay: 45,  dur: 50,  right: true,  opacity: 0.65, big: false },
-  { top: "72%",  width: 460, delay: 8,   dur: 85,  right: true,  opacity: 0.90, big: true  },
-  { top: "80%",  width: 160, delay: 32,  dur: 58,  right: false, opacity: 0.72, big: false },
-];
-
-const CloudsBackground = () => (
+const HeroBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    {/* Gradient image as sky */}
     <div className="absolute inset-0" style={{
       backgroundImage: "url('/hero-gradient.png')",
       backgroundSize: "cover",
       backgroundPosition: "center",
     }} />
-    {/* Subtle vignette to deepen edges */}
+    {/* Edge vignette */}
     <div className="absolute inset-0" style={{
       background: "radial-gradient(ellipse 120% 100% at 50% 50%, transparent 55%, rgba(10,60,40,0.38) 100%)",
     }} />
-    {/* Golden sun glow from top-left matching the image */}
+    {/* Golden sun glow top-left */}
     <div className="absolute inset-0" style={{
       background: "radial-gradient(ellipse 55% 50% at 8% 0%, rgba(255,240,180,0.32) 0%, transparent 65%)",
     }} />
-
-    {/* Clouds — warm ivory tint to match the golden sky */}
-    {CLOUD_LAYERS.map((c, i) => {
-      const fromX = c.right ? "-30%" : "110%";
-      const toX   = c.right ? "115%" : "-35%";
-      return (
-        <motion.div
-          key={i}
-          className="absolute pointer-events-none"
-          style={{ top: c.top, left: 0 }}
-          initial={{ x: fromX }}
-          animate={{ x: toX }}
-          transition={{ duration: c.dur, delay: c.delay, repeat: Infinity, ease: "linear" }}
-        >
-          {c.big
-            ? <CloudShape width={c.width} opacity={c.opacity} tint="#d4ede3" />
-            : <SmallCloud width={c.width} opacity={c.opacity} />
-          }
-        </motion.div>
-      );
-    })}
   </div>
 );
 
@@ -219,7 +123,7 @@ export default function Home() {
       <main>
         {/* HERO SECTION */}
         <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-          <CloudsBackground />
+          <HeroBackground />
           <div className="container relative z-10 mx-auto px-6 flex flex-col items-center text-center">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
