@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { clsx } from "clsx";
 import { 
   Monitor, AppWindow, PenTool, LayoutTemplate, Wrench, 
-  ChevronDown, Check, ExternalLink, ArrowRight 
+  ChevronDown, Check, ExternalLink, ArrowRight,
+  Smartphone, CalendarCheck
 } from "lucide-react";
 
 // --- Sub-components (Kept in-file for optimal single-page structure) ---
@@ -280,18 +281,22 @@ const Navbar = () => {
 };
 
 const SERVICES = [
-  { icon: Monitor, title: "Web Design & Development", desc: "Custom websites built from the ground up for performance and aesthetics." },
-  { icon: AppWindow, title: "Web App Development", desc: "Complex, scalable web applications solving real business problems." },
-  { icon: PenTool, title: "UI/UX Design", desc: "Intuitive, engaging, and beautiful user interfaces tailored to your audience." },
-  { icon: LayoutTemplate, title: "Landing Pages & Portfolios", desc: "High-converting marketing pages designed to captivate and convert." },
-  { icon: Wrench, title: "Maintenance & Support", desc: "Keeping your digital presence secure, fast, and running flawlessly." }
+  { icon: Monitor,       title: "Web Design & Development",  desc: "Custom websites built from the ground up for performance and stunning aesthetics." },
+  { icon: AppWindow,     title: "Web App Development",        desc: "Complex, scalable web applications that solve real business problems." },
+  { icon: Smartphone,    title: "Mobile App Development",     desc: "Native-quality iOS & Android apps built with modern cross-platform frameworks." },
+  { icon: CalendarCheck, title: "Booking & Scheduling Apps",  desc: "Purpose-built booking systems, reservation platforms, and appointment apps tailored to your workflow." },
+  { icon: PenTool,       title: "UI/UX Design",               desc: "Intuitive, engaging, and beautiful interfaces tailored to your audience." },
+  { icon: LayoutTemplate,title: "Landing Pages & Portfolios", desc: "High-converting marketing pages designed to captivate and convert." },
+  { icon: Wrench,        title: "Maintenance & Support",      desc: "Keeping your digital presence secure, fast, and running flawlessly." }
 ];
 
 const WHY_US = [
   "Clean Modern Code",
   "Tailored to Your Brand",
+  "Web, Mobile & Booking Apps",
   "Fast Delivery",
-  "Long-term Support"
+  "Long-term Support",
+  "Full-Stack Expertise"
 ];
 
 const contactSchema = z.object({
@@ -359,7 +364,7 @@ export default function Home() {
 
               <p className="mt-6 text-base md:text-lg max-w-md font-sans leading-relaxed"
                 style={{ color: "rgba(255,255,255,0.62)" }}>
-                LX CLOUDS crafts high-performance websites and web apps — designed with precision, built for growth, and delivered with care.
+                LX CLOUDS crafts websites, web apps, mobile apps, and custom booking systems — designed with precision, built for growth, delivered with care.
               </p>
 
               {/* stats row */}
