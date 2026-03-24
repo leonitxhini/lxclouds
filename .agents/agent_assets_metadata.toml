@@ -6,3 +6,9 @@ id = "UISXcO0UMwZj22xIpxgHQ"
 uri = "file://lx-clouds.tar.gz"
 type = "unspecified"
 title = "LX CLOUDS — website source files"
+
+[[outputs]]
+id = "RjRw_KCAmTtwZd09rH0pA"
+uri = "file://artifacts/lx-clouds/public/lx-clouds-website.tar.gz"
+type = "unspecified"
+title = "LX CLOUDS Website Source"
