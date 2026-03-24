@@ -254,7 +254,7 @@ const Navbar = () => {
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
         <a href="#" aria-label="LX CLOUDS home" className="flex items-center gap-2.5">
-          <img src="/logo-icon.png" alt="" className="h-9 w-9 rounded-xl object-cover" />
+          <img src="/logo-icon.png" alt="" className="h-10 w-auto object-contain" />
           <img src="/logo.png" alt="LX CLOUDS" className="h-7 w-auto object-contain" />
         </a>
         <nav className="hidden md:flex gap-8 items-center font-mono text-sm">
@@ -920,7 +920,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="py-16 border-t border-border bg-background relative z-10 text-center">
         <div className="mb-4 flex justify-center items-center gap-2.5">
-          <img src="/logo-icon.png" alt="" className="h-9 w-9 rounded-xl object-cover" />
+          <img src="/logo-icon.png" alt="" className="h-10 w-auto object-contain" />
           <img src="/logo.png" alt="LX CLOUDS" className="h-7 w-auto object-contain" />
         </div>
         <p className="text-muted-foreground font-sans mb-8 tracking-wide">Crafting Digital Experiences That Last</p>
