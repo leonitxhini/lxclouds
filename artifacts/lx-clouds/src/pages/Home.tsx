@@ -392,12 +392,12 @@ const SUBSCRIPTION_PLANS = [
 ];
 
 const WHY_US = [
-  "Clean Modern Code",
+  "Pixel-Perfect Execution",
   "Tailored to Your Brand",
-  "Web, Mobile & Booking Apps",
-  "Fast Delivery",
-  "Long-term Support",
-  "Full-Stack Expertise"
+  "Web, Mobile & Booking Systems",
+  "On-Time Delivery",
+  "Long-Term Partnership",
+  "End-to-End Expertise"
 ];
 
 const contactSchema = z.object({
@@ -536,12 +536,12 @@ export default function Home() {
               className="max-w-4xl mx-auto border-l-4 border-primary pl-8 py-2"
             >
               <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6 text-foreground">
-                A Boutique Web Studio
+                Precision. Design. Impact.
               </h2>
               <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-sans font-light">
-                At LX CLOUDS, we don't just build websites; we engineer digital ecosystems. 
-                With a focus on stunning design, modern architecture, and scalable performance, 
-                we transform your vision into an elegant reality that elevates your brand and engages your users.
+                LX CLOUDS is a boutique digital studio. We build websites, web apps, mobile applications, 
+                and booking systems with a singular obsession — quality. Every line of code, every pixel, 
+                every interaction is crafted to elevate your brand and outperform the competition.
               </p>
             </motion.div>
           </div>
@@ -552,7 +552,7 @@ export default function Home() {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Our Services</h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">Everything you need to establish a dominant digital presence.</p>
+              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto font-light tracking-wide">From pixel-perfect websites to full-scale applications — every discipline, one studio.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -582,7 +582,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
               <div>
                 <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Selected Work</h2>
-                <p className="mt-4 text-muted-foreground max-w-2xl">A showcase of our recent digital crafts.</p>
+                <p className="mt-4 text-muted-foreground max-w-2xl font-light tracking-wide">A curated selection of projects we have built and shipped.</p>
               </div>
               
               <div className="flex flex-wrap gap-3">
@@ -923,7 +923,7 @@ export default function Home() {
           <img src="/logo-icon.png" alt="" className="h-10 w-auto object-contain" />
           <img src="/logo.png" alt="LX CLOUDS" className="h-7 w-auto object-contain" />
         </div>
-        <p className="text-muted-foreground font-sans mb-8 tracking-wide">Crafting Digital Experiences That Last</p>
+        <p className="text-muted-foreground font-sans mb-8 tracking-widest uppercase text-sm font-light">Where Precision Meets Elegance</p>
         <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mb-8" />
         <p className="text-sm text-border font-mono tracking-wider">© {new Date().getFullYear()} LX CLOUDS. ALL RIGHTS RESERVED.</p>
       </footer>
