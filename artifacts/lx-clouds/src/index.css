@@ -39,19 +39,19 @@
 }
 
 :root {
-  /* LX CLOUDS Brand Colors */
-  --background: 120 20% 5%; /* #0A0F0A */
-  --background-secondary: 120 27% 8%; /* #0F1A0F */
-  --surface: 120 26% 9%; /* #111D11 */
+  /* LX CLOUDS Brand Colors — refined, restrained palette */
+  --background: 220 14% 5%;          /* near-black with cool undertone, not green */
+  --background-secondary: 220 12% 8%; /* slightly lighter dark, still neutral */
+  --surface: 220 10% 10%;            /* dark surface for cards, very subtle */
   
-  --primary: 152 100% 38%; /* #00C46A */
-  --primary-hover: 141 73% 42%; /* #1DB954 */
-  --glow: 150 100% 50%; /* #00FF7F */
+  --primary: 152 60% 40%;            /* toned-down sage green — not vivid */
+  --primary-hover: 152 55% 48%;      /* slightly lighter on hover */
+  --glow: 152 50% 55%;               /* very soft mint, used sparingly */
   
-  --foreground: 136 100% 97%; /* #F0FFF4 */
-  --muted: 120 27% 8%; /* #0F1A0F */
-  --muted-foreground: 120 15% 61%; /* #8FA98F */
-  --border: 120 24% 16%; /* #1F331F */
+  --foreground: 210 20% 92%;         /* cool near-white, no green cast */
+  --muted: 220 12% 8%;
+  --muted-foreground: 210 10% 55%;   /* neutral grey, subtle */
+  --border: 220 10% 16%;             /* neutral dark border */
 
   /* Standard Shadcn Mappings */
   --card: var(--surface);
@@ -62,8 +62,8 @@
   --secondary-foreground: var(--foreground);
   --accent: var(--primary-hover);
   --accent-foreground: var(--background);
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 136 100% 97%;
+  --destructive: 0 70% 55%;
+  --destructive-foreground: 210 20% 92%;
   --input: var(--border);
   --ring: var(--primary);
   --radius: 0.75rem;
@@ -89,6 +89,6 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-surface/40 border border-primary/15 backdrop-blur-xl shadow-lg shadow-black/40;
+    @apply bg-surface/60 border border-border/60 backdrop-blur-xl shadow-lg shadow-black/50;
   }
 }

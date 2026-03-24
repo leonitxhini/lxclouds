@@ -30,14 +30,14 @@ const NoiseOverlay = () => (
 const FloatingOrbs = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
     <motion.div
-      className="absolute top-[10%] left-[20%] w-[35vw] h-[35vw] rounded-full bg-primary/20 blur-[140px]"
-      animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
-      transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute top-[15%] left-[25%] w-[30vw] h-[30vw] rounded-full bg-primary/8 blur-[180px]"
+      animate={{ x: [0, 60, 0], y: [0, -30, 0] }}
+      transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
     />
     <motion.div
-      className="absolute bottom-[15%] right-[10%] w-[45vw] h-[45vw] rounded-full bg-glow/15 blur-[160px]"
-      animate={{ x: [0, -80, 0], y: [0, 80, 0] }}
-      transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      className="absolute bottom-[20%] right-[15%] w-[35vw] h-[35vw] rounded-full bg-primary/6 blur-[200px]"
+      animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
+      transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 3 }}
     />
   </div>
 );
