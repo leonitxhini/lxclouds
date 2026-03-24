@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "UISXcO0UMwZj22xIpxgHQ"
+uri = "file://lx-clouds.tar.gz"
+type = "unspecified"
+title = "LX CLOUDS — website source files"
