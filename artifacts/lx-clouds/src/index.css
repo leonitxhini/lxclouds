@@ -39,31 +39,31 @@
 }
 
 :root {
-  /* LX CLOUDS Brand Colors — refined, restrained palette */
-  --background: 220 14% 5%;          /* near-black with cool undertone, not green */
-  --background-secondary: 220 12% 8%; /* slightly lighter dark, still neutral */
-  --surface: 220 10% 10%;            /* dark surface for cards, very subtle */
+  /* LX CLOUDS Brand Colors — light/white theme */
+  --background: 0 0% 100%;           /* pure white */
+  --background-secondary: 150 20% 97%; /* very faint mint-white for alternating sections */
+  --surface: 150 15% 95%;            /* subtle light surface for cards */
   
-  --primary: 152 60% 40%;            /* toned-down sage green — not vivid */
-  --primary-hover: 152 55% 48%;      /* slightly lighter on hover */
-  --glow: 152 50% 55%;               /* very soft mint, used sparingly */
+  --primary: 152 60% 36%;            /* sage green accent */
+  --primary-hover: 152 55% 44%;      /* slightly lighter on hover */
+  --glow: 152 50% 50%;               /* soft mint */
   
-  --foreground: 210 20% 92%;         /* cool near-white, no green cast */
-  --muted: 220 12% 8%;
-  --muted-foreground: 210 10% 55%;   /* neutral grey, subtle */
-  --border: 220 10% 16%;             /* neutral dark border */
+  --foreground: 220 20% 12%;         /* near-black text */
+  --muted: 150 20% 97%;
+  --muted-foreground: 220 10% 45%;   /* medium grey for secondary text */
+  --border: 150 15% 88%;             /* soft light border */
 
   /* Standard Shadcn Mappings */
   --card: var(--surface);
   --card-foreground: var(--foreground);
-  --popover: var(--surface);
+  --popover: 0 0% 100%;
   --popover-foreground: var(--foreground);
   --secondary: var(--background-secondary);
   --secondary-foreground: var(--foreground);
   --accent: var(--primary-hover);
-  --accent-foreground: var(--background);
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 70% 55%;
-  --destructive-foreground: 210 20% 92%;
+  --destructive-foreground: 0 0% 100%;
   --input: var(--border);
   --ring: var(--primary);
   --radius: 0.75rem;
@@ -89,6 +89,6 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-surface/60 border border-border/60 backdrop-blur-xl shadow-lg shadow-black/50;
+    @apply bg-white/70 border border-border backdrop-blur-xl shadow-sm shadow-black/5;
   }
 }

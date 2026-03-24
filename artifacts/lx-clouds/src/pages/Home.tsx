@@ -30,12 +30,12 @@ const NoiseOverlay = () => (
 const FloatingOrbs = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
     <motion.div
-      className="absolute top-[15%] left-[25%] w-[30vw] h-[30vw] rounded-full bg-primary/8 blur-[180px]"
+      className="absolute top-[10%] left-[20%] w-[40vw] h-[40vw] rounded-full bg-primary/20 blur-[120px]"
       animate={{ x: [0, 60, 0], y: [0, -30, 0] }}
       transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
     />
     <motion.div
-      className="absolute bottom-[20%] right-[15%] w-[35vw] h-[35vw] rounded-full bg-primary/6 blur-[200px]"
+      className="absolute bottom-[10%] right-[10%] w-[35vw] h-[35vw] rounded-full bg-primary/15 blur-[140px]"
       animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
       transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 3 }}
     />
@@ -273,7 +273,7 @@ export default function Home() {
                           alt={project.title} 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                         />
-                        <div className="absolute inset-0 bg-surface/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
+                        <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
                           <Button className="scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-100">
                             Live Preview <ExternalLink className="w-4 h-4 ml-2" />
                           </Button>
