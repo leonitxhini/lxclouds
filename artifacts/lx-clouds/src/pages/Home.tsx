@@ -445,13 +445,6 @@ export default function Home() {
               transition={{ duration: 0.9, ease: "easeOut" }}
               className="flex flex-col items-start"
             >
-              {/* eyebrow tag */}
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-mono tracking-widest uppercase"
-                style={{ background: "rgba(0,229,255,0.10)", border: "1.5px solid rgba(0,229,255,0.50)", color: "#00e5ff" }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"/>
-                Boutique Web Studio
-              </div>
-
               <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-6xl lg:text-7xl text-foreground">
                 We Build<br/>
                 <span style={{
