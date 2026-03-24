@@ -526,7 +526,7 @@ export default function Home() {
         </section>
 
         {/* ABOUT SECTION */}
-        <section id="about" className="py-24 relative z-10">
+        <section id="about" className="py-24 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.04) 30%, rgba(0,163,204,0.06) 60%, transparent 100%)" }}>
           <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -548,7 +548,7 @@ export default function Home() {
         </section>
 
         {/* SERVICES SECTION */}
-        <section id="services" className="py-24 bg-background-secondary relative z-10 border-y border-border">
+        <section id="services" className="py-24 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(186,230,253,0.18) 20%, rgba(186,230,253,0.28) 50%, rgba(186,230,253,0.18) 80%, transparent 100%)" }}>
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Our Services</h2>
@@ -577,7 +577,7 @@ export default function Home() {
         </section>
 
         {/* PORTFOLIO SECTION */}
-        <section id="work" className="py-32 relative z-10">
+        <section id="work" className="py-32 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.03) 25%, rgba(0,163,204,0.03) 75%, transparent 100%)" }}>
           <div className="container mx-auto px-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
               <div>
@@ -659,8 +659,7 @@ export default function Home() {
         </section>
 
         {/* WHY US SECTION */}
-        <section id="why" className="py-24 relative z-10 border-t border-border">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+        <section id="why" className="py-24 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(124,58,237,0.04) 25%, rgba(124,58,237,0.07) 55%, rgba(0,163,204,0.05) 80%, transparent 100%)" }}>
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Why LX CLOUDS?</h2>
@@ -689,8 +688,7 @@ export default function Home() {
         </section>
 
         {/* PRICING SECTION */}
-        <section id="pricing" className="py-28 relative z-10 border-t border-border">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+        <section id="pricing" className="py-28 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(186,230,253,0.15) 20%, rgba(186,230,253,0.22) 55%, rgba(186,230,253,0.12) 80%, transparent 100%)" }}>
           <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -841,7 +839,7 @@ export default function Home() {
         </section>
 
         {/* CONTACT SECTION */}
-        <section id="contact" className="py-32 relative z-10 bg-background-secondary/50">
+        <section id="contact" className="py-32 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(124,58,237,0.04) 15%, rgba(0,163,204,0.07) 50%, rgba(0,163,204,0.05) 85%, transparent 100%)" }}>
           <div className="container mx-auto px-6 max-w-4xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -918,7 +916,7 @@ export default function Home() {
       </main>
 
       {/* FOOTER */}
-      <footer className="py-16 border-t border-border bg-background relative z-10 text-center">
+      <footer className="py-16 relative z-10 text-center" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.05) 30%, rgba(0,163,204,0.07) 60%, rgba(0,163,204,0.04) 100%)" }}>
         <div className="mb-4 flex justify-center items-center gap-2.5">
           <img src="/logo-icon.png" alt="" className="h-10 w-auto object-contain" />
           <img src="/logo.png" alt="LX CLOUDS" className="h-7 w-auto object-contain" />
