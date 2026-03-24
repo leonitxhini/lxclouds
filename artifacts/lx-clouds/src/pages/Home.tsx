@@ -592,7 +592,7 @@ export default function Home() {
               </div>
               
               <div className="flex flex-wrap gap-3">
-                {["All", "Web Apps", "Websites", "Landing Pages"].map(cat => (
+                {["All", "Web Apps", "Websites"].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setFilter(cat)}
@@ -632,15 +632,17 @@ export default function Home() {
                         <img 
                           src={project.imageUrl} 
                           alt={project.title} 
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          onError={(e) => {
+                            e.currentTarget.src = `https://placehold.co/600x400/daf3fb/007099?text=${encodeURIComponent(project.title)}&font=playfair-display`;
+                          }}
                         />
-                        <div className="absolute inset-0 bg-indigo-950/85 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
-                          <Button className="scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-100">
-                            Live Preview <ExternalLink className="w-4 h-4 ml-2" />
-                          </Button>
-                          <Button variant="outline" className="bg-background/80 border-transparent hover:bg-background scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-150">
-                            View Details
-                          </Button>
+                        <div className="absolute inset-0 bg-sky-950/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
+                          <a href={project.url} target="_blank" rel="noopener noreferrer"
+                            className="scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-100 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-sm font-semibold"
+                            style={{ background: "linear-gradient(135deg, #0099cc, #00c9e8)", color: "#fff", boxShadow: "0 4px 18px rgba(0,163,204,0.35)" }}>
+                            Visit Live Site <ExternalLink className="w-4 h-4" />
+                          </a>
                         </div>
                       </div>
                       <div className="p-6">
