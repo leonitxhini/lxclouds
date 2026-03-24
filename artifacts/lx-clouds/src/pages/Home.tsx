@@ -30,29 +30,29 @@ const NoiseOverlay = () => (
 
 const HeroBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    {/* Base — medium-dark forest green, noticeably lighter than before */}
+    {/* Base — deep navy-indigo */}
     <div className="absolute inset-0" style={{
-      background: "linear-gradient(140deg, #061c0e 0%, #0b2f17 40%, #0d3a1c 70%, #07200f 100%)",
+      background: "linear-gradient(140deg, #060417 0%, #0a0625 40%, #0d0830 70%, #080520 100%)",
     }} />
-    {/* Large bright glow behind illustration — right side */}
+    {/* Large cyan glow behind illustration — right side */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 65% 75% at 82% 52%, rgba(0,255,100,0.22) 0%, transparent 65%)",
+      background: "radial-gradient(ellipse 65% 75% at 85% 55%, rgba(0,229,255,0.18) 0%, transparent 65%)",
     }} />
-    {/* Vibrant lime-green center pulse */}
+    {/* Vivid purple glow — center */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 45% 50% at 68% 45%, rgba(50,255,120,0.14) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 50% 55% at 65% 45%, rgba(139,92,246,0.16) 0%, transparent 60%)",
     }} />
-    {/* Upper-left hero text glow */}
+    {/* Cyan glow — upper-left behind text */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 55% 60% at 12% 30%, rgba(0,220,90,0.13) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 55% 60% at 10% 28%, rgba(0,200,255,0.12) 0%, transparent 60%)",
     }} />
-    {/* Top edge haze */}
+    {/* Purple top-edge haze */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(0,210,80,0.10) 0%, transparent 55%)",
+      background: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(120,60,255,0.09) 0%, transparent 55%)",
     }} />
-    {/* Bottom-right corner accent */}
+    {/* Deep purple bottom-right accent */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 40% 35% at 100% 100%, rgba(0,200,70,0.09) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 45% 40% at 100% 100%, rgba(168,85,247,0.10) 0%, transparent 60%)",
     }} />
   </div>
 );
@@ -259,8 +259,8 @@ const Navbar = () => {
       <div className="container mx-auto px-6 flex items-center justify-between">
         <div className="font-serif font-bold text-2xl tracking-widest" style={{
           background: scrolled
-            ? "linear-gradient(135deg, #0d8a48, #4ade80)"
-            : "linear-gradient(135deg, #00ff88, #22c55e)",
+            ? "linear-gradient(135deg, #00b8d9, #a78bfa)"
+            : "linear-gradient(135deg, #00e5ff, #a78bfa)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",
@@ -271,14 +271,18 @@ const Navbar = () => {
           {["About","Services","Work","Pricing"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`}
               className="transition-colors"
-              style={{ color: scrolled ? undefined : "rgba(255,255,255,0.75)" }}
+              style={{ color: scrolled ? "rgba(220,230,255,0.8)" : "rgba(255,255,255,0.75)" }}
             >{l}</a>
           ))}
           <Button asChild size="sm" className="rounded-full px-6"
-            style={scrolled ? {} : {
-              background: "rgba(0,255,136,0.10)",
-              border: "1.5px solid rgba(0,255,136,0.45)",
-              color: "#00ff88",
+            style={scrolled ? {
+              background: "rgba(0,229,255,0.10)",
+              border: "1.5px solid rgba(0,229,255,0.45)",
+              color: "#00e5ff",
+            } : {
+              background: "rgba(0,229,255,0.10)",
+              border: "1.5px solid rgba(0,229,255,0.45)",
+              color: "#00e5ff",
               backdropFilter: "blur(8px)",
             }}>
             <a href="#contact">Let's Talk</a>
@@ -458,7 +462,7 @@ export default function Home() {
             >
               {/* eyebrow tag */}
               <div className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-mono tracking-widest uppercase"
-                style={{ background: "rgba(0,255,136,0.14)", border: "1.5px solid rgba(0,255,136,0.55)", color: "#39ff88" }}>
+                style={{ background: "rgba(0,229,255,0.10)", border: "1.5px solid rgba(0,229,255,0.50)", color: "#00e5ff" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"/>
                 Boutique Web Studio
               </div>
@@ -466,11 +470,11 @@ export default function Home() {
               <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-6xl lg:text-7xl text-white">
                 We Build<br/>
                 <span style={{
-                  background: "linear-gradient(115deg, #39ff88 0%, #00ff66 35%, #5fffaa 70%, #a0ffcc 100%)",
+                  background: "linear-gradient(115deg, #00e5ff 0%, #38bdf8 35%, #a78bfa 70%, #c4b5fd 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
-                  filter: "drop-shadow(0 0 28px rgba(0,255,120,0.6))",
+                  filter: "drop-shadow(0 0 30px rgba(0,229,255,0.55))",
                 }}>Digital Experiences</span><br/>
                 That Last.
               </h1>
@@ -484,22 +488,22 @@ export default function Home() {
               <div className="mt-8 flex gap-8">
                 {[["50+","Projects Delivered"],["100%","Client Satisfaction"],["5★","Average Rating"]].map(([n,l]) => (
                   <div key={l}>
-                    <div className="text-2xl font-serif font-bold" style={{ color: "#00ff88" }}>{n}</div>
-                    <div className="text-xs font-mono mt-0.5" style={{ color: "rgba(255,255,255,0.42)" }}>{l}</div>
+                    <div className="text-2xl font-serif font-bold" style={{ color: "#00e5ff" }}>{n}</div>
+                    <div className="text-xs font-mono mt-0.5" style={{ color: "rgba(200,210,255,0.55)" }}>{l}</div>
                   </div>
                 ))}
               </div>
 
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg" className="group text-base font-sans px-8"
-                  style={{ background: "linear-gradient(135deg, #00c853, #00ff88)", border: "none", color: "#031a0a", fontWeight: 700, boxShadow: "0 0 32px rgba(0,255,136,0.35)" }}>
+                  style={{ background: "linear-gradient(135deg, #7c3aed, #00e5ff)", border: "none", color: "#ffffff", fontWeight: 700, boxShadow: "0 0 36px rgba(0,229,255,0.30)" }}>
                   <a href="#work">
                     View Our Work
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"/>
                   </a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="text-base font-sans px-8"
-                  style={{ background: "rgba(0,255,136,0.05)", border: "1.5px solid rgba(0,255,136,0.28)", color: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)" }}>
+                  style={{ background: "rgba(168,85,247,0.07)", border: "1.5px solid rgba(168,85,247,0.40)", color: "rgba(255,255,255,0.88)", backdropFilter: "blur(8px)" }}>
                   <a href="#contact">Get in Touch</a>
                 </Button>
               </div>
@@ -520,7 +524,7 @@ export default function Home() {
                 <img
                   src="/hero-illustration.png"
                   alt="LX CLOUDS — cloud, LX letters and laptop isometric illustration"
-                  className="w-full max-w-[560px] object-contain drop-shadow-[0_0_60px_rgba(0,255,100,0.35)]"
+                  className="w-full max-w-[560px] object-contain drop-shadow-[0_0_60px_rgba(0,229,255,0.25)]"
                 />
               </motion.div>
             </motion.div>
@@ -530,7 +534,7 @@ export default function Home() {
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            style={{ color: "rgba(0,255,120,0.7)" }}
+            style={{ color: "rgba(0,229,255,0.65)" }}
           >
             <ChevronDown className="w-7 h-7"/>
           </motion.div>
@@ -604,7 +608,7 @@ export default function Home() {
                     className={clsx(
                       "px-4 py-2 rounded-full font-mono text-xs transition-all duration-300 border",
                       filter === cat 
-                        ? "bg-primary text-background border-primary shadow-[0_0_15px_rgba(0,196,106,0.3)]" 
+                        ? "bg-primary/20 text-primary border-primary shadow-[0_0_15px_rgba(0,229,255,0.25)]" 
                         : "bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-primary"
                     )}
                   >
@@ -631,7 +635,7 @@ export default function Home() {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.4 }}
                       key={project.id}
-                      className="group glass-card overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,196,106,0.15)]"
+                      className="group glass-card overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,229,255,0.12)]"
                     >
                       <div className="relative overflow-hidden aspect-[16/10]">
                         <img 
@@ -639,7 +643,7 @@ export default function Home() {
                           alt={project.title} 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                         />
-                        <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
+                        <div className="absolute inset-0 bg-indigo-950/85 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
                           <Button className="scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-100">
                             Live Preview <ExternalLink className="w-4 h-4 ml-2" />
                           </Button>
@@ -685,7 +689,7 @@ export default function Home() {
                   transition={{ delay: i * 0.1, duration: 0.5 }}
                   className="flex items-center gap-4 p-6 glass-card rounded-xl border border-border/50"
                 >
-                  <div className="text-primary flex-shrink-0 drop-shadow-[0_0_8px_rgba(0,196,106,0.6)]">
+                  <div className="text-primary flex-shrink-0 drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                       <path d="M12 2L22 12L12 22L2 12L12 2Z"/>
                     </svg>
@@ -729,9 +733,9 @@ export default function Home() {
                     onClick={() => setPricingTab(tab)}
                     className="px-6 py-2 rounded-full font-mono text-sm font-semibold tracking-wide transition-all duration-200"
                     style={pricingTab === tab ? {
-                      background: "linear-gradient(135deg, #00c853, #00ff88)",
-                      color: "#031a0a",
-                      boxShadow: "0 2px 12px rgba(0,255,136,0.3)",
+                      background: "linear-gradient(135deg, #7c3aed, #00e5ff)",
+                      color: "#ffffff",
+                      boxShadow: "0 2px 12px rgba(0,229,255,0.25)",
                     } : {
                       background: "transparent",
                       color: "var(--color-muted-foreground)",
@@ -752,9 +756,9 @@ export default function Home() {
                   transition={{ delay: i * 0.1, duration: 0.45 }}
                   className="relative rounded-2xl flex flex-col overflow-hidden"
                   style={plan.highlight ? {
-                    background: "linear-gradient(160deg, #0a2a17 0%, #072012 100%)",
-                    border: "1.5px solid rgba(0,255,136,0.45)",
-                    boxShadow: "0 0 40px rgba(0,255,136,0.12), 0 8px 32px rgba(0,0,0,0.35)",
+                    background: "linear-gradient(160deg, #0e0630 0%, #130850 100%)",
+                    border: "1.5px solid rgba(0,229,255,0.50)",
+                    boxShadow: "0 0 40px rgba(0,229,255,0.12), 0 8px 32px rgba(0,0,0,0.50)",
                   } : {
                     background: "var(--color-background-secondary)",
                     border: "1.5px solid var(--color-border)",
@@ -763,9 +767,9 @@ export default function Home() {
                   {/* Popular badge */}
                   {plan.highlight && (
                     <div className="flex items-center justify-center gap-1.5 py-2"
-                      style={{ background: "rgba(0,255,136,0.12)", borderBottom: "1px solid rgba(0,255,136,0.25)" }}>
-                      <Zap className="w-3.5 h-3.5" style={{ color: "#00ff88" }} />
-                      <span className="font-mono text-xs tracking-widest uppercase font-semibold" style={{ color: "#00ff88" }}>
+                      style={{ background: "rgba(0,229,255,0.10)", borderBottom: "1px solid rgba(0,229,255,0.22)" }}>
+                      <Zap className="w-3.5 h-3.5" style={{ color: "#00e5ff" }} />
+                      <span className="font-mono text-xs tracking-widest uppercase font-semibold" style={{ color: "#00e5ff" }}>
                         Most Popular
                       </span>
                     </div>
@@ -779,7 +783,7 @@ export default function Home() {
                         {plan.name}
                       </h3>
                       <p className="mt-1 text-sm leading-snug"
-                        style={{ color: plan.highlight ? "rgba(180,255,220,0.65)" : "var(--color-muted-foreground)" }}>
+                        style={{ color: plan.highlight ? "rgba(160,210,255,0.70)" : "var(--color-muted-foreground)" }}>
                         {plan.tagline}
                       </p>
                     </div>
@@ -787,11 +791,11 @@ export default function Home() {
                     {/* Price */}
                     <div>
                       <div className="text-3xl font-serif font-bold"
-                        style={{ color: plan.highlight ? "#00ff88" : "var(--color-foreground)" }}>
+                        style={{ color: plan.highlight ? "#00e5ff" : "var(--color-foreground)" }}>
                         {plan.price}
                       </div>
                       <div className="font-mono text-xs mt-1 uppercase tracking-wider"
-                        style={{ color: plan.highlight ? "rgba(180,255,220,0.55)" : "var(--color-muted-foreground)" }}>
+                        style={{ color: plan.highlight ? "rgba(160,220,255,0.60)" : "var(--color-muted-foreground)" }}>
                         {plan.period}
                       </div>
                     </div>
@@ -800,9 +804,9 @@ export default function Home() {
                     <ul className="space-y-3 flex-1">
                       {plan.features.map(f => (
                         <li key={f} className="flex items-start gap-3 text-sm"
-                          style={{ color: plan.highlight ? "rgba(220,255,240,0.88)" : "var(--color-foreground)" }}>
+                          style={{ color: plan.highlight ? "rgba(210,240,255,0.90)" : "var(--color-foreground)" }}>
                           <Check className="w-4 h-4 mt-0.5 flex-shrink-0"
-                            style={{ color: plan.highlight ? "#00ff88" : "var(--color-primary)" }} />
+                            style={{ color: plan.highlight ? "#00e5ff" : "var(--color-primary)" }} />
                           {f}
                         </li>
                       ))}
@@ -812,9 +816,9 @@ export default function Home() {
                     <a href="#contact"
                       className="mt-2 block text-center rounded-xl py-3 px-6 font-mono text-sm font-semibold tracking-wide transition-all duration-200"
                       style={plan.highlight ? {
-                        background: "linear-gradient(135deg, #00c853, #00ff88)",
-                        color: "#031a0a",
-                        boxShadow: "0 4px 20px rgba(0,255,136,0.35)",
+                        background: "linear-gradient(135deg, #7c3aed, #00e5ff)",
+                        color: "#ffffff",
+                        boxShadow: "0 4px 20px rgba(0,229,255,0.28)",
                       } : {
                         background: "transparent",
                         border: "1.5px solid var(--color-border)",
@@ -822,8 +826,8 @@ export default function Home() {
                       }}
                       onMouseEnter={e => {
                         if (!plan.highlight) {
-                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(0,255,136,0.5)";
-                          (e.currentTarget as HTMLAnchorElement).style.color = "#00ff88";
+                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(0,229,255,0.5)";
+                          (e.currentTarget as HTMLAnchorElement).style.color = "#00e5ff";
                         }
                       }}
                       onMouseLeave={e => {

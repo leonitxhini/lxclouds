@@ -39,28 +39,28 @@
 }
 
 :root {
-  /* LX CLOUDS Brand Colors — light/white theme */
-  --background: 0 0% 100%;           /* pure white */
-  --background-secondary: 150 20% 97%; /* very faint mint-white for alternating sections */
-  --surface: 150 15% 95%;            /* subtle light surface for cards */
-  
-  --primary: 152 60% 36%;            /* sage green accent */
-  --primary-hover: 152 55% 44%;      /* slightly lighter on hover */
-  --glow: 152 50% 50%;               /* soft mint */
-  
-  --foreground: 220 20% 12%;         /* near-black text */
-  --muted: 150 20% 97%;
-  --muted-foreground: 220 10% 45%;   /* medium grey for secondary text */
-  --border: 150 15% 88%;             /* soft light border */
+  /* LX CLOUDS Ice Style — deep navy-indigo dark theme */
+  --background: 248 55% 5%;           /* #060417 deep dark navy */
+  --background-secondary: 248 50% 8%; /* #0a0724 slightly lighter for sections */
+  --surface: 252 45% 11%;             /* #0f0c2e surface for cards */
+
+  --primary: 188 100% 50%;            /* #00e5ff bright cyan */
+  --primary-hover: 191 95% 62%;       /* #30edff lighter cyan hover */
+  --glow: 188 100% 65%;               /* #52eeff glow */
+
+  --foreground: 220 60% 96%;          /* #f0f3ff near-white with cool tint */
+  --muted: 248 40% 12%;
+  --muted-foreground: 220 20% 58%;    /* #7a8cb5 blue-grey secondary text */
+  --border: 258 40% 20%;              /* #221844 purple-tinted border */
 
   /* Standard Shadcn Mappings */
   --card: var(--surface);
   --card-foreground: var(--foreground);
-  --popover: 0 0% 100%;
+  --popover: 248 55% 7%;
   --popover-foreground: var(--foreground);
   --secondary: var(--background-secondary);
   --secondary-foreground: var(--foreground);
-  --accent: var(--primary-hover);
+  --accent: 272 80% 60%;              /* #a855f7 vivid purple accent */
   --accent-foreground: 0 0% 100%;
   --destructive: 0 70% 55%;
   --destructive-foreground: 0 0% 100%;
@@ -89,6 +89,6 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/70 border border-border backdrop-blur-xl shadow-sm shadow-black/5;
+    @apply bg-surface/60 border border-border backdrop-blur-xl shadow-lg shadow-black/40;
   }
 }
