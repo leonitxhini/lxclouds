@@ -35,7 +35,7 @@ const PROJECTS: Project[] = [
     description: "Professionelle Autovermietungs-Plattform mit einfacher Buchung und übersichtlichem Fahrzeugkatalog.",
     category: "Websites",
     tags: ["Autovermietung", "Booking", "React"],
-    imageUrl: "https://image.thum.io/get/width/600/crop/400/https://rentacarron.com",
+    imageUrl: "/project-rentacarron.png",
     url: "https://rentacarron.com",
   },
 ];
