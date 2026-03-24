@@ -30,19 +30,19 @@ const NoiseOverlay = () => (
 const HeroBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
     <div className="absolute inset-0" style={{
-      background: "linear-gradient(135deg, #05091a 0%, #091428 40%, #081e32 70%, #040e1c 100%)",
+      background: "linear-gradient(135deg, #04100a 0%, #071a10 40%, #081f14 70%, #040e08 100%)",
     }} />
-    {/* Cyan glow — right where the illustration lives */}
+    {/* Bright green glow — right where the illustration lives */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 60% 70% at 80% 55%, rgba(0,200,255,0.10) 0%, transparent 70%)",
+      background: "radial-gradient(ellipse 60% 70% at 80% 55%, rgba(0,255,120,0.10) 0%, transparent 70%)",
     }} />
-    {/* Purple glow — upper-left */}
+    {/* Deep green glow — upper-left */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 50% 55% at 15% 35%, rgba(110,50,220,0.09) 0%, transparent 65%)",
+      background: "radial-gradient(ellipse 50% 55% at 15% 35%, rgba(20,180,80,0.09) 0%, transparent 65%)",
     }} />
     {/* Subtle top haze */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 90% 35% at 50% 0%, rgba(0,160,220,0.06) 0%, transparent 60%)",
+      background: "radial-gradient(ellipse 90% 35% at 50% 0%, rgba(0,200,80,0.06) 0%, transparent 60%)",
     }} />
   </div>
 );
@@ -50,154 +50,184 @@ const HeroBackground = () => (
 const TechIllustration = () => (
   <svg viewBox="0 0 560 440" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full max-h-[520px]">
     <defs>
-      <filter id="gcyan" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="8" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      <filter id="gg" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="9" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
-      <filter id="gpurp" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="10" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      <filter id="gs" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="5"/>
       </filter>
-      <filter id="gsoft" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="4"/>
+      <filter id="gsm" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="2.5"/>
       </filter>
-      <radialGradient id="cloudFill" cx="50%" cy="40%" r="55%">
-        <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.18"/>
-        <stop offset="60%" stopColor="#0044aa" stopOpacity="0.06"/>
-        <stop offset="100%" stopColor="#001144" stopOpacity="0.02"/>
+      {/* Cloud fill — deep green inner glow */}
+      <radialGradient id="cFill" cx="50%" cy="38%" r="58%">
+        <stop offset="0%"   stopColor="#00ff88" stopOpacity="0.22"/>
+        <stop offset="55%"  stopColor="#00aa44" stopOpacity="0.07"/>
+        <stop offset="100%" stopColor="#003318" stopOpacity="0.02"/>
       </radialGradient>
-      <linearGradient id="screenL" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#021830"/>
-        <stop offset="100%" stopColor="#032a50"/>
+      {/* Device surfaces */}
+      <linearGradient id="devTop" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#0a2018"/>
+        <stop offset="100%" stopColor="#061410"/>
       </linearGradient>
-      <linearGradient id="lapTop" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#0a2448"/>
-        <stop offset="100%" stopColor="#061830"/>
+      <linearGradient id="scrn" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#011a0c"/>
+        <stop offset="100%" stopColor="#022a14"/>
       </linearGradient>
-      <linearGradient id="lapRight" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#041220"/>
-        <stop offset="100%" stopColor="#061830"/>
+      <linearGradient id="grnLine" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#00ff88" stopOpacity="0"/>
+        <stop offset="50%" stopColor="#00ff88" stopOpacity="1"/>
+        <stop offset="100%" stopColor="#00ff88" stopOpacity="0"/>
       </linearGradient>
     </defs>
 
-    {/* ── ORBIT RINGS ── */}
-    <ellipse cx="268" cy="295" rx="225" ry="58" fill="none" stroke="#00e5ff" strokeWidth="0.7" strokeOpacity="0.15"/>
-    <ellipse cx="268" cy="295" rx="195" ry="49" fill="none" stroke="#8b5cf6" strokeWidth="0.5" strokeOpacity="0.12"/>
+    {/* ── ORBIT RING ── */}
+    <ellipse cx="268" cy="302" rx="228" ry="58" fill="none" stroke="#00ff88" strokeWidth="0.8" strokeOpacity="0.14"/>
+    <ellipse cx="268" cy="302" rx="198" ry="49" fill="none" stroke="#22c55e" strokeWidth="0.5" strokeOpacity="0.10"/>
 
-    {/* ── CLOUD BODY ── */}
-    {/* outer glow */}
-    <ellipse cx="250" cy="195" rx="140" ry="105" fill="#00e5ff" fillOpacity="0.04" filter="url(#gsoft)"/>
-    {/* cloud outline — three concentric strokes */}
-    <path d="M138 228 Q124 158 178 140 Q200 108 250 114 Q288 98 322 128 Q364 136 366 175 Q378 202 358 228 Q338 252 300 254 L200 254 Q158 252 138 228Z"
-      fill="url(#cloudFill)" stroke="#00e5ff" strokeWidth="2.2" strokeOpacity="0.75"/>
-    <path d="M130 233 Q114 156 174 136 Q198 102 250 108 Q292 90 328 124 Q374 132 376 178 Q390 208 366 236 Q344 262 304 264 L196 264 Q150 260 130 233Z"
-      fill="none" stroke="#00e5ff" strokeWidth="1" strokeOpacity="0.3"/>
-    <path d="M122 238 Q104 154 170 130 Q196 94 250 100 Q296 82 336 120 Q386 128 388 180 Q404 214 374 244 Q350 274 308 276 L192 276 Q142 270 122 238Z"
-      fill="none" stroke="#00e5ff" strokeWidth="0.6" strokeOpacity="0.14"/>
+    {/* ── CLOUD ICON (proper cloud-service silhouette) ── */}
+    {/* Outer ambient glow */}
+    <ellipse cx="258" cy="185" rx="150" ry="110" fill="#00ff88" fillOpacity="0.04" filter="url(#gs)"/>
 
-    {/* cloud center glow dot */}
-    <circle cx="250" cy="185" r="14" fill="#00e5ff" fillOpacity="0.08" filter="url(#gsoft)"/>
-    <circle cx="250" cy="185" r="6"  fill="#00e5ff" fillOpacity="0.25"/>
-    <circle cx="250" cy="185" r="3"  fill="#00e5ff" fillOpacity="0.7"/>
-    <circle cx="250" cy="185" r="1.2" fill="white"/>
+    {/* Cloud body — classic fluffy cloud shape */}
+    {/* Three concentric outlines for depth */}
+    <path d="
+      M 148 248
+      C 128 248 118 234 120 216
+      C 120 196 136 182 158 180
+      C 154 154 170 132 194 126
+      C 206 112 226 106 248 112
+      C 252  90 272  80 298  80
+      C 326  78 348  96 352 120
+      C 374 108 396 120 402 144
+      C 426 146 442 168 436 192
+      C 432 214 414 230 392 232
+      L 168 232
+      C 155 232 148 242 148 248 Z"
+      fill="url(#cFill)"
+      stroke="#00ff88" strokeWidth="2.4" strokeOpacity="0.85"
+      strokeLinejoin="round"/>
+    <path d="
+      M 140 252
+      C 118 252 106 236 108 216
+      C 106 192 124 175 148 172
+      C 142 144 160 118 186 112
+      C 200 96 222  90 246 96
+      C 250  72 272  60 300  60
+      C 332  57 357  78 362 106
+      C 386  92 412 106 418 134
+      C 446 136 464 162 458 190
+      C 454 216 432 234 406 236
+      L 162 236
+      C 148 237 140 246 140 252 Z"
+      fill="none" stroke="#00ff88" strokeWidth="1" strokeOpacity="0.28" strokeLinejoin="round"/>
+    <path d="
+      M 132 256
+      C 108 256 94 238 96 215
+      C 93 187 114 167 140 162
+      C 132 130 152 104 180 96
+      C 196 80 220  74 246  80
+      C 251  54 274  42 304  42
+      C 340  38 368  62 374  92
+      C 400  76 430  92 436 124
+      C 468 126 488 156 482 188
+      C 478 218 452 238 422 240
+      L 156 240
+      C 140 241 132 250 132 256 Z"
+      fill="none" stroke="#00ff88" strokeWidth="0.6" strokeOpacity="0.12" strokeLinejoin="round"/>
 
-    {/* ── CLOUD ARROWS (data flow) ── */}
-    {/* down-left */}
-    <line x1="218" y1="162" x2="218" y2="248" stroke="#00e5ff" strokeWidth="1.8" strokeOpacity="0.8"/>
-    <polygon points="218,257 212,242 224,242" fill="#00e5ff" fillOpacity="0.9"/>
-    {/* down-center */}
-    <line x1="250" y1="152" x2="250" y2="248" stroke="#8b5cf6" strokeWidth="1.8" strokeOpacity="0.8"/>
-    <polygon points="250,257 244,242 256,242" fill="#8b5cf6" fillOpacity="0.9"/>
-    {/* up-right */}
-    <line x1="282" y1="248" x2="282" y2="162" stroke="#00e5ff" strokeWidth="1.8" strokeOpacity="0.8"/>
-    <polygon points="282,153 276,168 288,168" fill="#00e5ff" fillOpacity="0.9"/>
+    {/* Upload ↑ arrow inside cloud */}
+    <line x1="236" y1="220" x2="236" y2="152" stroke="#00ff88" strokeWidth="2" strokeOpacity="0.9"/>
+    <polygon points="236,140 229,158 243,158" fill="#00ff88" fillOpacity="0.95"/>
+    {/* Download ↓ arrow inside cloud */}
+    <line x1="280" y1="148" x2="280" y2="220" stroke="#22c55e" strokeWidth="2" strokeOpacity="0.9"/>
+    <polygon points="280,232 273,216 287,216" fill="#22c55e" fillOpacity="0.95"/>
+    {/* Upload ↑ arrow 2 (right) */}
+    <line x1="318" y1="218" x2="318" y2="155" stroke="#00ff88" strokeWidth="1.6" strokeOpacity="0.7"/>
+    <polygon points="318,144 312,161 324,161" fill="#00ff88" fillOpacity="0.8"/>
+
+    {/* Cloud center glow node */}
+    <circle cx="258" cy="170" r="18" fill="#00ff88" fillOpacity="0.07" filter="url(#gs)"/>
+    <circle cx="258" cy="170" r="8"  fill="#00ff88" fillOpacity="0.18"/>
+    <circle cx="258" cy="170" r="4"  fill="#00ff88" fillOpacity="0.6"/>
+    <circle cx="258" cy="170" r="1.5" fill="white"/>
+
+    {/* Horizontal shine line through cloud */}
+    <rect x="148" y="163" width="280" height="1" fill="url(#grnLine)" fillOpacity="0.25"/>
 
     {/* ── ISOMETRIC LAPTOP (right) ── */}
-    {/* base top face */}
-    <path d="M390 298 L458 260 L508 285 L440 323Z" fill="url(#lapTop)" stroke="#00e5ff" strokeWidth="1.4" strokeOpacity="0.65"/>
-    {/* base right face */}
-    <path d="M508 285 L508 302 L440 340 L440 323Z" fill="url(#lapRight)" stroke="#00e5ff" strokeWidth="1" strokeOpacity="0.4"/>
-    {/* base left face */}
-    <path d="M390 298 L390 315 L440 340 L440 323Z" fill="#051220" stroke="#00e5ff" strokeWidth="1" strokeOpacity="0.4"/>
-    {/* screen hinge */}
-    <path d="M390 298 L458 260 L463 210 L395 248Z" fill="#041830" stroke="#00e5ff" strokeWidth="1.2" strokeOpacity="0.45"/>
-    {/* screen face */}
-    <path d="M395 248 L463 210 L513 235 L445 273Z" fill="url(#screenL)" stroke="#00e5ff" strokeWidth="1.6" strokeOpacity="0.85"/>
-    {/* screen — chart bars */}
-    <rect x="401" y="250" width="5" height="16" fill="#00e5ff" fillOpacity="0.75" rx="1"/>
-    <rect x="409" y="245" width="5" height="21" fill="#8b5cf6" fillOpacity="0.65" rx="1"/>
-    <rect x="417" y="253" width="5" height="13" fill="#00e5ff" fillOpacity="0.6" rx="1"/>
-    <rect x="425" y="241" width="5" height="25" fill="#00e5ff" fillOpacity="0.7" rx="1"/>
-    <rect x="433" y="248" width="5" height="18" fill="#8b5cf6" fillOpacity="0.55" rx="1"/>
-    {/* screen — line chart */}
-    <polyline points="400,243 410,240 420,244 432,235 442,241 452,237" fill="none" stroke="#00e5ff" strokeWidth="1.6" strokeOpacity="0.95"/>
-    <circle cx="432" cy="235" r="2.5" fill="#00e5ff" fillOpacity="0.9"/>
-    {/* screen glow overlay */}
-    <rect x="396" y="248" width="57" height="27" fill="#00e5ff" fillOpacity="0.03" rx="1"/>
+    <path d="M385 295 L455 258 L506 283 L436 320Z" fill="url(#devTop)" stroke="#00ff88" strokeWidth="1.4" strokeOpacity="0.6"/>
+    <path d="M506 283 L506 300 L436 337 L436 320Z" fill="#040e08" stroke="#00ff88" strokeWidth="0.9" strokeOpacity="0.35"/>
+    <path d="M385 295 L385 312 L436 337 L436 320Z" fill="#061210" stroke="#00ff88" strokeWidth="0.9" strokeOpacity="0.35"/>
+    <path d="M385 295 L455 258 L460 206 L390 243Z" fill="#030e08" stroke="#00ff88" strokeWidth="1.1" strokeOpacity="0.4"/>
+    <path d="M390 243 L460 206 L511 231 L441 268Z" fill="url(#scrn)" stroke="#00ff88" strokeWidth="1.8" strokeOpacity="0.9"/>
+    {/* screen bars */}
+    <rect x="396" y="246" width="5" height="16" fill="#00ff88" fillOpacity="0.7" rx="1"/>
+    <rect x="404" y="241" width="5" height="21" fill="#22c55e" fillOpacity="0.6" rx="1"/>
+    <rect x="412" y="249" width="5" height="13" fill="#00ff88" fillOpacity="0.55" rx="1"/>
+    <rect x="420" y="238" width="5" height="26" fill="#00ff88" fillOpacity="0.65" rx="1"/>
+    <rect x="428" y="245" width="5" height="19" fill="#22c55e" fillOpacity="0.5" rx="1"/>
+    {/* screen line chart */}
+    <polyline points="395,239 406,236 416,241 428,231 439,237 450,233" fill="none" stroke="#00ff88" strokeWidth="1.7" strokeOpacity="1"/>
+    <circle cx="428" cy="231" r="2.8" fill="#00ff88"/>
+    <rect x="391" y="244" width="60" height="26" fill="#00ff88" fillOpacity="0.025" rx="1"/>
 
     {/* ── ISOMETRIC PHONE (left) ── */}
-    {/* top face */}
-    <path d="M94 310 L126 292 L146 302 L114 320Z" fill="url(#lapTop)" stroke="#8b5cf6" strokeWidth="1.3" strokeOpacity="0.7"/>
-    {/* right face */}
-    <path d="M146 302 L146 354 L114 372 L114 320Z" fill="#040e20" stroke="#8b5cf6" strokeWidth="1" strokeOpacity="0.4"/>
-    {/* left face */}
-    <path d="M94 310 L94 362 L114 372 L114 320Z" fill="#051420" stroke="#8b5cf6" strokeWidth="1" strokeOpacity="0.4"/>
-    {/* screen */}
-    <path d="M96 312 L126 294 L144 304 L114 322Z" fill="url(#screenL)" stroke="#8b5cf6" strokeWidth="1.2" strokeOpacity="0.75"/>
-    {/* phone screen content */}
-    <circle cx="120" cy="308" r="6" fill="none" stroke="#8b5cf6" strokeWidth="1.2" strokeOpacity="0.85"/>
-    <circle cx="120" cy="308" r="2.5" fill="#8b5cf6" fillOpacity="0.5"/>
-    <line x1="120" y1="303" x2="120" y2="308" stroke="#8b5cf6" strokeWidth="1.2" strokeOpacity="0.8"/>
+    <path d="M90 308 L122 290 L142 300 L110 318Z" fill="url(#devTop)" stroke="#22c55e" strokeWidth="1.3" strokeOpacity="0.7"/>
+    <path d="M142 300 L142 352 L110 370 L110 318Z" fill="#030c06" stroke="#22c55e" strokeWidth="0.9" strokeOpacity="0.35"/>
+    <path d="M90 308 L90 360 L110 370 L110 318Z" fill="#040e08" stroke="#22c55e" strokeWidth="0.9" strokeOpacity="0.35"/>
+    <path d="M92 310 L122 292 L140 302 L110 320Z" fill="url(#scrn)" stroke="#22c55e" strokeWidth="1.2" strokeOpacity="0.8"/>
+    {/* phone dial indicator */}
+    <circle cx="116" cy="306" r="7" fill="none" stroke="#00ff88" strokeWidth="1.4" strokeOpacity="0.9"/>
+    <circle cx="116" cy="306" r="3" fill="#00ff88" fillOpacity="0.55"/>
+    <line x1="116" y1="300" x2="116" y2="306" stroke="#00ff88" strokeWidth="1.3"/>
     {/* phone up arrow */}
-    <line x1="90" y1="300" x2="90" y2="273" stroke="#00e5ff" strokeWidth="2" strokeOpacity="0.85"/>
-    <polygon points="90,264 84,280 96,280" fill="#00e5ff" fillOpacity="0.9"/>
-    {/* second arrow */}
-    <line x1="80" y1="310" x2="80" y2="286" stroke="#8b5cf6" strokeWidth="1.5" strokeOpacity="0.6"/>
-    <polygon points="80,278 74,294 86,294" fill="#8b5cf6" fillOpacity="0.7"/>
+    <line x1="84" y1="298" x2="84" y2="270" stroke="#00ff88" strokeWidth="2.2" strokeOpacity="0.9"/>
+    <polygon points="84,260 77,277 91,277" fill="#00ff88" fillOpacity="0.95"/>
+    <line x1="74" y1="308" x2="74" y2="284" stroke="#22c55e" strokeWidth="1.4" strokeOpacity="0.6"/>
+    <polygon points="74,275 68,292 80,292" fill="#22c55e" fillOpacity="0.7"/>
 
-    {/* ── CIRCUIT LINES ── */}
-    {/* Cloud → Laptop */}
-    <path d="M362 190 L392 190 L410 230 L420 256" fill="none" stroke="#00e5ff" strokeWidth="1.6" strokeOpacity="0.55" strokeDasharray="5,3"/>
-    {/* Cloud → Phone */}
-    <path d="M144 218 L120 218 L116 270 L116 292" fill="none" stroke="#8b5cf6" strokeWidth="1.6" strokeOpacity="0.55" strokeDasharray="5,3"/>
-    {/* Cloud bottom lines */}
-    <path d="M210 262 L210 292 L185 305" fill="none" stroke="#00e5ff" strokeWidth="1.2" strokeOpacity="0.45"/>
-    <path d="M250 268 L250 305 L250 322" fill="none" stroke="#8b5cf6" strokeWidth="1.2" strokeOpacity="0.45"/>
-    <path d="M290 262 L290 292 L318 305" fill="none" stroke="#00e5ff" strokeWidth="1.2" strokeOpacity="0.45"/>
+    {/* ── CONNECTION LINES ── */}
+    <path d="M400 200 L430 200 L448 232 L456 258" fill="none" stroke="#00ff88" strokeWidth="1.7" strokeOpacity="0.5" strokeDasharray="5,3"/>
+    <path d="M132 220 L108 220 L104 268 L104 290" fill="none" stroke="#22c55e" strokeWidth="1.7" strokeOpacity="0.5" strokeDasharray="5,3"/>
+    <path d="M210 240 L210 275 L185 288" fill="none" stroke="#00ff88" strokeWidth="1.2" strokeOpacity="0.4"/>
+    <path d="M258 238 L258 278 L258 298" fill="none" stroke="#22c55e" strokeWidth="1.2" strokeOpacity="0.4"/>
+    <path d="M308 240 L308 275 L332 290" fill="none" stroke="#00ff88" strokeWidth="1.2" strokeOpacity="0.4"/>
 
-    {/* ── NODES ── */}
-    <circle cx="363" cy="190" r="7" fill="#00e5ff" fillOpacity="0.12" filter="url(#gsoft)"/>
-    <circle cx="363" cy="190" r="4"  fill="#00e5ff" fillOpacity="0.45"/>
-    <circle cx="363" cy="190" r="1.8" fill="white"/>
-    <circle cx="143" cy="218" r="7"  fill="#8b5cf6" fillOpacity="0.12" filter="url(#gsoft)"/>
-    <circle cx="143" cy="218" r="4"  fill="#8b5cf6" fillOpacity="0.45"/>
-    <circle cx="143" cy="218" r="1.8" fill="white"/>
-    <circle cx="185" cy="305" r="4" fill="#00e5ff" fillOpacity="0.45"/>
-    <circle cx="318" cy="305" r="4" fill="#00e5ff" fillOpacity="0.45"/>
-    <circle cx="250" cy="322" r="4" fill="#8b5cf6" fillOpacity="0.45"/>
-    {/* scattered dots */}
-    <circle cx="165" cy="155" r="2.2" fill="#00e5ff" fillOpacity="0.5"/>
-    <circle cx="335" cy="138" r="2.5" fill="#00e5ff" fillOpacity="0.4"/>
-    <circle cx="470" cy="188" r="2" fill="#8b5cf6" fillOpacity="0.5"/>
-    <circle cx="355" cy="358" r="2" fill="#00e5ff" fillOpacity="0.3"/>
-    <circle cx="135" cy="368" r="2" fill="#8b5cf6" fillOpacity="0.4"/>
-    <circle cx="480" cy="140" r="1.8" fill="#00e5ff" fillOpacity="0.35"/>
-    <circle cx="68"  cy="250" r="1.8" fill="#8b5cf6" fillOpacity="0.35"/>
+    {/* ── GLOWING NODES ── */}
+    <circle cx="401" cy="200" r="8"  fill="#00ff88" fillOpacity="0.1" filter="url(#gsm)"/>
+    <circle cx="401" cy="200" r="4.5" fill="#00ff88" fillOpacity="0.45"/>
+    <circle cx="401" cy="200" r="2"  fill="white"/>
+    <circle cx="131" cy="220" r="8"  fill="#22c55e" fillOpacity="0.1" filter="url(#gsm)"/>
+    <circle cx="131" cy="220" r="4.5" fill="#22c55e" fillOpacity="0.45"/>
+    <circle cx="131" cy="220" r="2"  fill="white"/>
+    <circle cx="185" cy="288" r="4.5" fill="#00ff88" fillOpacity="0.5"/>
+    <circle cx="332" cy="290" r="4.5" fill="#00ff88" fillOpacity="0.5"/>
+    <circle cx="258" cy="298" r="4.5" fill="#22c55e" fillOpacity="0.5"/>
+    {/* floating particles */}
+    <circle cx="160" cy="148" r="2.4" fill="#00ff88" fillOpacity="0.55"/>
+    <circle cx="358" cy="132" r="2.6" fill="#00ff88" fillOpacity="0.45"/>
+    <circle cx="474" cy="184" r="2"   fill="#22c55e" fillOpacity="0.5"/>
+    <circle cx="358" cy="362" r="2"   fill="#00ff88" fillOpacity="0.32"/>
+    <circle cx="136" cy="370" r="2"   fill="#22c55e" fillOpacity="0.42"/>
+    <circle cx="485" cy="136" r="1.8" fill="#00ff88" fillOpacity="0.38"/>
+    <circle cx="64"  cy="252" r="1.8" fill="#22c55e" fillOpacity="0.36"/>
+    <circle cx="420" cy="380" r="1.6" fill="#00ff88" fillOpacity="0.28"/>
 
-    {/* ── DATA BARS (lower right) ── */}
-    <rect x="356" y="340" width="9" height="34" fill="#00e5ff" fillOpacity="0.55" rx="2"/>
-    <rect x="369" y="328" width="9" height="46" fill="#8b5cf6" fillOpacity="0.5" rx="2"/>
-    <rect x="382" y="345" width="9" height="29" fill="#00e5ff" fillOpacity="0.4" rx="2"/>
-    <rect x="395" y="334" width="9" height="40" fill="#8b5cf6" fillOpacity="0.55" rx="2"/>
-    {/* bars glow */}
-    <rect x="354" y="326" width="54" height="54" fill="#00e5ff" fillOpacity="0.03" filter="url(#gsoft)" rx="4"/>
+    {/* ── DATA BARS (bottom-right) ── */}
+    <rect x="358" y="344" width="10" height="34" fill="#00ff88" fillOpacity="0.5" rx="2"/>
+    <rect x="372" y="330" width="10" height="48" fill="#22c55e" fillOpacity="0.45" rx="2"/>
+    <rect x="386" y="348" width="10" height="30" fill="#00ff88" fillOpacity="0.38" rx="2"/>
+    <rect x="400" y="337" width="10" height="41" fill="#22c55e" fillOpacity="0.5" rx="2"/>
+    <rect x="356" y="328" width="58" height="56" fill="#00ff88" fillOpacity="0.025" filter="url(#gsm)" rx="4"/>
 
-    {/* ── BIG UPLOAD ARROWS (top right) ── */}
-    <line x1="510" y1="200" x2="510" y2="142" stroke="#00e5ff" strokeWidth="2.5" strokeOpacity="0.85"/>
-    <polygon points="510,132 503,150 517,150" fill="#00e5ff" fillOpacity="0.9"/>
-    <circle cx="510" cy="205" r="3.5" fill="#00e5ff" fillOpacity="0.5"/>
-    <line x1="524" y1="218" x2="524" y2="162" stroke="#00e5ff" strokeWidth="1.5" strokeOpacity="0.45"/>
-    <polygon points="524,152 518,168 530,168" fill="#00e5ff" fillOpacity="0.5"/>
+    {/* ── UPLOAD ARROWS (top-right) ── */}
+    <line x1="514" y1="204" x2="514" y2="144" stroke="#00ff88" strokeWidth="2.6" strokeOpacity="0.88"/>
+    <polygon points="514,133 507,152 521,152" fill="#00ff88" fillOpacity="0.92"/>
+    <circle cx="514" cy="209" r="3.8" fill="#00ff88" fillOpacity="0.5"/>
+    <line x1="528" y1="222" x2="528" y2="165" stroke="#22c55e" strokeWidth="1.5" strokeOpacity="0.45"/>
+    <polygon points="528,155 522,172 534,172" fill="#22c55e" fillOpacity="0.5"/>
   </svg>
 );
 
@@ -220,7 +250,7 @@ const Navbar = () => {
         <div className="font-serif font-bold text-2xl tracking-widest" style={{
           background: scrolled
             ? "linear-gradient(135deg, #0d8a48, #4ade80)"
-            : "linear-gradient(135deg, #00e5ff, #8b5cf6)",
+            : "linear-gradient(135deg, #00ff88, #22c55e)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",
@@ -236,9 +266,9 @@ const Navbar = () => {
           ))}
           <Button asChild size="sm" className="rounded-full px-6"
             style={scrolled ? {} : {
-              background: "rgba(0,229,255,0.12)",
-              border: "1.5px solid rgba(0,229,255,0.5)",
-              color: "#00e5ff",
+              background: "rgba(0,255,136,0.10)",
+              border: "1.5px solid rgba(0,255,136,0.45)",
+              color: "#00ff88",
               backdropFilter: "blur(8px)",
             }}>
             <a href="#contact">Let's Talk</a>
@@ -310,7 +340,7 @@ export default function Home() {
             >
               {/* eyebrow tag */}
               <div className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-mono tracking-widest uppercase"
-                style={{ background: "rgba(0,229,255,0.1)", border: "1px solid rgba(0,229,255,0.3)", color: "#00e5ff" }}>
+                style={{ background: "rgba(0,255,136,0.08)", border: "1px solid rgba(0,255,136,0.35)", color: "#00ff88" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"/>
                 Boutique Web Studio
               </div>
@@ -318,16 +348,17 @@ export default function Home() {
               <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-6xl lg:text-7xl text-white">
                 We Build<br/>
                 <span style={{
-                  background: "linear-gradient(125deg, #00e5ff 0%, #a78bfa 60%, #e879f9 100%)",
+                  background: "linear-gradient(125deg, #00ff88 0%, #4ade80 50%, #86efac 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
+                  filter: "drop-shadow(0 0 20px rgba(0,255,136,0.4))",
                 }}>Digital Experiences</span><br/>
                 That Last.
               </h1>
 
               <p className="mt-6 text-base md:text-lg max-w-md font-sans leading-relaxed"
-                style={{ color: "rgba(255,255,255,0.65)" }}>
+                style={{ color: "rgba(255,255,255,0.62)" }}>
                 LX CLOUDS crafts high-performance websites and web apps — designed with precision, built for growth, and delivered with care.
               </p>
 
@@ -335,22 +366,22 @@ export default function Home() {
               <div className="mt-8 flex gap-8">
                 {[["50+","Projects Delivered"],["100%","Client Satisfaction"],["5★","Average Rating"]].map(([n,l]) => (
                   <div key={l}>
-                    <div className="text-2xl font-serif font-bold" style={{ color: "#00e5ff" }}>{n}</div>
-                    <div className="text-xs font-mono mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>{l}</div>
+                    <div className="text-2xl font-serif font-bold" style={{ color: "#00ff88" }}>{n}</div>
+                    <div className="text-xs font-mono mt-0.5" style={{ color: "rgba(255,255,255,0.42)" }}>{l}</div>
                   </div>
                 ))}
               </div>
 
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
                 <Button asChild size="lg" className="group text-base font-sans px-8"
-                  style={{ background: "linear-gradient(135deg, #00b4d8, #7c3aed)", border: "none", color: "white", boxShadow: "0 0 32px rgba(0,180,216,0.35)" }}>
+                  style={{ background: "linear-gradient(135deg, #00c853, #00ff88)", border: "none", color: "#031a0a", fontWeight: 700, boxShadow: "0 0 32px rgba(0,255,136,0.35)" }}>
                   <a href="#work">
                     View Our Work
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"/>
                   </a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="text-base font-sans px-8"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)" }}>
+                  style={{ background: "rgba(0,255,136,0.05)", border: "1.5px solid rgba(0,255,136,0.28)", color: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)" }}>
                   <a href="#contact">Get in Touch</a>
                 </Button>
               </div>
