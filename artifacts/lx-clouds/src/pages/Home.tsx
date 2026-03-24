@@ -294,7 +294,7 @@ const PRICING_PLANS = [
   {
     name: "Starter",
     tagline: "Perfect for small businesses & personal brands",
-    price: "From €499",
+    price: "From €799",
     period: "one-time",
     highlight: false,
     features: [
@@ -343,6 +343,56 @@ const PRICING_PLANS = [
   },
 ];
 
+const SUBSCRIPTION_PLANS = [
+  {
+    name: "Essential",
+    tagline: "Keep your site healthy & up to date",
+    price: "€149",
+    period: "/ month",
+    highlight: false,
+    features: [
+      "Security & CMS updates",
+      "Uptime monitoring 24/7",
+      "Monthly performance report",
+      "1h of changes / month",
+      "Email support",
+    ],
+    cta: "Subscribe",
+  },
+  {
+    name: "Growth",
+    tagline: "Active maintenance + ongoing improvements",
+    price: "€299",
+    period: "/ month",
+    highlight: true,
+    features: [
+      "Everything in Essential",
+      "4h of changes / month",
+      "SEO monitoring & tips",
+      "Speed & Core Web Vitals checks",
+      "Priority email & chat support",
+      "Quarterly review call",
+    ],
+    cta: "Subscribe",
+  },
+  {
+    name: "Studio Partner",
+    tagline: "Your dedicated digital partner, on-demand",
+    price: "€599",
+    period: "/ month",
+    highlight: false,
+    features: [
+      "Everything in Growth",
+      "10h of changes / month",
+      "Feature development included",
+      "Hotfix SLA within 4h",
+      "Monthly strategy session",
+      "Slack / direct line access",
+    ],
+    cta: "Book a Call",
+  },
+];
+
 const WHY_US = [
   "Clean Modern Code",
   "Tailored to Your Brand",
@@ -363,6 +413,7 @@ const contactSchema = z.object({
 export default function Home() {
   const { data: projects = [], isLoading: isProjectsLoading } = usePortfolio();
   const [filter, setFilter] = useState("All");
+  const [pricingTab, setPricingTab] = useState<"project" | "abo">("project");
   
   const filteredProjects = filter === "All" 
     ? projects 
@@ -642,7 +693,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center mb-16"
+              className="text-center mb-10"
             >
               <span className="font-mono text-xs tracking-widest uppercase mb-4 block" style={{ color: "var(--color-primary)" }}>
                 Transparent Pricing
@@ -655,14 +706,37 @@ export default function Home() {
               </p>
             </motion.div>
 
+            {/* Tab toggle */}
+            <div className="flex justify-center mb-12">
+              <div className="inline-flex rounded-full p-1 gap-1"
+                style={{ background: "var(--color-background-secondary)", border: "1.5px solid var(--color-border)" }}>
+                {(["project", "abo"] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setPricingTab(tab)}
+                    className="px-6 py-2 rounded-full font-mono text-sm font-semibold tracking-wide transition-all duration-200"
+                    style={pricingTab === tab ? {
+                      background: "linear-gradient(135deg, #00c853, #00ff88)",
+                      color: "#031a0a",
+                      boxShadow: "0 2px 12px rgba(0,255,136,0.3)",
+                    } : {
+                      background: "transparent",
+                      color: "var(--color-muted-foreground)",
+                    }}
+                  >
+                    {tab === "project" ? "One-Time Projects" : "Abo / Monthly"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
-              {PRICING_PLANS.map((plan, i) => (
+              {(pricingTab === "project" ? PRICING_PLANS : SUBSCRIPTION_PLANS).map((plan, i) => (
                 <motion.div
-                  key={plan.name}
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.12, duration: 0.55 }}
+                  key={pricingTab + plan.name}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.45 }}
                   className="relative rounded-2xl flex flex-col overflow-hidden"
                   style={plan.highlight ? {
                     background: "linear-gradient(160deg, #0a2a17 0%, #072012 100%)",
@@ -755,7 +829,9 @@ export default function Home() {
 
             {/* Fine print */}
             <p className="text-center text-xs text-muted-foreground mt-10 font-mono">
-              All prices are estimates. Final scope agreed before any work begins. &nbsp;·&nbsp; VAT may apply.
+              {pricingTab === "project"
+                ? "All prices are estimates. Final scope agreed before any work begins. · VAT may apply."
+                : "Abo plans billed monthly. Minimum 3-month commitment. Cancel anytime after. · VAT may apply."}
             </p>
           </div>
         </section>
