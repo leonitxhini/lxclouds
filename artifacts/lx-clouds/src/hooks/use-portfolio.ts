@@ -14,10 +14,10 @@ const PROJECTS: Project[] = [
   {
     id: "1",
     title: "Lonorix",
-    description: "A modern web project crafted for performance, clarity, and a seamless user experience.",
-    category: "Websites",
-    tags: ["React", "Tailwind", "Vite"],
-    imageUrl: "https://image.thum.io/get/width/600/crop/400/https://lonorix.com",
+    description: "AI-powered album cover creator — helping musicians generate stunning covers in seconds.",
+    category: "Web Apps",
+    tags: ["AI", "React", "Music", "SaaS"],
+    imageUrl: "/project-lonorix.png",
     url: "https://lonorix.com",
   },
   {
