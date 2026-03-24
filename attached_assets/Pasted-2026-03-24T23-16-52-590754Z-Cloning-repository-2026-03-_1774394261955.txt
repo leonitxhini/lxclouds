@@ -1,0 +1,56 @@
+2026-03-24T23:16:52.590754Z	Cloning repository...
+2026-03-24T23:16:54.08414Z	From https://github.com/leonitxhini/lxclouds
+2026-03-24T23:16:54.08446Z	 * branch            e536dc1caeca647dc4d28e00c79aefd56349ef2f -> FETCH_HEAD
+2026-03-24T23:16:54.084515Z	
+2026-03-24T23:16:54.150045Z	HEAD is now at e536dc1 Add files via upload
+2026-03-24T23:16:54.150383Z	
+2026-03-24T23:16:54.193223Z	
+2026-03-24T23:16:54.193537Z	Using v2 root directory strategy
+2026-03-24T23:16:54.208025Z	Success: Finished cloning repository files
+2026-03-24T23:16:56.201163Z	Checking for configuration in a Wrangler configuration file (BETA)
+2026-03-24T23:16:56.201679Z	
+2026-03-24T23:16:57.302402Z	No Wrangler configuration file found. Continuing.
+2026-03-24T23:16:57.734374Z	Detected the following tools from environment: npm@10.9.2, nodejs@22.16.0
+2026-03-24T23:16:57.734844Z	Installing project dependencies: npm install --progress=false
+2026-03-24T23:17:18.786162Z	
+2026-03-24T23:17:18.786517Z	added 240 packages, and audited 241 packages in 21s
+2026-03-24T23:17:18.787191Z	
+2026-03-24T23:17:18.78731Z	22 packages are looking for funding
+2026-03-24T23:17:18.787374Z	  run `npm fund` for details
+2026-03-24T23:17:18.787439Z	
+2026-03-24T23:17:18.787495Z	found 0 vulnerabilities
+2026-03-24T23:17:18.866657Z	Executing user command: npm install --legacy-peer-deps && npm run build
+2026-03-24T23:17:19.92823Z	
+2026-03-24T23:17:19.928461Z	added 3 packages, and audited 244 packages in 865ms
+2026-03-24T23:17:19.928509Z	
+2026-03-24T23:17:19.928561Z	23 packages are looking for funding
+2026-03-24T23:17:19.928604Z	  run `npm fund` for details
+2026-03-24T23:17:19.929204Z	
+2026-03-24T23:17:19.929407Z	found 0 vulnerabilities
+2026-03-24T23:17:20.174719Z	
+2026-03-24T23:17:20.175092Z	> @workspace/lx-clouds@0.0.0 build
+2026-03-24T23:17:20.175168Z	> vite build --config vite.config.ts
+2026-03-24T23:17:20.175283Z	
+2026-03-24T23:17:20.415964Z	▲ [WARNING] Cannot find base config file "../../tsconfig.base.json" [tsconfig.json]
+2026-03-24T23:17:20.416238Z	
+2026-03-24T23:17:20.416295Z	    tsconfig.json:2:13:
+2026-03-24T23:17:20.416355Z	      2 │   "extends": "../../tsconfig.base.json",
+2026-03-24T23:17:20.416432Z	        ╵              ~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-03-24T23:17:20.416472Z	
+2026-03-24T23:17:20.692024Z	[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+2026-03-24T23:17:20.765589Z	[32m✓[39m 0 modules transformed.
+2026-03-24T23:17:20.770225Z	[31m✗[39m Build failed in 38ms
+2026-03-24T23:17:20.770447Z	[31merror during build:
+2026-03-24T23:17:20.770512Z	[31m[vite:build-html] failed to resolve "extends":"../../tsconfig.base.json" in /opt/buildhome/repo/artifacts/lx-clouds/tsconfig.json[31m
+2026-03-24T23:17:20.770635Z	file: [36m/opt/buildhome/repo/artifacts/lx-clouds/index.html[31m
+2026-03-24T23:17:20.771478Z	    at resolveExtends (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/vite/dist/node/chunks/config.js:5809:8)
+2026-03-24T23:17:20.771573Z	    at parseExtends (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/vite/dist/node/chunks/config.js:5775:71)
+2026-03-24T23:17:20.771739Z	    at parse$13 (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/vite/dist/node/chunks/config.js:5677:23)
+2026-03-24T23:17:20.771828Z	    at async loadTsconfigJsonForFile (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/vite/dist/node/chunks/config.js:6286:37)
+2026-03-24T23:17:20.771872Z	    at async transformWithEsbuild (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/vite/dist/node/chunks/config.js:6086:55)
+2026-03-24T23:17:20.771904Z	    at async Object.transform (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/vite/dist/node/chunks/config.js:6172:20)
+2026-03-24T23:17:20.771956Z	    at async transform (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/rollup/dist/es/shared/node-entry.js:21316:16)
+2026-03-24T23:17:20.771996Z	    at async ModuleLoader.addModuleSource (file:///opt/buildhome/repo/artifacts/lx-clouds/node_modules/rollup/dist/es/shared/node-entry.js:21544:36)[39m
+2026-03-24T23:17:20.800143Z	Failed: Error while executing user command. Exited with error code: 1
+2026-03-24T23:17:20.807209Z	Failed: build command exited with code: 1
+2026-03-24T23:17:22.250384Z	Failed: error occurred while running build command
