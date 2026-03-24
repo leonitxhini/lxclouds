@@ -119,17 +119,25 @@ export default function Home() {
 
       <main>
         {/* HERO SECTION */}
-        <section className="relative min-h-screen flex items-center justify-center pt-20">
-          <FloatingOrbs />
+        <section
+          className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden"
+          style={{
+            backgroundImage: "url('/hero-bg.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/40 z-0" />
           <div className="container relative z-10 mx-auto px-6 flex flex-col items-center text-center">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight max-w-5xl leading-[1.1]"
+              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight max-w-5xl leading-[1.1] text-white"
             >
               We Build Digital Experiences <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-glow inline-block mt-2">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400 inline-block mt-2">
                 That Last
               </span>
             </motion.h1>
@@ -138,7 +146,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl font-sans"
+              className="mt-8 text-lg md:text-xl text-white/75 max-w-2xl font-sans"
             >
               LX CLOUDS — Web Apps & Websites, Crafted with Precision
             </motion.p>
@@ -164,7 +172,7 @@ export default function Home() {
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 text-primary/50"
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/60"
           >
             <ChevronDown className="w-8 h-8" />
           </motion.div>
