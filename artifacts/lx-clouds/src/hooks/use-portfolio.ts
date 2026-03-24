@@ -23,10 +23,10 @@ const PROJECTS: Project[] = [
   {
     id: "2",
     title: "Zgjedhja",
-    description: "Vergleichsportal für Kosovo & Albanien — hilft Nutzern, die besten Angebote schnell zu finden.",
+    description: "Price comparison platform for Kosovo — find the best deals on phones, laptops, and gaming gear instantly.",
     category: "Web Apps",
-    tags: ["Vergleichsportal", "React", "Kosovo", "Albanien"],
-    imageUrl: "https://image.thum.io/get/width/600/crop/400/https://zgjedhja.com",
+    tags: ["E-commerce", "React", "Kosovo", "Comparison"],
+    imageUrl: "/project-zgjedhja.png",
     url: "https://zgjedhja.com",
   },
   {
