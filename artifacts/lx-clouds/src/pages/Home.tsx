@@ -687,8 +687,14 @@ export default function Home() {
                   <div className="p-8 flex flex-col flex-1 gap-6">
                     {/* Header */}
                     <div>
-                      <h3 className="text-xl font-serif font-bold text-foreground">{plan.name}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground leading-snug">{plan.tagline}</p>
+                      <h3 className="text-xl font-serif font-bold"
+                        style={{ color: plan.highlight ? "#ffffff" : "var(--color-foreground)" }}>
+                        {plan.name}
+                      </h3>
+                      <p className="mt-1 text-sm leading-snug"
+                        style={{ color: plan.highlight ? "rgba(180,255,220,0.65)" : "var(--color-muted-foreground)" }}>
+                        {plan.tagline}
+                      </p>
                     </div>
 
                     {/* Price */}
@@ -697,7 +703,8 @@ export default function Home() {
                         style={{ color: plan.highlight ? "#00ff88" : "var(--color-foreground)" }}>
                         {plan.price}
                       </div>
-                      <div className="font-mono text-xs text-muted-foreground mt-1 uppercase tracking-wider">
+                      <div className="font-mono text-xs mt-1 uppercase tracking-wider"
+                        style={{ color: plan.highlight ? "rgba(180,255,220,0.55)" : "var(--color-muted-foreground)" }}>
                         {plan.period}
                       </div>
                     </div>
@@ -705,7 +712,8 @@ export default function Home() {
                     {/* Features */}
                     <ul className="space-y-3 flex-1">
                       {plan.features.map(f => (
-                        <li key={f} className="flex items-start gap-3 text-sm text-foreground/80">
+                        <li key={f} className="flex items-start gap-3 text-sm"
+                          style={{ color: plan.highlight ? "rgba(220,255,240,0.88)" : "var(--color-foreground)" }}>
                           <Check className="w-4 h-4 mt-0.5 flex-shrink-0"
                             style={{ color: plan.highlight ? "#00ff88" : "var(--color-primary)" }} />
                           {f}
