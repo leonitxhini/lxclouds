@@ -103,20 +103,22 @@ const CLOUD_LAYERS = [
 
 const CloudsBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    {/* Sky: white top fading through mint to vivid green */}
+    {/* Gradient image as sky */}
     <div className="absolute inset-0" style={{
-      background: "linear-gradient(175deg, #ffffff 0%, #f0fff8 12%, #c8f5e0 28%, #5dd49a 50%, #1fb870 68%, #0d8a48 82%, #075c2e 100%)",
+      backgroundImage: "url('/hero-gradient.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
     }} />
-    {/* Radial sun glow at top-center */}
+    {/* Subtle vignette to deepen edges */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 70% 45% at 50% 5%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.3) 40%, transparent 75%)",
+      background: "radial-gradient(ellipse 120% 100% at 50% 50%, transparent 55%, rgba(10,60,40,0.38) 100%)",
     }} />
-    {/* Atmospheric haze mid-layer */}
+    {/* Golden sun glow from top-left matching the image */}
     <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 100% 40% at 50% 55%, rgba(200,255,228,0.35) 0%, transparent 70%)",
+      background: "radial-gradient(ellipse 55% 50% at 8% 0%, rgba(255,240,180,0.32) 0%, transparent 65%)",
     }} />
 
-    {/* Clouds */}
+    {/* Clouds — warm ivory tint to match the golden sky */}
     {CLOUD_LAYERS.map((c, i) => {
       const fromX = c.right ? "-30%" : "110%";
       const toX   = c.right ? "115%" : "-35%";
@@ -130,7 +132,7 @@ const CloudsBackground = () => (
           transition={{ duration: c.dur, delay: c.delay, repeat: Infinity, ease: "linear" }}
         >
           {c.big
-            ? <CloudShape width={c.width} opacity={c.opacity} tint="#c8f5e0" />
+            ? <CloudShape width={c.width} opacity={c.opacity} tint="#d4ede3" />
             : <SmallCloud width={c.width} opacity={c.opacity} />
           }
         </motion.div>
@@ -224,17 +226,17 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight max-w-5xl leading-[1.1]"
-              style={{ color: "#0d4f2e", textShadow: "0 1px 2px rgba(255,255,255,0.4)" }}
+              style={{ color: "#ffffff", textShadow: "0 2px 20px rgba(10,60,40,0.45), 0 1px 3px rgba(0,0,0,0.2)" }}
             >
               We Build Digital Experiences <br className="hidden md:block" />
               <span
                 className="inline-block mt-2"
                 style={{
-                  background: "linear-gradient(135deg, #ffffff, #d4f7e4)",
+                  background: "linear-gradient(125deg, #ffd84d 0%, #ffe680 30%, #a8f590 65%, #4dffb4 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
-                  filter: "drop-shadow(0 2px 8px rgba(0,80,30,0.25))",
+                  filter: "drop-shadow(0 4px 20px rgba(10,70,30,0.7)) drop-shadow(0 0px 50px rgba(120,255,100,0.35))",
                 }}
               >
                 That Last
@@ -246,7 +248,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
               className="mt-8 text-lg md:text-xl max-w-2xl font-sans font-medium"
-              style={{ color: "#1a5c38" }}
+              style={{ color: "rgba(255,255,255,0.88)", textShadow: "0 1px 8px rgba(10,50,30,0.5)" }}
             >
               LX CLOUDS — Web Apps & Websites, Crafted with Precision
             </motion.p>
@@ -257,13 +259,15 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
               className="mt-12 flex flex-col sm:flex-row gap-6 w-full sm:w-auto"
             >
-              <Button asChild size="lg" className="w-full sm:w-auto text-lg group">
+              <Button asChild size="lg" className="w-full sm:w-auto text-lg group"
+                style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(12px)", border: "1.5px solid rgba(255,255,255,0.55)", color: "white", boxShadow: "0 4px 24px rgba(10,60,40,0.25)" }}>
                 <a href="#work">
                   View Our Work
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto text-lg">
+              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto text-lg"
+                style={{ background: "rgba(30,120,80,0.45)", backdropFilter: "blur(12px)", border: "1.5px solid rgba(255,255,255,0.35)", color: "white", boxShadow: "0 4px 24px rgba(10,60,40,0.3)" }}>
                 <a href="#contact">Get in Touch</a>
               </Button>
             </motion.div>
