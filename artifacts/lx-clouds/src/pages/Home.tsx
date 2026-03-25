@@ -254,7 +254,7 @@ const Navbar = () => {
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
         <a href="#" aria-label="LX CLOUDS home" className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="LX CLOUDS" className="h-14 w-auto object-contain" />
+          <img src="/logo.png" alt="LX CLOUDS" className="h-20 w-auto object-contain" />
         </a>
         <nav className="hidden md:flex gap-8 items-center font-mono text-sm">
           {["About","Services","Work","Pricing"].map(l => (
