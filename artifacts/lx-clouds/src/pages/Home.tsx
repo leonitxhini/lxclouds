@@ -254,7 +254,7 @@ const Navbar = () => {
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
         <a href="#" aria-label="LX CLOUDS home" className="flex items-center gap-2.5">
-          <img src="/logo-icon.png" alt="LX CLOUDS" className="h-10 w-auto object-contain" />
+          <img src="/logo.png" alt="LX CLOUDS" className="h-14 w-auto object-contain" />
         </a>
         <nav className="hidden md:flex gap-8 items-center font-mono text-sm">
           {["About","Services","Work","Pricing"].map(l => (
@@ -910,7 +910,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="py-16 relative z-10 text-center" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.05) 30%, rgba(0,163,204,0.07) 60%, rgba(0,163,204,0.04) 100%)" }}>
         <div className="mb-4 flex justify-center items-center gap-2.5">
-          <img src="/logo-icon.png" alt="LX CLOUDS" className="h-10 w-auto object-contain" />
+          <img src="/logo.png" alt="LX CLOUDS" className="h-14 w-auto object-contain" />
         </div>
         <p className="text-muted-foreground font-sans mb-8 tracking-widest uppercase text-sm font-light">Where Precision Meets Elegance</p>
         <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mb-8" />
