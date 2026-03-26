@@ -432,86 +432,74 @@ export default function Home() {
 
       <main>
         {/* HERO SECTION */}
-        <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
-          <HeroBackground />
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden"
+          style={{
+            backgroundImage: "url('/hero-bg.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          {/* Dark overlay for text legibility */}
+          <div className="absolute inset-0 z-0" style={{ background: "linear-gradient(135deg, rgba(5,10,30,0.72) 0%, rgba(10,20,60,0.55) 50%, rgba(5,10,30,0.68) 100%)" }} />
 
-          <div className="container relative z-10 mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-screen py-24">
+          {/* Subtle cyan glow from below */}
+          <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 40% at 50% 100%, rgba(0,180,220,0.18) 0%, transparent 70%)" }} />
 
-            {/* LEFT — text content */}
+          <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center py-32 pt-40">
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
-              className="flex flex-col items-start"
+              className="flex flex-col items-center"
             >
-              <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-6xl lg:text-7xl text-foreground">
+              <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-7xl lg:text-8xl text-white max-w-5xl">
                 We Build<br/>
                 <span style={{
-                  background: "linear-gradient(115deg, #00e5ff 0%, #38bdf8 35%, #a78bfa 70%, #c4b5fd 100%)",
+                  background: "linear-gradient(115deg, #00e5ff 0%, #38bdf8 40%, #a78bfa 75%, #c4b5fd 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
-                  filter: "drop-shadow(0 0 30px rgba(0,229,255,0.55))",
+                  filter: "drop-shadow(0 0 40px rgba(0,229,255,0.7))",
                 }}>Digital Experiences</span><br/>
                 That Last.
               </h1>
 
-              <p className="mt-6 text-base md:text-lg max-w-md font-sans leading-relaxed"
-                style={{ color: "rgba(10,18,42,0.62)" }}>
+              <p className="mt-8 text-lg md:text-xl max-w-2xl font-sans leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>
                 LX CLOUDS crafts websites, web apps, mobile apps, and custom booking systems — designed with precision, built for growth, delivered with care.
               </p>
 
               {/* stats row */}
-              <div className="mt-8 flex gap-8">
+              <div className="mt-10 flex gap-12">
                 {[["50+","Projects Delivered"],["100%","Client Satisfaction"],["5★","Average Rating"]].map(([n,l]) => (
-                  <div key={l}>
-                    <div className="text-2xl font-serif font-bold" style={{ color: "#0099bb" }}>{n}</div>
-                    <div className="text-xs font-mono mt-0.5" style={{ color: "rgba(10,18,42,0.48)" }}>{l}</div>
+                  <div key={l} className="text-center">
+                    <div className="text-3xl font-serif font-bold" style={{ color: "#00e5ff" }}>{n}</div>
+                    <div className="text-xs font-mono mt-1 uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.50)" }}>{l}</div>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                <Button asChild size="lg" className="group text-base font-sans px-8"
-                  style={{ background: "linear-gradient(135deg, #0099cc, #00c9e8)", border: "none", color: "#ffffff", fontWeight: 700, boxShadow: "0 4px 24px rgba(0,163,204,0.30)" }}>
+              <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+                <Button asChild size="lg" className="group text-base font-sans px-10"
+                  style={{ background: "linear-gradient(135deg, #0099cc, #00c9e8)", border: "none", color: "#ffffff", fontWeight: 700, boxShadow: "0 4px 30px rgba(0,200,240,0.40)" }}>
                   <a href="#work">
                     View Our Work
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"/>
                   </a>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="text-base font-sans px-8"
-                  style={{ background: "rgba(0,163,204,0.07)", border: "1.5px solid rgba(0,163,204,0.40)", color: "#006688", backdropFilter: "blur(8px)" }}>
+                <Button asChild size="lg" variant="outline" className="text-base font-sans px-10"
+                  style={{ background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.30)", color: "#ffffff", backdropFilter: "blur(12px)" }}>
                   <a href="#contact">Get in Touch</a>
                 </Button>
               </div>
-            </motion.div>
-
-            {/* RIGHT — isometric illustration */}
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.15, ease: "easeOut" }}
-              className="hidden lg:flex items-center justify-center"
-            >
-              <motion.div
-                animate={{ y: [0, -14, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="w-full flex items-center justify-center"
-              >
-                <img
-                  src="/hero-illustration.png"
-                  alt="LX CLOUDS — cloud, LX letters and laptop isometric illustration"
-                  className="w-full max-w-[560px] object-contain drop-shadow-[0_0_60px_rgba(0,229,255,0.25)]"
-                />
-              </motion.div>
             </motion.div>
           </div>
 
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            style={{ color: "rgba(0,163,204,0.65)" }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+            style={{ color: "rgba(0,229,255,0.75)" }}
           >
             <ChevronDown className="w-7 h-7"/>
           </motion.div>
