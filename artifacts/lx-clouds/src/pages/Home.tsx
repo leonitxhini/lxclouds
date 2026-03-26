@@ -254,20 +254,27 @@ const Navbar = () => {
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
         <a href="#" aria-label="LX CLOUDS home" className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="LX CLOUDS" className="h-20 w-auto object-contain" />
+          <span className="font-serif font-bold text-xl tracking-wide transition-colors"
+            style={{ color: scrolled ? "rgba(10,18,42,1)" : "rgba(255,255,255,0.95)" }}>
+            LX CLOUDS
+          </span>
         </a>
         <nav className="hidden md:flex gap-8 items-center font-mono text-sm">
           {["About","Services","Work","Pricing"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`}
               className="transition-colors"
-              style={{ color: scrolled ? "rgba(10,18,42,0.80)" : "rgba(10,18,42,0.72)" }}
+              style={{ color: scrolled ? "rgba(10,18,42,0.80)" : "rgba(255,255,255,0.80)" }}
             >{l}</a>
           ))}
           <Button asChild size="sm" className="rounded-full px-6"
-            style={{
+            style={scrolled ? {
               background: "rgba(0,163,204,0.12)",
               border: "1.5px solid rgba(0,163,204,0.45)",
               color: "#007aa3",
+            } : {
+              background: "rgba(255,255,255,0.12)",
+              border: "1.5px solid rgba(255,255,255,0.40)",
+              color: "#ffffff",
             }}>
             <a href="#contact">Let's Talk</a>
           </Button>
@@ -706,7 +713,7 @@ export default function Home() {
                       color: "var(--color-muted-foreground)",
                     }}
                   >
-                    {tab === "project" ? "One-Time Projects" : "Abo / Monthly"}
+                    {tab === "project" ? "One-Time Projects" : "Monthly Plans"}
                   </button>
                 ))}
               </div>
@@ -813,7 +820,7 @@ export default function Home() {
             <p className="text-center text-xs text-muted-foreground mt-10 font-mono">
               {pricingTab === "project"
                 ? "All prices are estimates. Final scope agreed before any work begins. · VAT may apply."
-                : "Abo plans billed monthly. Minimum 3-month commitment. Cancel anytime after. · VAT may apply."}
+                : "Monthly plans billed every 30 days. Minimum 3-month commitment. Cancel anytime after. · VAT may apply."}
             </p>
           </div>
         </section>
@@ -897,8 +904,8 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="py-16 relative z-10 text-center" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.05) 30%, rgba(0,163,204,0.07) 60%, rgba(0,163,204,0.04) 100%)" }}>
-        <div className="mb-4 flex justify-center items-center gap-2.5">
-          <img src="/logo.png" alt="LX CLOUDS" className="h-14 w-auto object-contain" />
+        <div className="mb-4 flex justify-center items-center">
+          <span className="font-serif font-bold text-2xl tracking-wide text-foreground">LX CLOUDS</span>
         </div>
         <p className="text-muted-foreground font-sans mb-8 tracking-widest uppercase text-sm font-light">Where Precision Meets Elegance</p>
         <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mb-8" />

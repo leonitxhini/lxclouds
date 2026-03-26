@@ -32,9 +32,9 @@ const PROJECTS: Project[] = [
   {
     id: "3",
     title: "Rent a Car Ron",
-    description: "Professionelle Autovermietungs-Plattform mit einfacher Buchung und übersichtlichem Fahrzeugkatalog.",
+    description: "Professional car rental platform with seamless booking and a clean vehicle catalogue.",
     category: "Websites",
-    tags: ["Autovermietung", "Booking", "React"],
+    tags: ["Car Rental", "Booking", "React"],
     imageUrl: "/project-rentacarron.png",
     url: "https://rentacarron.com",
   },
