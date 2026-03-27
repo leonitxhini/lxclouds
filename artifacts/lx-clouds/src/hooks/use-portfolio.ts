@@ -22,12 +22,12 @@ const PROJECTS: Project[] = [
   },
   {
     id: "2",
-    title: "Zgjedhja",
+    title: "ZgjedhPlus",
     description: "Price comparison platform for Kosovo — find the best deals on phones, laptops, and gaming gear instantly.",
     category: "Web Apps",
     tags: ["E-commerce", "React", "Kosovo", "Comparison"],
-    imageUrl: "/project-zgjedhja.png",
-    url: "https://zgjedhja.com",
+    imageUrl: "/project-zgjedhplus.png",
+    url: "https://zgjedhplus.com",
   },
   {
     id: "3",
