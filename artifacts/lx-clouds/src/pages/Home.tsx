@@ -478,7 +478,7 @@ export default function Home() {
 
               {/* stats row */}
               <div className="mt-10 flex gap-12">
-                {[["50+","Projects Delivered"],["100%","Client Satisfaction"],["🇩🇪 DE","Based in Germany"]].map(([n,l]) => (
+                {[["50+","Projects Delivered"],["100%","Client Satisfaction"],["Germany","Based in Germany"]].map(([n,l]) => (
                   <div key={l} className="text-center">
                     <div className="text-3xl font-serif font-bold" style={{ color: "#00e5ff" }}>{n}</div>
                     <div className="text-xs font-mono mt-1 uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.50)" }}>{l}</div>
