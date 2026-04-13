@@ -44,7 +44,7 @@ const PROJECTS: Project[] = [
     description: "Premium hotel booking experience with immersive room previews, instant reservations, and concierge chat.",
     category: "Websites",
     tags: ["Hospitality", "Booking", "Luxury", "Next.js"],
-    imageUrl: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&h=500&fit=crop&auto=format",
+    imageUrl: "https://api.microlink.io?url=https://www.aman.com&screenshot=true&meta=false&embed=screenshot.url",
     url: "#",
   },
   {
@@ -53,7 +53,7 @@ const PROJECTS: Project[] = [
     description: "Real-time fintech analytics dashboard with live charts, transaction monitoring, and smart reporting.",
     category: "Web Apps",
     tags: ["FinTech", "Dashboard", "Charts", "TypeScript"],
-    imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop&auto=format",
+    imageUrl: "https://api.microlink.io?url=https://stripe.com&screenshot=true&meta=false&embed=screenshot.url",
     url: "#",
   },
   {
@@ -62,7 +62,7 @@ const PROJECTS: Project[] = [
     description: "Minimalist luxury e-commerce store with editorial product pages, smooth animations, and one-click checkout.",
     category: "Websites",
     tags: ["E-commerce", "Fashion", "Shopify", "UI/UX"],
-    imageUrl: "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=800&h=500&fit=crop&auto=format",
+    imageUrl: "https://api.microlink.io?url=https://www.ssense.com&screenshot=true&meta=false&embed=screenshot.url",
     url: "#",
   },
 ];
