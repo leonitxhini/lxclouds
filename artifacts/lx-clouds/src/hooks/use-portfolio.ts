@@ -40,11 +40,11 @@ const PROJECTS: Project[] = [
   },
   {
     id: "4",
-    title: "Luxuria Hotels",
-    description: "Premium hotel booking experience with immersive room previews, instant reservations, and concierge chat.",
+    title: "AutoElite",
+    description: "Premium luxury automotive platform — curated performance vehicles available for acquisition or exclusive private rental.",
     category: "Websites",
-    tags: ["Hospitality", "Booking", "Luxury", "Next.js"],
-    imageUrl: "https://api.microlink.io?url=https://www.aman.com&screenshot=true&meta=false&embed=screenshot.url",
+    tags: ["Automotive", "Luxury", "AI Studio", "React"],
+    imageUrl: "/project-autoelite.png",
     url: "#",
   },
   {
