@@ -38,6 +38,33 @@ const PROJECTS: Project[] = [
     imageUrl: "/project-rentacarron.png",
     url: "https://rentacarron.com",
   },
+  {
+    id: "4",
+    title: "Luxuria Hotels",
+    description: "Premium hotel booking experience with immersive room previews, instant reservations, and concierge chat.",
+    category: "Websites",
+    tags: ["Hospitality", "Booking", "Luxury", "Next.js"],
+    imageUrl: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&h=500&fit=crop&auto=format",
+    url: "#",
+  },
+  {
+    id: "5",
+    title: "NexaPay",
+    description: "Real-time fintech analytics dashboard with live charts, transaction monitoring, and smart reporting.",
+    category: "Web Apps",
+    tags: ["FinTech", "Dashboard", "Charts", "TypeScript"],
+    imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop&auto=format",
+    url: "#",
+  },
+  {
+    id: "6",
+    title: "Bloom Boutique",
+    description: "Minimalist luxury e-commerce store with editorial product pages, smooth animations, and one-click checkout.",
+    category: "Websites",
+    tags: ["E-commerce", "Fashion", "Shopify", "UI/UX"],
+    imageUrl: "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=800&h=500&fit=crop&auto=format",
+    url: "#",
+  },
 ];
 
 export function usePortfolio() {

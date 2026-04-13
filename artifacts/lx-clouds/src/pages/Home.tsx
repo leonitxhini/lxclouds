@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -406,6 +406,123 @@ const WHY_US = [
   "End-to-End Expertise"
 ];
 
+// --- 3D Carousel ---
+const ProjectCarousel3D = ({ projects }: { projects: import("@/hooks/use-portfolio").Project[] }) => {
+  const [active, setActive] = useState(0);
+  const startX = useRef(0);
+  const len = projects.length;
+
+  const prev = useCallback(() => setActive(a => (a - 1 + len) % len), [len]);
+  const next = useCallback(() => setActive(a => (a + 1) % len), [len]);
+
+  const getOffset = (i: number) => {
+    let d = i - active;
+    if (d > len / 2) d -= len;
+    if (d < -len / 2) d += len;
+    return d;
+  };
+
+  const getStyle = (d: number): React.CSSProperties => {
+    const base: React.CSSProperties = { position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.7s cubic-bezier(0.25,0.8,0.25,1)" };
+    if (Math.abs(d) > 2) return { ...base, opacity: 0, pointerEvents: "none", zIndex: 0 };
+    if (d === 0)  return { ...base, transform: "translateX(0%) translateZ(180px) scale(1)", opacity: 1, zIndex: 10, cursor: "default" };
+    if (d === 1)  return { ...base, transform: "translateX(62%) translateZ(-60px) rotateY(-32deg) scale(0.82)", opacity: 0.72, zIndex: 6, cursor: "pointer" };
+    if (d === -1) return { ...base, transform: "translateX(-62%) translateZ(-60px) rotateY(32deg) scale(0.82)", opacity: 0.72, zIndex: 6, cursor: "pointer" };
+    if (d === 2)  return { ...base, transform: "translateX(105%) translateZ(-180px) rotateY(-58deg) scale(0.62)", opacity: 0.28, zIndex: 2, pointerEvents: "none" };
+    if (d === -2) return { ...base, transform: "translateX(-105%) translateZ(-180px) rotateY(58deg) scale(0.62)", opacity: 0.28, zIndex: 2, pointerEvents: "none" };
+    return { ...base, opacity: 0, pointerEvents: "none" };
+  };
+
+  return (
+    <div className="select-none">
+      <div
+        className="relative h-[500px] flex items-center justify-center overflow-visible"
+        style={{ perspective: "1300px", perspectiveOrigin: "50% 45%" }}
+        onMouseDown={e => { startX.current = e.clientX; }}
+        onMouseUp={e => { const d = e.clientX - startX.current; if (Math.abs(d) > 55) d < 0 ? next() : prev(); }}
+        onTouchStart={e => { startX.current = e.touches[0].clientX; }}
+        onTouchEnd={e => { const d = e.changedTouches[0].clientX - startX.current; if (Math.abs(d) > 55) d < 0 ? next() : prev(); }}
+      >
+        <div className="relative w-full h-full" style={{ transformStyle: "preserve-3d" }}>
+          {projects.map((project, i) => {
+            const d = getOffset(i);
+            return (
+              <div
+                key={project.id}
+                style={{ ...getStyle(d), transformStyle: "preserve-3d" }}
+                onClick={() => { if (d === 1) next(); else if (d === -1) prev(); }}
+              >
+                <div className="w-[400px] max-w-[88vw] rounded-3xl overflow-hidden"
+                  style={{
+                    background: "rgba(255,255,255,0.97)",
+                    boxShadow: d === 0
+                      ? "0 30px 90px rgba(0,120,180,0.22), 0 0 0 1px rgba(0,163,204,0.10), 0 0 60px rgba(0,200,240,0.08)"
+                      : "0 15px 50px rgba(0,0,0,0.10)",
+                  }}>
+                  <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
+                    <img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                      draggable={false}
+                      onError={e => { e.currentTarget.src = `https://placehold.co/800x500/daf3fb/007099?text=${encodeURIComponent(project.title)}`; }}
+                    />
+                    <div className="absolute inset-0 flex items-end p-5"
+                      style={{ background: "linear-gradient(to top, rgba(0,15,35,0.80) 0%, transparent 55%)", opacity: d === 0 ? 1 : 0, transition: "opacity 0.4s" }}>
+                      {project.url !== "#" && (
+                        <a href={project.url} target="_blank" rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-mono font-semibold text-white"
+                          style={{ background: "linear-gradient(135deg,#0099cc,#00c9e8)", boxShadow: "0 4px 18px rgba(0,163,204,0.45)" }}>
+                          Visit Live Site <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-serif font-bold text-foreground">{project.title}</h3>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">{project.category}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{project.description}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {project.tags.map(t => (
+                        <span key={t} className="text-[10px] font-mono px-2 py-0.5 bg-sky-50 text-sky-700 rounded border border-sky-200">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center justify-center gap-5 mt-2">
+        <button onClick={prev}
+          className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-light transition-all hover:scale-110"
+          style={{ border: "1.5px solid rgba(0,163,204,0.35)", color: "#00a3cc", background: "rgba(0,163,204,0.06)" }}>
+          ‹
+        </button>
+        <div className="flex gap-2 items-center">
+          {projects.map((_, i) => (
+            <button key={i} onClick={() => setActive(i)}
+              className="rounded-full transition-all duration-300"
+              style={{ width: i === active ? "22px" : "7px", height: "7px", background: i === active ? "#00a3cc" : "rgba(0,163,204,0.25)" }}
+            />
+          ))}
+        </div>
+        <button onClick={next}
+          className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-light transition-all hover:scale-110"
+          style={{ border: "1.5px solid rgba(0,163,204,0.35)", color: "#00a3cc", background: "rgba(0,163,204,0.06)" }}>
+          ›
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
@@ -416,12 +533,7 @@ const contactSchema = z.object({
 
 export default function Home() {
   const { data: projects = [], isLoading: isProjectsLoading } = usePortfolio();
-  const [filter, setFilter] = useState("All");
   const [pricingTab, setPricingTab] = useState<"project" | "abo">("project");
-  
-  const filteredProjects = filter === "All" 
-    ? projects 
-    : projects.filter(p => p.category === filter);
 
   const { mutate: submitContact, isPending: isSubmitting, isSuccess: isSubmitSuccess } = useSubmitContact();
   const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof contactSchema>>({
@@ -564,83 +676,21 @@ export default function Home() {
         </section>
 
         {/* PORTFOLIO SECTION */}
-        <section id="work" className="py-32 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.03) 25%, rgba(0,163,204,0.03) 75%, transparent 100%)" }}>
+        <section id="work" className="py-32 relative z-10 overflow-hidden" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.04) 25%, rgba(0,163,204,0.04) 75%, transparent 100%)" }}>
           <div className="container mx-auto px-6">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-              <div>
-                <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Selected Work</h2>
-                <p className="mt-4 text-muted-foreground max-w-2xl font-light tracking-wide">A curated selection of projects we have built and shipped.</p>
-              </div>
-              
-              <div className="flex flex-wrap gap-3">
-                {["All", "Web Apps", "Websites"].map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setFilter(cat)}
-                    className={clsx(
-                      "px-4 py-2 rounded-full font-mono text-xs transition-all duration-300 border",
-                      filter === cat 
-                        ? "bg-primary/20 text-primary border-primary shadow-[0_0_15px_rgba(0,229,255,0.25)]" 
-                        : "bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-primary"
-                    )}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Selected Work</h2>
+              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto font-light tracking-wide">
+                A curated selection of projects we've built and shipped. Drag or swipe to explore.
+              </p>
             </div>
 
             {isProjectsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1,2,3,4,5,6].map(i => (
-                  <div key={i} className="glass-card aspect-[4/3] rounded-2xl animate-pulse bg-surface/80" />
-                ))}
+              <div className="flex items-center justify-center h-[500px]">
+                <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
               </div>
             ) : (
-              <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <AnimatePresence>
-                  {filteredProjects.map((project, idx) => (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.4 }}
-                      key={project.id}
-                      className="group glass-card overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,229,255,0.12)]"
-                    >
-                      <div className="relative overflow-hidden aspect-[16/10]">
-                        <img 
-                          src={project.imageUrl} 
-                          alt={project.title} 
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          onError={(e) => {
-                            e.currentTarget.src = `https://placehold.co/600x400/daf3fb/007099?text=${encodeURIComponent(project.title)}&font=playfair-display`;
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-sky-950/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
-                          <a href={project.url} target="_blank" rel="noopener noreferrer"
-                            className="scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-100 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-sm font-semibold"
-                            style={{ background: "linear-gradient(135deg, #0099cc, #00c9e8)", color: "#fff", boxShadow: "0 4px 18px rgba(0,163,204,0.35)" }}>
-                            Visit Live Site <ExternalLink className="w-4 h-4" />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="p-6">
-                        <h3 className="text-xl font-serif font-bold text-foreground">{project.title}</h3>
-                        <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{project.description}</p>
-                        <div className="mt-6 flex flex-wrap gap-2">
-                          {project.tags.map(tag => (
-                            <span key={tag} className="text-[10px] font-mono px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
+              <ProjectCarousel3D projects={projects} />
             )}
           </div>
         </section>
