@@ -536,7 +536,7 @@ export default function Home() {
   const { data: projects = [], isLoading: isProjectsLoading } = usePortfolio();
   const [pricingTab, setPricingTab] = useState<"project" | "abo">("project");
 
-  const { mutate: submitContact, isPending: isSubmitting, isSuccess: isSubmitSuccess } = useSubmitContact();
+  const { mutate: submitContact, isPending: isSubmitting, isSuccess: isSubmitSuccess, isError: isSubmitError, error: submitError } = useSubmitContact();
   const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof contactSchema>>({
     resolver: zodResolver(contactSchema)
   });
@@ -941,10 +941,15 @@ export default function Home() {
                     />
                     {errors.message && <p className="text-destructive/80 text-xs mt-2 font-mono">{errors.message.message}</p>}
                   </div>
-                  <div className="pt-4 text-center md:text-left">
+                  <div className="pt-4 text-center md:text-left flex flex-col md:flex-row items-center gap-4">
                     <Button type="submit" disabled={isSubmitting} size="lg" className="w-full md:w-auto">
                       {isSubmitting ? "Sending..." : "Send Message"}
                     </Button>
+                    {isSubmitError && (
+                      <p className="text-destructive/80 text-sm font-mono">
+                        {(submitError as Error)?.message ?? "Something went wrong. Please try again."}
+                      </p>
+                    )}
                   </div>
                 </form>
               )}
