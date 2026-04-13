@@ -425,7 +425,7 @@ const ProjectCarousel3D = ({ projects }: { projects: import("@/hooks/use-portfol
   const getStyle = (d: number): React.CSSProperties => {
     const base: React.CSSProperties = { position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.7s cubic-bezier(0.25,0.8,0.25,1)" };
     if (Math.abs(d) > 2) return { ...base, opacity: 0, pointerEvents: "none", zIndex: 0 };
-    if (d === 0)  return { ...base, transform: "translateX(0%) translateZ(180px) scale(1)", opacity: 1, zIndex: 10, cursor: "default" };
+    if (d === 0)  return { ...base, transform: "translateX(0%) translateZ(180px) scale(1)", opacity: 1, zIndex: 10, cursor: "default", pointerEvents: "none" };
     if (d === 1)  return { ...base, transform: "translateX(62%) translateZ(-60px) rotateY(-32deg) scale(0.82)", opacity: 0.72, zIndex: 6, cursor: "pointer" };
     if (d === -1) return { ...base, transform: "translateX(-62%) translateZ(-60px) rotateY(32deg) scale(0.82)", opacity: 0.72, zIndex: 6, cursor: "pointer" };
     if (d === 2)  return { ...base, transform: "translateX(105%) translateZ(-180px) rotateY(-58deg) scale(0.62)", opacity: 0.28, zIndex: 2, pointerEvents: "none" };
@@ -454,6 +454,7 @@ const ProjectCarousel3D = ({ projects }: { projects: import("@/hooks/use-portfol
               >
                 <div className="w-[400px] max-w-[88vw] rounded-3xl overflow-hidden"
                   style={{
+                    pointerEvents: "auto",
                     background: "rgba(255,255,255,0.97)",
                     boxShadow: d === 0
                       ? "0 30px 90px rgba(0,120,180,0.22), 0 0 0 1px rgba(0,163,204,0.10), 0 0 60px rgba(0,200,240,0.08)"
