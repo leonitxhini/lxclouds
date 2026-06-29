@@ -1,971 +1,733 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { usePortfolio } from "@/hooks/use-portfolio";
-import { useSubmitContact } from "@/hooks/use-contact";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { clsx } from "clsx";
-import { 
-  Monitor, AppWindow, PenTool, LayoutTemplate, Wrench, 
-  ChevronDown, Check, ExternalLink, ArrowRight,
-  Smartphone, CalendarCheck, Zap
+import {
+  Cloud, Check, ArrowRight, ArrowUpRight, Menu, X, BadgeEuro, Sparkles, MessageCircle,
+  Monitor, LayoutTemplate, Code2, PenTool, Settings, Server, Globe, Mail,
+  MessageSquare, Layers, Rocket,
 } from "lucide-react";
 
-// --- Sub-components (Kept in-file for optimal single-page structure) ---
+// --- Constants ---
 
-const NoiseOverlay = () => (
-  <div className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.03]">
-    <svg className="absolute inset-0 h-full w-full">
-      <filter id="noise">
-        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#noise)" />
-    </svg>
-  </div>
-);
+const PHONE_DISPLAY = "0157 8099 8115";
+const WHATSAPP_URL = "https://wa.me/4915780998115";
+const EMAIL = "info@lxclouds.com";
+const YEAR = new Date().getFullYear();
 
-const HeroBackground = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    {/* Base — pure ice white */}
-    <div className="absolute inset-0" style={{
-      background: "linear-gradient(140deg, #f8fdff 0%, #eef8fd 35%, #e8f4fa 65%, #f2faff 100%)",
-    }} />
-    {/* Soft sky-cyan glow — right, behind illustration */}
-    <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 65% 75% at 85% 55%, rgba(0,180,220,0.14) 0%, transparent 65%)",
-    }} />
-    {/* Pale lavender glow — center */}
-    <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 50% 55% at 60% 45%, rgba(160,200,255,0.10) 0%, transparent 60%)",
-    }} />
-    {/* Ice-cyan glow — upper-left behind text */}
-    <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 55% 60% at 8% 25%, rgba(0,200,240,0.09) 0%, transparent 60%)",
-    }} />
-    {/* Faint sky-blue top haze */}
-    <div className="absolute inset-0" style={{
-      background: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(100,180,240,0.07) 0%, transparent 55%)",
-    }} />
-  </div>
-);
+type Lang = "en" | "de";
 
-const TechIllustration = () => (
-  <svg viewBox="0 0 560 440" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full max-h-[520px]">
-    <defs>
-      <filter id="gg" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="9" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <filter id="gs" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="5"/>
-      </filter>
-      <filter id="gsm" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="2.5"/>
-      </filter>
-      {/* Cloud fill — deep green inner glow */}
-      <radialGradient id="cFill" cx="50%" cy="38%" r="58%">
-        <stop offset="0%"   stopColor="#00ff88" stopOpacity="0.22"/>
-        <stop offset="55%"  stopColor="#00aa44" stopOpacity="0.07"/>
-        <stop offset="100%" stopColor="#003318" stopOpacity="0.02"/>
-      </radialGradient>
-      {/* Device surfaces */}
-      <linearGradient id="devTop" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#0a2018"/>
-        <stop offset="100%" stopColor="#061410"/>
-      </linearGradient>
-      <linearGradient id="scrn" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#011a0c"/>
-        <stop offset="100%" stopColor="#022a14"/>
-      </linearGradient>
-      <linearGradient id="grnLine" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#00ff88" stopOpacity="0"/>
-        <stop offset="50%" stopColor="#00ff88" stopOpacity="1"/>
-        <stop offset="100%" stopColor="#00ff88" stopOpacity="0"/>
-      </linearGradient>
-    </defs>
-
-    {/* ── ORBIT RING ── */}
-    <ellipse cx="268" cy="302" rx="228" ry="58" fill="none" stroke="#00ff88" strokeWidth="0.8" strokeOpacity="0.14"/>
-    <ellipse cx="268" cy="302" rx="198" ry="49" fill="none" stroke="#22c55e" strokeWidth="0.5" strokeOpacity="0.10"/>
-
-    {/* ── CLOUD ICON (proper cloud-service silhouette) ── */}
-    {/* Outer ambient glow */}
-    <ellipse cx="258" cy="185" rx="150" ry="110" fill="#00ff88" fillOpacity="0.04" filter="url(#gs)"/>
-
-    {/* Cloud body — classic fluffy cloud shape */}
-    {/* Three concentric outlines for depth */}
-    <path d="
-      M 148 248
-      C 128 248 118 234 120 216
-      C 120 196 136 182 158 180
-      C 154 154 170 132 194 126
-      C 206 112 226 106 248 112
-      C 252  90 272  80 298  80
-      C 326  78 348  96 352 120
-      C 374 108 396 120 402 144
-      C 426 146 442 168 436 192
-      C 432 214 414 230 392 232
-      L 168 232
-      C 155 232 148 242 148 248 Z"
-      fill="url(#cFill)"
-      stroke="#00ff88" strokeWidth="2.4" strokeOpacity="0.85"
-      strokeLinejoin="round"/>
-    <path d="
-      M 140 252
-      C 118 252 106 236 108 216
-      C 106 192 124 175 148 172
-      C 142 144 160 118 186 112
-      C 200 96 222  90 246 96
-      C 250  72 272  60 300  60
-      C 332  57 357  78 362 106
-      C 386  92 412 106 418 134
-      C 446 136 464 162 458 190
-      C 454 216 432 234 406 236
-      L 162 236
-      C 148 237 140 246 140 252 Z"
-      fill="none" stroke="#00ff88" strokeWidth="1" strokeOpacity="0.28" strokeLinejoin="round"/>
-    <path d="
-      M 132 256
-      C 108 256 94 238 96 215
-      C 93 187 114 167 140 162
-      C 132 130 152 104 180 96
-      C 196 80 220  74 246  80
-      C 251  54 274  42 304  42
-      C 340  38 368  62 374  92
-      C 400  76 430  92 436 124
-      C 468 126 488 156 482 188
-      C 478 218 452 238 422 240
-      L 156 240
-      C 140 241 132 250 132 256 Z"
-      fill="none" stroke="#00ff88" strokeWidth="0.6" strokeOpacity="0.12" strokeLinejoin="round"/>
-
-    {/* Upload ↑ arrow inside cloud */}
-    <line x1="236" y1="220" x2="236" y2="152" stroke="#00ff88" strokeWidth="2" strokeOpacity="0.9"/>
-    <polygon points="236,140 229,158 243,158" fill="#00ff88" fillOpacity="0.95"/>
-    {/* Download ↓ arrow inside cloud */}
-    <line x1="280" y1="148" x2="280" y2="220" stroke="#22c55e" strokeWidth="2" strokeOpacity="0.9"/>
-    <polygon points="280,232 273,216 287,216" fill="#22c55e" fillOpacity="0.95"/>
-    {/* Upload ↑ arrow 2 (right) */}
-    <line x1="318" y1="218" x2="318" y2="155" stroke="#00ff88" strokeWidth="1.6" strokeOpacity="0.7"/>
-    <polygon points="318,144 312,161 324,161" fill="#00ff88" fillOpacity="0.8"/>
-
-    {/* Cloud center glow node */}
-    <circle cx="258" cy="170" r="18" fill="#00ff88" fillOpacity="0.07" filter="url(#gs)"/>
-    <circle cx="258" cy="170" r="8"  fill="#00ff88" fillOpacity="0.18"/>
-    <circle cx="258" cy="170" r="4"  fill="#00ff88" fillOpacity="0.6"/>
-    <circle cx="258" cy="170" r="1.5" fill="white"/>
-
-    {/* Horizontal shine line through cloud */}
-    <rect x="148" y="163" width="280" height="1" fill="url(#grnLine)" fillOpacity="0.25"/>
-
-    {/* ── ISOMETRIC LAPTOP (right) ── */}
-    <path d="M385 295 L455 258 L506 283 L436 320Z" fill="url(#devTop)" stroke="#00ff88" strokeWidth="1.4" strokeOpacity="0.6"/>
-    <path d="M506 283 L506 300 L436 337 L436 320Z" fill="#040e08" stroke="#00ff88" strokeWidth="0.9" strokeOpacity="0.35"/>
-    <path d="M385 295 L385 312 L436 337 L436 320Z" fill="#061210" stroke="#00ff88" strokeWidth="0.9" strokeOpacity="0.35"/>
-    <path d="M385 295 L455 258 L460 206 L390 243Z" fill="#030e08" stroke="#00ff88" strokeWidth="1.1" strokeOpacity="0.4"/>
-    <path d="M390 243 L460 206 L511 231 L441 268Z" fill="url(#scrn)" stroke="#00ff88" strokeWidth="1.8" strokeOpacity="0.9"/>
-    {/* screen bars */}
-    <rect x="396" y="246" width="5" height="16" fill="#00ff88" fillOpacity="0.7" rx="1"/>
-    <rect x="404" y="241" width="5" height="21" fill="#22c55e" fillOpacity="0.6" rx="1"/>
-    <rect x="412" y="249" width="5" height="13" fill="#00ff88" fillOpacity="0.55" rx="1"/>
-    <rect x="420" y="238" width="5" height="26" fill="#00ff88" fillOpacity="0.65" rx="1"/>
-    <rect x="428" y="245" width="5" height="19" fill="#22c55e" fillOpacity="0.5" rx="1"/>
-    {/* screen line chart */}
-    <polyline points="395,239 406,236 416,241 428,231 439,237 450,233" fill="none" stroke="#00ff88" strokeWidth="1.7" strokeOpacity="1"/>
-    <circle cx="428" cy="231" r="2.8" fill="#00ff88"/>
-    <rect x="391" y="244" width="60" height="26" fill="#00ff88" fillOpacity="0.025" rx="1"/>
-
-    {/* ── ISOMETRIC PHONE (left) ── */}
-    <path d="M90 308 L122 290 L142 300 L110 318Z" fill="url(#devTop)" stroke="#22c55e" strokeWidth="1.3" strokeOpacity="0.7"/>
-    <path d="M142 300 L142 352 L110 370 L110 318Z" fill="#030c06" stroke="#22c55e" strokeWidth="0.9" strokeOpacity="0.35"/>
-    <path d="M90 308 L90 360 L110 370 L110 318Z" fill="#040e08" stroke="#22c55e" strokeWidth="0.9" strokeOpacity="0.35"/>
-    <path d="M92 310 L122 292 L140 302 L110 320Z" fill="url(#scrn)" stroke="#22c55e" strokeWidth="1.2" strokeOpacity="0.8"/>
-    {/* phone dial indicator */}
-    <circle cx="116" cy="306" r="7" fill="none" stroke="#00ff88" strokeWidth="1.4" strokeOpacity="0.9"/>
-    <circle cx="116" cy="306" r="3" fill="#00ff88" fillOpacity="0.55"/>
-    <line x1="116" y1="300" x2="116" y2="306" stroke="#00ff88" strokeWidth="1.3"/>
-    {/* phone up arrow */}
-    <line x1="84" y1="298" x2="84" y2="270" stroke="#00ff88" strokeWidth="2.2" strokeOpacity="0.9"/>
-    <polygon points="84,260 77,277 91,277" fill="#00ff88" fillOpacity="0.95"/>
-    <line x1="74" y1="308" x2="74" y2="284" stroke="#22c55e" strokeWidth="1.4" strokeOpacity="0.6"/>
-    <polygon points="74,275 68,292 80,292" fill="#22c55e" fillOpacity="0.7"/>
-
-    {/* ── CONNECTION LINES ── */}
-    <path d="M400 200 L430 200 L448 232 L456 258" fill="none" stroke="#00ff88" strokeWidth="1.7" strokeOpacity="0.5" strokeDasharray="5,3"/>
-    <path d="M132 220 L108 220 L104 268 L104 290" fill="none" stroke="#22c55e" strokeWidth="1.7" strokeOpacity="0.5" strokeDasharray="5,3"/>
-    <path d="M210 240 L210 275 L185 288" fill="none" stroke="#00ff88" strokeWidth="1.2" strokeOpacity="0.4"/>
-    <path d="M258 238 L258 278 L258 298" fill="none" stroke="#22c55e" strokeWidth="1.2" strokeOpacity="0.4"/>
-    <path d="M308 240 L308 275 L332 290" fill="none" stroke="#00ff88" strokeWidth="1.2" strokeOpacity="0.4"/>
-
-    {/* ── GLOWING NODES ── */}
-    <circle cx="401" cy="200" r="8"  fill="#00ff88" fillOpacity="0.1" filter="url(#gsm)"/>
-    <circle cx="401" cy="200" r="4.5" fill="#00ff88" fillOpacity="0.45"/>
-    <circle cx="401" cy="200" r="2"  fill="white"/>
-    <circle cx="131" cy="220" r="8"  fill="#22c55e" fillOpacity="0.1" filter="url(#gsm)"/>
-    <circle cx="131" cy="220" r="4.5" fill="#22c55e" fillOpacity="0.45"/>
-    <circle cx="131" cy="220" r="2"  fill="white"/>
-    <circle cx="185" cy="288" r="4.5" fill="#00ff88" fillOpacity="0.5"/>
-    <circle cx="332" cy="290" r="4.5" fill="#00ff88" fillOpacity="0.5"/>
-    <circle cx="258" cy="298" r="4.5" fill="#22c55e" fillOpacity="0.5"/>
-    {/* floating particles */}
-    <circle cx="160" cy="148" r="2.4" fill="#00ff88" fillOpacity="0.55"/>
-    <circle cx="358" cy="132" r="2.6" fill="#00ff88" fillOpacity="0.45"/>
-    <circle cx="474" cy="184" r="2"   fill="#22c55e" fillOpacity="0.5"/>
-    <circle cx="358" cy="362" r="2"   fill="#00ff88" fillOpacity="0.32"/>
-    <circle cx="136" cy="370" r="2"   fill="#22c55e" fillOpacity="0.42"/>
-    <circle cx="485" cy="136" r="1.8" fill="#00ff88" fillOpacity="0.38"/>
-    <circle cx="64"  cy="252" r="1.8" fill="#22c55e" fillOpacity="0.36"/>
-    <circle cx="420" cy="380" r="1.6" fill="#00ff88" fillOpacity="0.28"/>
-
-    {/* ── DATA BARS (bottom-right) ── */}
-    <rect x="358" y="344" width="10" height="34" fill="#00ff88" fillOpacity="0.5" rx="2"/>
-    <rect x="372" y="330" width="10" height="48" fill="#22c55e" fillOpacity="0.45" rx="2"/>
-    <rect x="386" y="348" width="10" height="30" fill="#00ff88" fillOpacity="0.38" rx="2"/>
-    <rect x="400" y="337" width="10" height="41" fill="#22c55e" fillOpacity="0.5" rx="2"/>
-    <rect x="356" y="328" width="58" height="56" fill="#00ff88" fillOpacity="0.025" filter="url(#gsm)" rx="4"/>
-
-    {/* ── UPLOAD ARROWS (top-right) ── */}
-    <line x1="514" y1="204" x2="514" y2="144" stroke="#00ff88" strokeWidth="2.6" strokeOpacity="0.88"/>
-    <polygon points="514,133 507,152 521,152" fill="#00ff88" fillOpacity="0.92"/>
-    <circle cx="514" cy="209" r="3.8" fill="#00ff88" fillOpacity="0.5"/>
-    <line x1="528" y1="222" x2="528" y2="165" stroke="#22c55e" strokeWidth="1.5" strokeOpacity="0.45"/>
-    <polygon points="528,155 522,172 534,172" fill="#22c55e" fillOpacity="0.5"/>
+const WhatsAppIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
   </svg>
 );
 
-const Navbar = () => {
+// --- Shared (non-translated) icon / image maps ---
+
+const ABOUT_ICONS = [BadgeEuro, Sparkles, MessageCircle];
+const SERVICE_ICONS = [Monitor, LayoutTemplate, Code2, Cloud, PenTool, Settings];
+const HOSTING_ICONS = [Server, Server, Globe, Mail];
+const PROCESS_ICONS = [MessageSquare, Layers, Code2, Rocket];
+const WORK_IMAGES: (string | null)[] = [null, null, null, "/project-lonorix.png"];
+
+// --- Translations ---
+
+const T = {
+  en: {
+    nav: ["Pricing", "Contact"],
+    getInTouch: "Get in Touch",
+    heroEyebrow: "WE BUILD SOLUTIONS",
+    heroLine1: "We Build",
+    heroGradient: "Digital Experiences",
+    heroLine3: "That Last.",
+    heroText:
+      "LX CLOUDS crafts websites, web apps, mobile apps, and custom booking systems — designed with precision, built for growth, delivered with care.",
+    heroCta1: "View Pricing",
+    heroCta2: "Get in Touch",
+    stats: [["50+", "Projects Delivered"], ["100%", "Client Satisfaction"], ["Germany", "Based in Germany"]],
+    aboutEyebrow: "ABOUT",
+    aboutTitle: "Personal. Clean. Reliable.",
+    aboutP1:
+      "LX CLOUDS is a personal web design project focused on creating modern websites for small businesses, creators, local brands and private projects.",
+    aboutP2:
+      "No agency overhead. No complicated processes. Just clean design, reliable development and fair communication from start to finish.",
+    aboutCards: [
+      { title: "Fair Pricing", desc: "Transparent prices without hidden costs." },
+      { title: "Modern Design", desc: "Clean layouts, responsive structure and strong visual quality." },
+      { title: "Personal Support", desc: "Direct communication and simple project handling." },
+    ],
+    servicesEyebrow: "SERVICES",
+    servicesTitle: "What I Build",
+    services: [
+      { title: "Websites", desc: "Modern websites for businesses, creators and personal brands." },
+      { title: "Landing Pages", desc: "Focused one-page websites for offers, campaigns and portfolios." },
+      { title: "Custom Functions", desc: "Forms, WhatsApp automations, filters, galleries and small tools." },
+      { title: "Hosting Setup", desc: "Domain, hosting, SSL and email setup for your project." },
+      { title: "Branding Basics", desc: "Simple logos, colors and visual direction for your website." },
+      { title: "Maintenance", desc: "Small changes, updates and support after launch." },
+    ],
+    workEyebrow: "WORK",
+    workTitle: "Selected Work",
+    work: [
+      { title: "Holzwurm-Lindheim", desc: "Boutique website for handmade wooden decorations.", features: ["Warm handmade design", "Product overview", "Gallery", "Contact form", "WhatsApp request", "Responsive layout"] },
+      { title: "RGM System", desc: "Returns and credit management system.", features: ["Dashboard interface", "Data structure", "Admin workflow", "Clean UI"] },
+      { title: "AFM Manager", desc: "Vehicle preparation management platform.", features: ["Task overview", "Status tracking", "Internal workflow", "Custom interface"] },
+      { title: "AI Album Cover Generator", desc: "Creative tool for generating album cover ideas.", features: ["Modern interface", "Prompt input", "Image result layout", "Clean user experience"] },
+    ],
+    pricingEyebrow: "PRICING",
+    pricingTitle: "Fair Pricing for Digital Projects",
+    pricingSub: "Every project is different. These prices are a starting point.",
+    mostPopular: "MOST POPULAR",
+    from: "from",
+    possibleFeatures: "Possible features:",
+    packages: [
+      { name: "Landing Page", price: "399", desc: "For simple one-page websites with a clear message.", features: ["One modern page", "Responsive design", "Contact section", "WhatsApp button", "Basic SEO"] },
+      { name: "Website", price: "1.500", desc: "For small businesses, local brands and personal projects.", features: ["Custom homepage", "Multiple content sections", "Gallery or product overview", "Contact form", "Mobile optimization", "Basic SEO"] },
+      { name: "Custom Website", price: "2.500", desc: "For projects with special functions or more advanced requirements.", features: ["Request forms", "WhatsApp automation", "Filters", "Upload fields", "Booking forms", "Custom JavaScript functions"] },
+    ],
+    addonsTitle: "ADD-ONS",
+    addons: [
+      { label: "Logo / Simple Branding", price: "from 30 €" },
+      { label: "Additional Page", price: "from 80 €" },
+      { label: "Contact Form", price: "from 50 €" },
+      { label: "WhatsApp Integration", price: "from 50 €" },
+      { label: "Gallery / Lightbox", price: "from 80 €" },
+      { label: "Product Request Function", price: "from 250 €" },
+      { label: "Hosting & Domain Setup", price: "from 50 €" },
+      { label: "Maintenance", price: "from 20 € / month" },
+    ],
+    hostingTitle: "HOSTING & RUNNING COSTS",
+    hosting: [
+      { label: "Simple Website Hosting", price: "ca. 5 – 15 €", unit: "/ month" },
+      { label: "Business Hosting", price: "ca. 15 – 30 €", unit: "/ month" },
+      { label: "Domain", price: "ca. 10 – 20 €", unit: "/ year" },
+      { label: "Business Email", price: "ca. 1 – 5 €", unit: "/ month" },
+    ],
+    hostingNote: "Hosting and domain costs are separate from the website price and depend on the provider and project requirements.",
+    processEyebrow: "PROCESS",
+    processTitle: "Simple Process. Clear Result.",
+    process: [
+      { title: "Brief", desc: "You tell me what you need." },
+      { title: "Concept", desc: "We define structure, design direction and features." },
+      { title: "Design & Build", desc: "I create the website and keep you updated." },
+      { title: "Launch", desc: "The website goes online with domain, hosting and basic setup." },
+    ],
+    contactEyebrow: "CONTACT",
+    contactTitle: "Let's Build Your Project.",
+    contactSub: "Need a website, landing page or custom function? Send me a message and I'll give you a clear estimate.",
+    labelWebsite: "Website",
+    labelEmail: "Email",
+    labelWhatsApp: "WhatsApp",
+    startProject: "Start a Project",
+    footerTagline: "Personal web design, clean development and fair digital solutions.",
+    rights: `© ${YEAR} LX CLOUDS. All rights reserved.`,
+  },
+  de: {
+    nav: ["Preise", "Kontakt"],
+    getInTouch: "Kontakt aufnehmen",
+    heroEyebrow: "WIR BAUEN LÖSUNGEN",
+    heroLine1: "Wir gestalten",
+    heroGradient: "digitale Erlebnisse,",
+    heroLine3: "die bleiben.",
+    heroText:
+      "LX CLOUDS gestaltet Websites, Web-Apps, mobile Apps und individuelle Buchungssysteme — mit Präzision entworfen, für Wachstum gebaut, mit Sorgfalt geliefert.",
+    heroCta1: "Preise ansehen",
+    heroCta2: "Kontakt aufnehmen",
+    stats: [["50+", "Projekte umgesetzt"], ["100%", "Kundenzufriedenheit"], ["Germany", "Sitz in Deutschland"]],
+    aboutEyebrow: "ÜBER MICH",
+    aboutTitle: "Persönlich. Sauber. Zuverlässig.",
+    aboutP1:
+      "LX CLOUDS ist ein persönliches Webdesign-Projekt mit Fokus auf moderne Websites für kleine Unternehmen, Creators, lokale Marken und private Projekte.",
+    aboutP2:
+      "Kein Agentur-Overhead. Keine komplizierten Prozesse. Nur sauberes Design, zuverlässige Entwicklung und faire Kommunikation von Anfang bis Ende.",
+    aboutCards: [
+      { title: "Faire Preise", desc: "Transparente Preise ohne versteckte Kosten." },
+      { title: "Modernes Design", desc: "Klare Layouts, responsive Struktur und starke visuelle Qualität." },
+      { title: "Persönlicher Support", desc: "Direkte Kommunikation und einfache Projektabwicklung." },
+    ],
+    servicesEyebrow: "LEISTUNGEN",
+    servicesTitle: "Was ich baue",
+    services: [
+      { title: "Websites", desc: "Moderne Websites für Unternehmen, Creators und persönliche Marken." },
+      { title: "Landingpages", desc: "Fokussierte One-Page-Websites für Angebote, Aktionen und Portfolios." },
+      { title: "Individuelle Funktionen", desc: "Formulare, WhatsApp-Automationen, Filter, Galerien und kleine Tools." },
+      { title: "Hosting-Setup", desc: "Domain, Hosting, SSL und E-Mail-Einrichtung für dein Projekt." },
+      { title: "Branding-Basics", desc: "Einfache Logos, Farben und visuelle Richtung für deine Website." },
+      { title: "Wartung", desc: "Kleine Änderungen, Updates und Support nach dem Launch." },
+    ],
+    workEyebrow: "ARBEITEN",
+    workTitle: "Ausgewählte Arbeiten",
+    work: [
+      { title: "Holzwurm-Lindheim", desc: "Boutique-Website für handgemachte Holzdekorationen.", features: ["Warmes handgemachtes Design", "Produktübersicht", "Galerie", "Kontaktformular", "WhatsApp-Anfrage", "Responsives Layout"] },
+      { title: "RGM System", desc: "Retouren- und Gutschriften-Management-System.", features: ["Dashboard-Oberfläche", "Datenstruktur", "Admin-Workflow", "Klares UI"] },
+      { title: "AFM Manager", desc: "Plattform für Fahrzeugaufbereitungs-Management.", features: ["Aufgabenübersicht", "Status-Tracking", "Interner Workflow", "Individuelles Interface"] },
+      { title: "KI-Album-Cover-Generator", desc: "Kreatives Tool zum Generieren von Album-Cover-Ideen.", features: ["Modernes Interface", "Prompt-Eingabe", "Bild-Ergebnis-Layout", "Klare Bedienung"] },
+    ],
+    pricingEyebrow: "PREISE",
+    pricingTitle: "Faire Preise für digitale Projekte",
+    pricingSub: "Jedes Projekt ist anders. Diese Preise sind ein Startpunkt.",
+    mostPopular: "BELIEBT",
+    from: "ab",
+    possibleFeatures: "Mögliche Funktionen:",
+    packages: [
+      { name: "Landingpage", price: "399", desc: "Für einfache One-Page-Websites mit einer klaren Botschaft.", features: ["Eine moderne Seite", "Responsives Design", "Kontaktbereich", "WhatsApp-Button", "Basis-SEO"] },
+      { name: "Website", price: "1.500", desc: "Für kleine Unternehmen, lokale Marken und persönliche Projekte.", features: ["Individuelle Startseite", "Mehrere Inhaltsbereiche", "Galerie oder Produktübersicht", "Kontaktformular", "Mobile Optimierung", "Basis-SEO"] },
+      { name: "Individuelle Website", price: "2.500", desc: "Für Projekte mit Sonderfunktionen oder höheren Anforderungen.", features: ["Anfrageformulare", "WhatsApp-Automation", "Filter", "Upload-Felder", "Buchungsformulare", "Individuelle JavaScript-Funktionen"] },
+    ],
+    addonsTitle: "ZUSATZLEISTUNGEN",
+    addons: [
+      { label: "Logo / einfaches Branding", price: "ab 30 €" },
+      { label: "Zusätzliche Unterseite", price: "ab 80 €" },
+      { label: "Kontaktformular", price: "ab 50 €" },
+      { label: "WhatsApp-Integration", price: "ab 50 €" },
+      { label: "Galerie / Lightbox", price: "ab 80 €" },
+      { label: "Produkt-Anfragefunktion", price: "ab 250 €" },
+      { label: "Hosting & Domain Einrichtung", price: "ab 50 €" },
+      { label: "Wartung", price: "ab 20 € / Monat" },
+    ],
+    hostingTitle: "HOSTING & LAUFENDE KOSTEN",
+    hosting: [
+      { label: "Einfaches Website-Hosting", price: "ca. 5 – 15 €", unit: "/ Monat" },
+      { label: "Business-Hosting", price: "ca. 15 – 30 €", unit: "/ Monat" },
+      { label: "Domain", price: "ca. 10 – 20 €", unit: "/ Jahr" },
+      { label: "Business-E-Mail", price: "ca. 1 – 5 €", unit: "/ Monat" },
+    ],
+    hostingNote: "Hosting- und Domainkosten sind unabhängig vom Website-Preis und hängen vom Anbieter und den Projektanforderungen ab.",
+    processEyebrow: "ABLAUF",
+    processTitle: "Einfacher Ablauf. Klares Ergebnis.",
+    process: [
+      { title: "Briefing", desc: "Du sagst mir, was du brauchst." },
+      { title: "Konzept", desc: "Wir definieren Struktur, Design-Richtung und Funktionen." },
+      { title: "Design & Bau", desc: "Ich erstelle die Website und halte dich auf dem Laufenden." },
+      { title: "Launch", desc: "Die Website geht online — mit Domain, Hosting und Basis-Setup." },
+    ],
+    contactEyebrow: "KONTAKT",
+    contactTitle: "Lass uns dein Projekt bauen.",
+    contactSub: "Brauchst du eine Website, Landingpage oder Sonderfunktion? Schreib mir und ich gebe dir eine klare Einschätzung.",
+    labelWebsite: "Website",
+    labelEmail: "E-Mail",
+    labelWhatsApp: "WhatsApp",
+    startProject: "Projekt starten",
+    footerTagline: "Persönliches Webdesign, saubere Entwicklung und faire digitale Lösungen.",
+    rights: `© ${YEAR} LX CLOUDS. Alle Rechte vorbehalten.`,
+  },
+} as const;
+
+type Translation = (typeof T)[Lang];
+
+// --- Background glow ribbons ---
+
+const BackgroundGlow = () => (
+  <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 75% 8%, rgba(34,211,238,0.10), transparent 60%)" }} />
+    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 50% 45% at 85% 30%, rgba(59,130,246,0.14), transparent 60%)" }} />
+    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 45% 40% at 10% 18%, rgba(99,102,241,0.10), transparent 60%)" }} />
+    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(37,99,235,0.08), transparent 65%)" }} />
+  </div>
+);
+
+// --- Language switcher ---
+
+const LangSwitch = ({ lang, setLang, className }: { lang: Lang; setLang: (l: Lang) => void; className?: string }) => (
+  <div className={clsx("inline-flex items-center rounded-lg border border-white/15 overflow-hidden text-xs font-bold", className)}>
+    {(["en", "de"] as const).map((l) => (
+      <button
+        key={l}
+        onClick={() => setLang(l)}
+        className={clsx("px-2.5 py-1.5 transition-colors uppercase", lang === l ? "bg-primary text-white" : "text-foreground/50 hover:text-foreground")}
+        aria-pressed={lang === l}
+      >
+        {l}
+      </button>
+    ))}
+  </div>
+);
+
+const Logo = () => (
+  <a href="#home" className="flex items-center gap-2.5" aria-label="LX CLOUDS">
+    <Cloud className="w-7 h-7 text-glow" fill="currentColor" strokeWidth={0} />
+    <span className="text-xl font-serif font-bold tracking-[0.15em] text-foreground">LX CLOUDS</span>
+  </a>
+);
+
+// --- Navbar ---
+
+const Navbar = ({ t, lang, setLang }: { t: Translation; lang: Lang; setLang: (l: Lang) => void }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const hrefs = ["#pricing", "#contact"];
+
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header className={clsx(
-      "fixed top-0 inset-x-0 z-40 transition-all duration-300 border-b",
-      scrolled
-        ? "bg-white/90 backdrop-blur-md border-border/50 py-4 shadow-md shadow-sky-100/70"
-        : "bg-transparent border-transparent py-6"
-    )}>
+    <header className={clsx("fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b", scrolled ? "bg-background/80 backdrop-blur-xl border-white/10 py-3" : "border-transparent py-5")}>
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <a href="#" aria-label="LX CLOUDS home" className="flex items-center gap-2.5">
-          <span className="font-serif font-bold text-xl tracking-wide transition-colors"
-            style={{ color: scrolled ? "rgba(10,18,42,1)" : "rgba(255,255,255,0.95)" }}>
-            LX CLOUDS
-          </span>
-        </a>
-        <nav className="hidden md:flex gap-8 items-center font-mono text-sm">
-          {["About","Services","Work","Pricing"].map(l => (
-            <a key={l} href={`#${l.toLowerCase()}`}
-              className="transition-colors"
-              style={{ color: scrolled ? "rgba(10,18,42,0.80)" : "rgba(255,255,255,0.80)" }}
-            >{l}</a>
+        <Logo />
+        <nav className="hidden lg:flex items-center gap-8">
+          {t.nav.map((label, i) => (
+            <a key={i} href={hrefs[i]} className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">{label}</a>
           ))}
-          <Button asChild size="sm" className="rounded-full px-6"
-            style={scrolled ? {
-              background: "rgba(0,163,204,0.12)",
-              border: "1.5px solid rgba(0,163,204,0.45)",
-              color: "#007aa3",
-            } : {
-              background: "rgba(255,255,255,0.12)",
-              border: "1.5px solid rgba(255,255,255,0.40)",
-              color: "#ffffff",
-            }}>
-            <a href="#contact">Let's Talk</a>
-          </Button>
+          <LangSwitch lang={lang} setLang={setLang} />
+          <a href="#contact" className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 hover:border-glow/50 hover:bg-white/5 text-foreground text-sm font-semibold px-5 py-2.5 transition-colors">
+            {t.getInTouch} <ArrowUpRight className="w-3.5 h-3.5" />
+          </a>
         </nav>
+        <div className="lg:hidden flex items-center gap-3">
+          <LangSwitch lang={lang} setLang={setLang} />
+          <button className="text-foreground p-2" onClick={() => setOpen((o) => !o)} aria-label="Menu">{open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}</button>
+        </div>
       </div>
+      {open && (
+        <div className="lg:hidden bg-background/95 backdrop-blur-xl border-t border-white/10 px-6 py-4 flex flex-col gap-1">
+          {t.nav.map((label, i) => (
+            <a key={i} href={hrefs[i]} onClick={() => setOpen(false)} className="py-2.5 text-sm font-medium text-foreground/80">{label}</a>
+          ))}
+          <a href="#contact" onClick={() => setOpen(false)} className="mt-2 rounded-lg bg-primary text-white text-sm font-semibold px-5 py-3 text-center">{t.getInTouch}</a>
+        </div>
+      )}
     </header>
   );
 };
 
-const SERVICES = [
-  { icon: Monitor,       title: "Web Design & Development",  desc: "Custom websites built from the ground up for performance and stunning aesthetics." },
-  { icon: AppWindow,     title: "Web App Development",        desc: "Complex, scalable web applications that solve real business problems." },
-  { icon: Smartphone,    title: "Mobile App Development",     desc: "Native-quality iOS & Android apps built with modern cross-platform frameworks." },
-  { icon: CalendarCheck, title: "Booking & Scheduling Apps",  desc: "Purpose-built booking systems, reservation platforms, and appointment apps tailored to your workflow." },
-  { icon: PenTool,       title: "UI/UX Design",               desc: "Intuitive, engaging, and beautiful interfaces tailored to your audience." },
-  { icon: LayoutTemplate,title: "Landing Pages & Portfolios", desc: "High-converting marketing pages designed to captivate and convert." },
-  { icon: Wrench,        title: "Maintenance & Support",      desc: "Keeping your digital presence secure, fast, and running flawlessly." }
+// --- Section eyebrow + title ---
+
+const SectionTitle = ({ eyebrow, title, sub, center = true }: { eyebrow: string; title: string; sub?: string; center?: boolean }) => (
+  <div className={clsx("mb-12", center && "text-center")}>
+    <div className={clsx("font-mono text-xs tracking-[0.25em] text-glow mb-3", center && "flex justify-center")}>{eyebrow}</div>
+    <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground">{title}</h2>
+    {sub && <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">{sub}</p>}
+  </div>
+);
+
+// --- Work card with image / mock fallback ---
+
+const WorkCard = ({ item, image, index }: { item: Translation["work"][number]; image: string | null; index: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 26 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-60px" }}
+    transition={{ duration: 0.5, delay: (index % 2) * 0.1 }}
+    className="glass-card rounded-2xl overflow-hidden flex flex-col group"
+  >
+    <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#0c1830] to-[#0a1424]">
+      {image ? (
+        <img src={image} alt={item.title} className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-500" />
+      ) : (
+        <div className="absolute inset-0 flex flex-col p-4">
+          <div className="flex gap-1.5 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+          </div>
+          <div className="flex-1 grid grid-cols-3 gap-2">
+            <div className="col-span-1 rounded-lg bg-white/[0.04] border border-white/5" />
+            <div className="col-span-2 flex flex-col gap-2">
+              <div className="h-3 w-2/3 rounded bg-white/10" />
+              <div className="h-2 w-full rounded bg-white/[0.06]" />
+              <div className="h-2 w-5/6 rounded bg-white/[0.06]" />
+              <div className="mt-auto h-6 w-24 rounded-md bg-gradient-to-r from-glow/40 to-primary/40" />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+    <div className="p-6 flex flex-col flex-1">
+      <h3 className="text-xl font-serif font-bold text-foreground">{item.title}</h3>
+      <p className="mt-1.5 text-sm text-muted-foreground">{item.desc}</p>
+      <ul className="mt-4 space-y-2">
+        {item.features.map((f) => (
+          <li key={f} className="flex items-center gap-2.5 text-sm text-foreground/85">
+            <Check className="w-4 h-4 text-glow flex-shrink-0" strokeWidth={2.5} />
+            {f}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </motion.div>
+);
+
+// --- Pricing section (bilingual: German primary, English secondary) ---
+
+type Pkg = {
+  name: string; nameEn?: string; priceDe: string; priceEn: string; descDe: string; descEn: string;
+  highlight: boolean; features: [string, string][]; notIncludedDe?: string; notIncludedEn?: string;
+};
+
+const WEBSITE_PACKAGES: Pkg[] = [
+  {
+    name: "Landing Page", priceDe: "ab 399 €", priceEn: "from 399 €", highlight: false,
+    descDe: "Für eine einfache statische One-Page-Website mit klarer Struktur.",
+    descEn: "For a simple static one-page website with a clean structure.",
+    features: [
+      ["Statische HTML/CSS-Website", "Static HTML/CSS website"],
+      ["Einfache Hero Section", "Simple hero section"],
+      ["Einfacher Inhaltsbereich", "Basic content section"],
+      ["Footer", "Footer section"],
+      ["Responsives Layout", "Responsive layout"],
+      ["Sauberes Design", "Clean visual design"],
+      ["Basis SEO Titel & Beschreibung", "Basic SEO title and description"],
+      ["Upload zum Hosting falls benötigt", "Upload to hosting if needed"],
+    ],
+    notIncludedDe: "Kein Kontaktformular, keine Animationen, keine Galerie, kein CMS, kein Buchungssystem, kein Konfigurator.",
+    notIncludedEn: "No contact form, no animations, no gallery, no CMS, no booking system, no configurator.",
+  },
+  {
+    name: "Website", priceDe: "ab 1.500 €", priceEn: "from 1,500 €", highlight: true,
+    descDe: "Für eine professionelle Website mit starkem Design, mehreren Bereichen und seriösem Online-Auftritt.",
+    descEn: "For a professional website with strong design, multiple sections and a serious online presence.",
+    features: [
+      ["Individuelles Webdesign", "Custom website design"],
+      ["Mehrere Inhaltsbereiche", "Multiple content sections"],
+      ["Sticky Navigation", "Sticky navigation"],
+      ["Mobile Burger-Menü", "Mobile burger menu"],
+      ["Hero Section mit starkem Look", "Hero section with strong visual direction"],
+      ["Über-uns Bereich", "About section"],
+      ["Leistungen oder Produkte", "Services or products section"],
+      ["Galerie oder Portfolio", "Gallery or portfolio section"],
+      ["Bewertungen / Testimonials", "Testimonials section"],
+      ["FAQ falls benötigt", "FAQ if needed"],
+      ["Kontaktbereich", "Contact section"],
+      ["Kontaktformular mit einfacher Validierung", "Contact form with basic validation"],
+      ["WhatsApp Integration", "WhatsApp integration"],
+      ["Smooth Scrolling", "Smooth scrolling"],
+      ["Dezente Animationen", "Subtle animations"],
+      ["Basis SEO", "Basic SEO setup"],
+      ["Impressum & Datenschutz falls benötigt", "Imprint and privacy pages if needed"],
+      ["Hosting & Domain Setup Support", "Hosting and domain setup support"],
+    ],
+  },
+  {
+    name: "Individuelle Website", nameEn: "Custom Website", priceDe: "ab 2.500 €", priceEn: "from 2,500 €", highlight: false,
+    descDe: "Für Websites mit besonderen Funktionen, komplexeren Abläufen und individuellen Anforderungen.",
+    descEn: "For websites with special features, advanced user flows and custom requirements.",
+    features: [
+      ["Alles aus dem Website-Paket", "Everything from the Website package"],
+      ["Individuelles UI/UX Konzept", "Custom UI/UX concept"],
+      ["Mehrstufige Konfiguratoren", "Multi-step configurators"],
+      ["Produkt-Anfragesysteme", "Product request systems"],
+      ["WhatsApp Automation", "WhatsApp automation"],
+      ["Automatisch generierte Nachrichten", "Auto-generated messages"],
+      ["Produktfilter", "Product filters"],
+      ["Terminbuchung", "Booking or appointment forms"],
+      ["Upload-Felder", "Upload fields"],
+      ["Erweiterte Galerie / Slider", "Advanced galleries or sliders"],
+      ["Lightbox Funktion", "Lightbox functionality"],
+      ["Countdown Bereiche", "Countdown sections"],
+      ["Individuelle JavaScript-Funktionen", "Custom JavaScript functions"],
+      ["API-Anbindungen falls möglich", "API integrations where possible"],
+      ["Strukturierte Daten / JSON-LD", "Structured data / JSON-LD"],
+      ["Erweiterte SEO-Struktur", "Advanced SEO structure"],
+      ["Performance Optimierung", "Performance optimization"],
+      ["Detailliertes Testing", "Detailed testing"],
+    ],
+  },
 ];
 
-const PRICING_PLANS = [
+const HOSTING_PACKAGES: Omit<Pkg, "notIncludedDe" | "notIncludedEn">[] = [
   {
-    name: "Starter",
-    tagline: "Perfect for small businesses & personal brands",
-    price: "From €799",
-    period: "one-time",
-    highlight: false,
+    name: "Basic Hosting", priceDe: "15 € / Monat", priceEn: "15 € / month", highlight: false,
+    descDe: "Für kleine statische Websites und einfache Online-Auftritte.",
+    descEn: "For small static websites and simple online presences.",
     features: [
-      "Up to 5 pages",
-      "Fully responsive design",
-      "SEO foundations",
-      "Contact form",
-      "2 revision rounds",
-      "14-day delivery",
+      ["Hosting für 1 Website", "Hosting for 1 website"],
+      ["SSL-Zertifikat", "SSL certificate"],
+      ["Cloudflare Setup", "Cloudflare setup"],
+      ["Basis Performance", "Basic performance"],
+      ["Technische Einrichtung", "Technical setup"],
+      ["Kleine technische Hilfe", "Small technical support"],
     ],
-    cta: "Get Started",
   },
   {
-    name: "Pro",
-    tagline: "Best for growing businesses & custom apps",
-    price: "From €1,499",
-    period: "one-time",
-    highlight: true,
+    name: "Business Hosting", priceDe: "29 € / Monat", priceEn: "29 € / month", highlight: true,
+    descDe: "Für professionelle Websites mit mehr Anforderungen und regelmäßiger Betreuung.",
+    descEn: "For professional websites with higher requirements and regular support.",
     features: [
-      "Custom web application",
-      "User authentication",
-      "Database & API integration",
-      "Admin dashboard",
-      "3 revision rounds",
-      "Priority support",
-      "30-day post-launch care",
+      ["Hosting für bis zu 3 Websites", "Hosting for up to 3 websites"],
+      ["SSL-Zertifikat", "SSL certificate"],
+      ["Cloudflare Optimierung", "Cloudflare optimization"],
+      ["Performance Setup", "Performance setup"],
+      ["Sicherheits-Grundsetup", "Basic security setup"],
+      ["Monatliche technische Kontrolle", "Monthly technical check"],
+      ["Kleine Inhaltsänderungen", "Small content changes"],
+      ["Priorisierter Support", "Priority support"],
     ],
-    cta: "Get a Quote",
   },
   {
-    name: "Custom",
-    tagline: "Mobile apps, booking systems & complex builds",
-    price: "Let's Talk",
-    period: "tailored to scope",
-    highlight: false,
+    name: "Premium Hosting", priceDe: "49 € / Monat", priceEn: "49 € / month", highlight: false,
+    descDe: "Für anspruchsvollere Projekte mit mehr Betreuung, Sicherheit und Performance.",
+    descEn: "For more demanding projects with stronger support, security and performance.",
     features: [
-      "iOS & Android mobile apps",
-      "Booking & scheduling systems",
-      "Multi-role user systems",
-      "Third-party integrations",
-      "Ongoing maintenance plan",
-      "Dedicated project manager",
-      "SLA & priority hotline",
+      ["Hosting für bis zu 5 Websites", "Hosting for up to 5 websites"],
+      ["SSL-Zertifikat", "SSL certificate"],
+      ["Erweiterte Cloudflare Optimierung", "Advanced Cloudflare optimization"],
+      ["Performance Monitoring", "Performance monitoring"],
+      ["Sicherheitskontrolle", "Security checks"],
+      ["Regelmäßige Backups falls möglich", "Regular backups if possible"],
+      ["Kleine Änderungen inklusive", "Small changes included"],
+      ["Priorisierter Support", "Priority support"],
+      ["Technische Beratung", "Technical consulting"],
     ],
-    cta: "Book a Call",
   },
 ];
 
-const SUBSCRIPTION_PLANS = [
-  {
-    name: "Essential",
-    tagline: "Keep your site healthy & up to date",
-    price: "€149",
-    period: "/ month",
-    highlight: false,
-    features: [
-      "Security & CMS updates",
-      "Uptime monitoring 24/7",
-      "Monthly performance report",
-      "1h of changes / month",
-      "Email support",
-    ],
-    cta: "Subscribe",
-  },
-  {
-    name: "Growth",
-    tagline: "Active maintenance + ongoing improvements",
-    price: "€299",
-    period: "/ month",
-    highlight: true,
-    features: [
-      "Everything in Essential",
-      "4h of changes / month",
-      "SEO monitoring & tips",
-      "Speed & Core Web Vitals checks",
-      "Priority email & chat support",
-      "Quarterly review call",
-    ],
-    cta: "Subscribe",
-  },
-  {
-    name: "Studio Partner",
-    tagline: "Your dedicated digital partner, on-demand",
-    price: "€599",
-    period: "/ month",
-    highlight: false,
-    features: [
-      "Everything in Growth",
-      "10h of changes / month",
-      "Feature development included",
-      "Hotfix SLA within 4h",
-      "Monthly strategy session",
-      "Slack / direct line access",
-    ],
-    cta: "Book a Call",
-  },
+const DOMAIN_COSTS: [string, string][] = [
+  ["Domain: ca. 18 € / Jahr", "Domain: approx. 18 € / year"],
+  ["Business E-Mail: ab 3 € / Monat", "Business email: from 3 € / month"],
+  ["Zusätzliche Domain: nach Anbieterpreis", "Additional domain: depending on provider"],
+  ["Größere Änderungen: nach Aufwand", "Larger changes: based on effort"],
 ];
 
-const WHY_US = [
-  "Pixel-Perfect Execution",
-  "Tailored to Your Brand",
-  "Web, Mobile & Booking Systems",
-  "On-Time Delivery",
-  "Long-Term Partnership",
-  "End-to-End Expertise"
+const PRICING_ADDONS: [string, string, string, string][] = [
+  ["Logo / einfaches Branding", "Logo / simple branding", "ab 30 €", "from 30 €"],
+  ["Zusätzliche Unterseite", "Additional page", "ab 80 €", "from 80 €"],
+  ["Kontaktformular", "Contact form", "ab 50 €", "from 50 €"],
+  ["WhatsApp Integration", "WhatsApp integration", "ab 50 €", "from 50 €"],
+  ["Galerie / Lightbox", "Gallery / lightbox", "ab 80 €", "from 80 €"],
+  ["Produkt-Anfragefunktion", "Product request function", "ab 250 €", "from 250 €"],
+  ["Google Unternehmensprofil", "Google Business Profile", "ab 100 €", "from 100 €"],
+  ["Wartung & kleine Änderungen", "Maintenance & small changes", "ab 20 € / Monat", "from 20 € / month"],
 ];
 
-// --- 3D Carousel ---
-const ProjectCarousel3D = ({ projects }: { projects: import("@/hooks/use-portfolio").Project[] }) => {
-  const [active, setActive] = useState(0);
-  const startX = useRef(0);
-  const len = projects.length;
+const PricingSection = ({ lang }: { lang: Lang }) => {
+  const pick = (de: string, en: string) => (lang === "de" ? de : en);
 
-  const prev = useCallback(() => setActive(a => (a - 1 + len) % len), [len]);
-  const next = useCallback(() => setActive(a => (a + 1) % len), [len]);
+  const featureGrid = (features: [string, string][]) => (
+    <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+      {features.map(([de, en]) => (
+        <li key={de} className="flex gap-1.5 items-start text-xs text-foreground/85">
+          <Check className="w-3 h-3 text-glow mt-[3px] shrink-0" strokeWidth={3} />
+          <span className="leading-snug">{pick(de, en)}</span>
+        </li>
+      ))}
+    </ul>
+  );
 
-  const getOffset = (i: number) => {
-    let d = i - active;
-    if (d > len / 2) d -= len;
-    if (d < -len / 2) d += len;
-    return d;
-  };
+  const includedLabel = (
+    <div className="mt-4 mb-2.5 font-mono text-[10px] tracking-[0.2em] uppercase text-glow">{pick("Enthalten", "Included")}</div>
+  );
 
-  const getStyle = (d: number): React.CSSProperties => {
-    const base: React.CSSProperties = { position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.7s cubic-bezier(0.25,0.8,0.25,1)" };
-    if (Math.abs(d) > 2) return { ...base, opacity: 0, pointerEvents: "none", zIndex: 0 };
-    if (d === 0)  return { ...base, transform: "translateX(0%) translateZ(180px) scale(1)", opacity: 1, zIndex: 10, cursor: "default", pointerEvents: "none" };
-    if (d === 1)  return { ...base, transform: "translateX(62%) translateZ(-60px) rotateY(-32deg) scale(0.82)", opacity: 0.72, zIndex: 6, cursor: "pointer" };
-    if (d === -1) return { ...base, transform: "translateX(-62%) translateZ(-60px) rotateY(32deg) scale(0.82)", opacity: 0.72, zIndex: 6, cursor: "pointer" };
-    if (d === 2)  return { ...base, transform: "translateX(105%) translateZ(-180px) rotateY(-58deg) scale(0.62)", opacity: 0.28, zIndex: 2, pointerEvents: "none" };
-    if (d === -2) return { ...base, transform: "translateX(-105%) translateZ(-180px) rotateY(58deg) scale(0.62)", opacity: 0.28, zIndex: 2, pointerEvents: "none" };
-    return { ...base, opacity: 0, pointerEvents: "none" };
-  };
+  const cta = (highlight: boolean) => (
+    <a href="#contact" className={clsx("mt-5 block text-center rounded-lg py-2.5 font-semibold text-sm transition-colors", highlight ? "bg-primary hover:bg-primary-hover text-white" : "border border-white/15 hover:border-white/35 hover:bg-white/5 text-foreground")}>
+      {pick("Anfragen", "Get a quote")}
+    </a>
+  );
 
   return (
-    <div className="select-none">
-      <div
-        className="relative h-[500px] flex items-center justify-center overflow-visible"
-        style={{ perspective: "1300px", perspectiveOrigin: "50% 45%" }}
-        onMouseDown={e => { startX.current = e.clientX; }}
-        onMouseUp={e => { const d = e.clientX - startX.current; if (Math.abs(d) > 55) d < 0 ? next() : prev(); }}
-        onTouchStart={e => { startX.current = e.touches[0].clientX; }}
-        onTouchEnd={e => { const d = e.changedTouches[0].clientX - startX.current; if (Math.abs(d) > 55) d < 0 ? next() : prev(); }}
-      >
-        <div className="relative w-full h-full" style={{ transformStyle: "preserve-3d" }}>
-          {projects.map((project, i) => {
-            const d = getOffset(i);
-            return (
-              <div
-                key={project.id}
-                style={{ ...getStyle(d), transformStyle: "preserve-3d" }}
-                onClick={() => { if (d === 1) next(); else if (d === -1) prev(); }}
-              >
-                <div className="w-[400px] max-w-[88vw] rounded-3xl overflow-hidden"
-                  style={{
-                    pointerEvents: "auto",
-                    background: "rgba(255,255,255,0.97)",
-                    boxShadow: d === 0
-                      ? "0 30px 90px rgba(0,120,180,0.22), 0 0 0 1px rgba(0,163,204,0.10), 0 0 60px rgba(0,200,240,0.08)"
-                      : "0 15px 50px rgba(0,0,0,0.10)",
-                  }}>
-                  <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
-                    <img
-                      src={project.imageUrl}
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                      draggable={false}
-                      onError={e => { e.currentTarget.src = `https://placehold.co/800x500/daf3fb/007099?text=${encodeURIComponent(project.title)}`; }}
-                    />
-                    <div className="absolute inset-0 flex items-end p-5"
-                      style={{ background: "linear-gradient(to top, rgba(0,15,35,0.80) 0%, transparent 55%)", opacity: d === 0 ? 1 : 0, transition: "opacity 0.4s" }}>
-                      {project.url !== "#" && (
-                        <a href={project.url} target="_blank" rel="noopener noreferrer"
-                          onClick={e => e.stopPropagation()}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-mono font-semibold text-white"
-                          style={{ background: "linear-gradient(135deg,#0099cc,#00c9e8)", boxShadow: "0 4px 18px rgba(0,163,204,0.45)" }}>
-                          Visit Live Site <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-serif font-bold text-foreground">{project.title}</h3>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">{project.category}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{project.description}</p>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {project.tags.map(t => (
-                        <span key={t} className="text-[10px] font-mono px-2 py-0.5 bg-sky-50 text-sky-700 rounded border border-sky-200">{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+    <section id="pricing" className="py-24 scroll-mt-24">
+      <div className="container mx-auto px-6">
+        {/* header */}
+        <div className="text-center mb-12 max-w-2xl mx-auto">
+          <div className="font-mono text-xs tracking-[0.25em] text-glow mb-3">{pick("PREISE", "PRICING")}</div>
+          <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground">{pick("Preise für digitale Projekte", "Pricing for Digital Projects")}</h2>
+          <p className="mt-5 text-foreground/75">{pick("Transparente Startpreise für Websites, individuelle Funktionen und Hosting.", "Transparent starting prices for websites, custom features and hosting.")}</p>
         </div>
-      </div>
 
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-5 mt-2">
-        <button onClick={prev}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-light transition-all hover:scale-110"
-          style={{ border: "1.5px solid rgba(0,163,204,0.35)", color: "#00a3cc", background: "rgba(0,163,204,0.06)" }}>
-          ‹
-        </button>
-        <div className="flex gap-2 items-center">
-          {projects.map((_, i) => (
-            <button key={i} onClick={() => setActive(i)}
-              className="rounded-full transition-all duration-300"
-              style={{ width: i === active ? "22px" : "7px", height: "7px", background: i === active ? "#00a3cc" : "rgba(0,163,204,0.25)" }}
-            />
+        {/* website packages */}
+        <div className="grid md:grid-cols-3 gap-5 items-start">
+          {WEBSITE_PACKAGES.map((p) => (
+            <div key={p.name} className={clsx("relative rounded-2xl p-6 flex flex-col", p.highlight ? "bg-primary/[0.07] border border-primary/40 shadow-[0_0_45px_rgba(59,130,246,0.14)]" : "glass-card")}>
+              {p.highlight && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-glow to-primary text-white text-[10px] font-bold tracking-wider px-3 py-1 uppercase whitespace-nowrap">{pick("Beliebt", "Most Popular")}</span>
+              )}
+              <div className="flex items-baseline justify-between gap-3">
+                <h3 className="text-lg font-serif font-bold text-foreground">{pick(p.name, p.nameEn ?? p.name)}</h3>
+                <div className="text-2xl font-serif font-bold gradient-text whitespace-nowrap">{pick(p.priceDe, p.priceEn)}</div>
+              </div>
+              <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed">{pick(p.descDe, p.descEn)}</p>
+              {includedLabel}
+              <div className="flex-1">{featureGrid(p.features)}</div>
+              {p.notIncludedDe && (
+                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                  <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1.5">{pick("Nicht enthalten", "Not included")}</div>
+                  <p className="text-xs text-foreground/65 leading-relaxed">{pick(p.notIncludedDe, p.notIncludedEn!)}</p>
+                </div>
+              )}
+              {cta(p.highlight)}
+            </div>
           ))}
         </div>
-        <button onClick={next}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-light transition-all hover:scale-110"
-          style={{ border: "1.5px solid rgba(0,163,204,0.35)", color: "#00a3cc", background: "rgba(0,163,204,0.06)" }}>
-          ›
-        </button>
+
+        {/* hosting */}
+        <div className="text-center mt-16 mb-8">
+          <h3 className="text-2xl md:text-3xl font-serif font-bold text-foreground">{pick("Hosting-Pakete", "Hosting Packages")}</h3>
+        </div>
+        <div className="flex flex-col gap-4 max-w-5xl mx-auto">
+          {HOSTING_PACKAGES.map((h) => (
+            <div key={h.name} className={clsx("relative rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center gap-5", h.highlight ? "bg-primary/[0.06] border border-primary/40 shadow-[0_0_40px_rgba(59,130,246,0.12)]" : "glass-card")}>
+              {/* left: name + price */}
+              <div className="lg:w-60 lg:shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <h3 className="text-lg font-serif font-bold text-foreground">{h.name}</h3>
+                  {h.highlight && (
+                    <span className="rounded-full bg-gradient-to-r from-glow to-primary text-white text-[9px] font-bold tracking-wider px-2 py-0.5 uppercase">{pick("Beliebt", "Most Popular")}</span>
+                  )}
+                </div>
+                <div className="mt-1.5 text-2xl font-serif font-bold gradient-text">{pick(h.priceDe, h.priceEn)}</div>
+                <p className="mt-1 text-xs text-muted-foreground leading-snug">{pick(h.descDe, h.descEn)}</p>
+              </div>
+              {/* divider */}
+              <div className="hidden lg:block w-px self-stretch bg-white/10" />
+              {/* features as chips */}
+              <div className="flex-1 flex flex-wrap gap-2">
+                {h.features.map(([de, en]) => (
+                  <span key={de} className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] border border-white/10 px-2.5 py-1 text-xs text-foreground/85">
+                    <Check className="w-3 h-3 text-glow shrink-0" strokeWidth={3} />
+                    {pick(de, en)}
+                  </span>
+                ))}
+              </div>
+              {/* cta */}
+              <a href="#contact" className={clsx("lg:shrink-0 text-center rounded-lg px-6 py-2.5 text-sm font-semibold transition-colors", h.highlight ? "bg-primary hover:bg-primary-hover text-white" : "border border-white/15 hover:border-white/35 hover:bg-white/5 text-foreground")}>
+                {pick("Anfragen", "Get a quote")}
+              </a>
+            </div>
+          ))}
+        </div>
+
+        {/* domains + add-ons */}
+        <div className="grid lg:grid-cols-2 gap-5 mt-14">
+          <div className="glass-card rounded-2xl p-6">
+            <h3 className="text-base font-serif font-bold text-foreground mb-3">{pick("Domains & laufende Kosten", "Domains & running costs")}</h3>
+            <ul className="divide-y divide-white/10">
+              {DOMAIN_COSTS.map(([de, en]) => (
+                <li key={de} className="py-2.5 text-sm text-foreground/85">{pick(de, en)}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="glass-card rounded-2xl p-6">
+            <h3 className="text-base font-serif font-bold text-foreground mb-3">{pick("Zusatzleistungen", "Add-ons")}</h3>
+            <ul className="divide-y divide-white/10">
+              {PRICING_ADDONS.map(([de, en, pde, pen]) => (
+                <li key={de} className="py-2.5 flex items-center justify-between gap-4">
+                  <span className="text-sm text-foreground/85">{pick(de, en)}</span>
+                  <span className="text-sm font-semibold text-glow whitespace-nowrap">{pick(pde, pen)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* footer note */}
+        <div className="glass-card rounded-2xl p-6 mt-8 max-w-3xl mx-auto text-center">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {pick(
+              "Alle Preise sind Startpreise und hängen vom finalen Umfang, Design, Inhalt und den gewünschten Funktionen ab. Nach einem kurzen Gespräch erhältst du ein klares Festpreis-Angebot.",
+              "All prices are starting prices and depend on the final scope, design, content and required features. After a short conversation, you receive a clear fixed-price offer."
+            )}
+          </p>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
-const contactSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
-});
-
-// --- Main Page Component ---
+// --- Main page ---
 
 export default function Home() {
-  const { data: projects = [], isLoading: isProjectsLoading } = usePortfolio();
-  const [pricingTab, setPricingTab] = useState<"project" | "abo">("project");
+  const [lang, setLang] = useState<Lang>("en");
+  const t = T[lang];
 
-  const { mutate: submitContact, isPending: isSubmitting, isSuccess: isSubmitSuccess, isError: isSubmitError, error: submitError } = useSubmitContact();
-  const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof contactSchema>>({
-    resolver: zodResolver(contactSchema)
-  });
-
-  const onContactSubmit = (data: z.infer<typeof contactSchema>) => {
-    submitContact(data);
-  };
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   return (
-    <div className="relative bg-background text-foreground min-h-screen overflow-x-hidden">
-      <NoiseOverlay />
-      <Navbar />
+    <div id="home" className="relative bg-background text-foreground min-h-screen overflow-x-hidden">
+      <BackgroundGlow />
+      <Navbar t={t} lang={lang} setLang={setLang} />
 
       <main>
-        {/* HERO SECTION */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden"
-          style={{
-            backgroundImage: "url('/hero-bg.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-        >
-          {/* Dark overlay for text legibility */}
-          <div className="absolute inset-0 z-0" style={{ background: "linear-gradient(135deg, rgba(5,10,30,0.72) 0%, rgba(10,20,60,0.55) 50%, rgba(5,10,30,0.68) 100%)" }} />
-
-          {/* Subtle cyan glow from below */}
-          <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 40% at 50% 100%, rgba(0,180,220,0.18) 0%, transparent 70%)" }} />
-
-          <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center py-32 pt-40">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: "easeOut" }}
-              className="flex flex-col items-center"
-            >
-              <h1 className="font-serif font-bold leading-[1.05] tracking-tight text-5xl md:text-7xl lg:text-8xl text-white max-w-5xl">
-                We Build<br/>
-                <span style={{
-                  background: "linear-gradient(115deg, #00e5ff 0%, #38bdf8 40%, #a78bfa 75%, #c4b5fd 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  filter: "drop-shadow(0 0 40px rgba(0,229,255,0.7))",
-                }}>Digital Experiences</span><br/>
-                That Last.
+        {/* HERO */}
+        <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden">
+          {/* background server image */}
+          <div className="absolute inset-0 z-0">
+            <img src="/hero-servers.png" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "right center" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, #06090f 0%, #06090f 30%, rgba(6,9,15,0.55) 41%, rgba(6,9,15,0) 55%)" }} />
+            <div className="absolute inset-x-0 bottom-0 h-28" style={{ background: "linear-gradient(to bottom, transparent, #06090f)" }} />
+            <div className="absolute inset-x-0 top-0 h-16" style={{ background: "linear-gradient(to bottom, #06090f, transparent)" }} />
+          </div>
+          <div className="container mx-auto px-6 relative z-10">
+            <motion.div key={lang} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-xl">
+              <div className="flex items-center gap-2.5 mb-5">
+                <span className="w-2 h-2 rounded-full bg-glow shadow-[0_0_10px_2px] shadow-glow/60" />
+                <span className="font-mono text-xs tracking-[0.35em] text-glow">{t.heroEyebrow}</span>
+              </div>
+              <h1 className="font-serif font-bold leading-[1.04] text-5xl md:text-6xl lg:text-7xl text-foreground">
+                {t.heroLine1}<br />
+                <span className="gradient-text">{t.heroGradient}</span><br />
+                {t.heroLine3}
               </h1>
-
-              <p className="mt-8 text-lg md:text-xl max-w-2xl font-sans leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>
-                LX CLOUDS crafts websites, web apps, mobile apps, and custom booking systems — designed with precision, built for growth, delivered with care.
-              </p>
-
-              {/* stats row */}
-              <div className="mt-10 flex gap-12">
-                {[["50+","Projects Delivered"],["100%","Client Satisfaction"],["Germany","Based in Germany"]].map(([n,l]) => (
-                  <div key={l} className="text-center">
-                    <div className="text-3xl font-serif font-bold" style={{ color: "#00e5ff" }}>{n}</div>
-                    <div className="text-xs font-mono mt-1 uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.50)" }}>{l}</div>
+              <p className="mt-7 text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">{t.heroText}</p>
+              <div className="mt-9 flex flex-wrap gap-4">
+                <a href="#pricing" className="inline-flex items-center gap-2 rounded-xl text-white font-semibold px-7 py-3.5 shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
+                  style={{ background: "linear-gradient(110deg, #2563eb 0%, #6d5cf5 100%)" }}>
+                  {t.heroCta1} <ArrowUpRight className="w-4 h-4" />
+                </a>
+                <a href="#contact" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.03] hover:bg-white/[0.07] text-foreground font-semibold px-7 py-3.5 transition-colors">
+                  {t.heroCta2} <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+              <div className="mt-12 flex">
+                {t.stats.map(([n, l], i) => (
+                  <div key={l} className={clsx("px-6 first:pl-0", i > 0 && "border-l border-white/15")}>
+                    <div className="text-2xl md:text-3xl font-serif font-bold gradient-text">{n}</div>
+                    <div className="mt-1 font-mono text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground">{l}</div>
                   </div>
                 ))}
               </div>
+            </motion.div>
+          </div>
+        </section>
 
-              <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild size="lg" className="group text-base font-sans px-10"
-                  style={{ background: "linear-gradient(135deg, #0099cc, #00c9e8)", border: "none", color: "#ffffff", fontWeight: 700, boxShadow: "0 4px 30px rgba(0,200,240,0.40)" }}>
-                  <a href="#work">
-                    View Our Work
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"/>
+        <PricingSection lang={lang} />
+
+        {/* CONTACT */}
+        <section id="contact" className="py-20 scroll-mt-24">
+          <div className="container mx-auto px-6">
+            <div className="glass-card rounded-3xl p-8 md:p-12">
+              <div className="grid lg:grid-cols-2 gap-10 items-center">
+                <div>
+                  <div className="font-mono text-xs tracking-[0.25em] text-glow mb-3">{t.contactEyebrow}</div>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">{t.contactTitle}</h2>
+                  <p className="mt-4 text-muted-foreground leading-relaxed max-w-md">{t.contactSub}</p>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-primary hover:bg-primary-hover text-white font-semibold px-7 py-3.5 transition-colors shadow-lg shadow-primary/30">
+                    {t.startProject} <ArrowRight className="w-4 h-4" />
                   </a>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="text-base font-sans px-10"
-                  style={{ background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.30)", color: "#ffffff", backdropFilter: "blur(12px)" }}>
-                  <a href="#contact">Get in Touch</a>
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-            style={{ color: "rgba(0,229,255,0.75)" }}
-          >
-            <ChevronDown className="w-7 h-7"/>
-          </motion.div>
-        </section>
-
-        {/* ABOUT SECTION */}
-        <section id="about" className="py-24 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.04) 30%, rgba(0,163,204,0.06) 60%, transparent 100%)" }}>
-          <div className="container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7 }}
-              className="max-w-4xl mx-auto border-l-4 border-primary pl-8 py-2"
-            >
-              <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6 text-foreground">
-                Precision. Design. Impact.
-              </h2>
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-sans font-light">
-                LX CLOUDS is a boutique digital studio. We build websites, web apps, mobile applications, 
-                and booking systems with a singular obsession — quality. Every line of code, every pixel, 
-                every interaction is crafted to elevate your brand and outperform the competition.
-              </p>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* SERVICES SECTION */}
-        <section id="services" className="py-24 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(186,230,253,0.18) 20%, rgba(186,230,253,0.28) 50%, rgba(186,230,253,0.18) 80%, transparent 100%)" }}>
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Our Services</h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto font-light tracking-wide">From pixel-perfect websites to full-scale applications — every discipline, one studio.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {SERVICES.map((service, idx) => (
-                <motion.div
-                  key={service.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="glass-card p-8 rounded-2xl group hover:-translate-y-2 transition-all duration-300"
-                >
-                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 group-hover:bg-primary/20 transition-all">
-                    <service.icon className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold mb-3">{service.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{service.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* PORTFOLIO SECTION */}
-        <section id="work" className="py-32 relative z-10 overflow-hidden" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.04) 25%, rgba(0,163,204,0.04) 75%, transparent 100%)" }}>
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Selected Work</h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto font-light tracking-wide">
-                A curated selection of projects we've built and shipped. Drag or swipe to explore.
-              </p>
-            </div>
-
-            {isProjectsLoading ? (
-              <div className="flex items-center justify-center h-[500px]">
-                <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-              </div>
-            ) : (
-              <ProjectCarousel3D projects={projects} />
-            )}
-          </div>
-        </section>
-
-        {/* WHY US SECTION */}
-        <section id="why" className="py-24 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(124,58,237,0.04) 25%, rgba(124,58,237,0.07) 55%, rgba(0,163,204,0.05) 80%, transparent 100%)" }}>
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">Why LX CLOUDS?</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {WHY_US.map((item, i) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="flex items-center gap-4 p-6 glass-card rounded-xl border border-border/50"
-                >
-                  <div className="text-primary flex-shrink-0 drop-shadow-[0_0_8px_rgba(0,229,255,0.6)]">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                      <path d="M12 2L22 12L12 22L2 12L12 2Z"/>
-                    </svg>
-                  </div>
-                  <h4 className="text-xl font-serif font-bold text-foreground">{item}</h4>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* PRICING SECTION */}
-        <section id="pricing" className="py-28 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(186,230,253,0.15) 20%, rgba(186,230,253,0.22) 55%, rgba(186,230,253,0.12) 80%, transparent 100%)" }}>
-          <div className="container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-10"
-            >
-              <span className="font-mono text-xs tracking-widest uppercase mb-4 block" style={{ color: "var(--color-primary)" }}>
-                Transparent Pricing
-              </span>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
-                Simple, Honest Rates
-              </h2>
-              <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
-                No hidden fees. Every project is scoped carefully so you always know what you're getting.
-              </p>
-            </motion.div>
-
-            {/* Tab toggle */}
-            <div className="flex justify-center mb-12">
-              <div className="inline-flex rounded-full p-1 gap-1"
-                style={{ background: "var(--color-background-secondary)", border: "1.5px solid var(--color-border)" }}>
-                {(["project", "abo"] as const).map(tab => (
-                  <button
-                    key={tab}
-                    onClick={() => setPricingTab(tab)}
-                    className="px-6 py-2 rounded-full font-mono text-sm font-semibold tracking-wide transition-all duration-200"
-                    style={pricingTab === tab ? {
-                      background: "linear-gradient(135deg, #7c3aed, #00e5ff)",
-                      color: "#ffffff",
-                      boxShadow: "0 2px 12px rgba(0,229,255,0.25)",
-                    } : {
-                      background: "transparent",
-                      color: "var(--color-muted-foreground)",
-                    }}
-                  >
-                    {tab === "project" ? "One-Time Projects" : "Monthly Plans"}
-                  </button>
-                ))}
+                </div>
+                <div className="flex flex-col gap-4">
+                  <a href="https://lxclouds.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-xl bg-white/[0.03] border border-white/5 p-4 hover:border-glow/30 transition-colors">
+                    <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center"><Globe className="w-5 h-5" /></span>
+                    <span><span className="block text-xs text-muted-foreground">{t.labelWebsite}</span><span className="font-semibold text-foreground">lxclouds.com</span></span>
+                  </a>
+                  <a href={`mailto:${EMAIL}`} className="flex items-center gap-4 rounded-xl bg-white/[0.03] border border-white/5 p-4 hover:border-glow/30 transition-colors">
+                    <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center"><Mail className="w-5 h-5" /></span>
+                    <span><span className="block text-xs text-muted-foreground">{t.labelEmail}</span><span className="font-semibold text-foreground">{EMAIL}</span></span>
+                  </a>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-xl bg-white/[0.03] border border-white/5 p-4 hover:border-glow/30 transition-colors">
+                    <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center"><WhatsAppIcon className="w-5 h-5" /></span>
+                    <span><span className="block text-xs text-muted-foreground">{t.labelWhatsApp}</span><span className="font-semibold text-foreground">{PHONE_DISPLAY}</span></span>
+                  </a>
+                </div>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
-              {(pricingTab === "project" ? PRICING_PLANS : SUBSCRIPTION_PLANS).map((plan, i) => (
-                <motion.div
-                  key={pricingTab + plan.name}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.45 }}
-                  className="relative rounded-2xl flex flex-col overflow-hidden"
-                  style={plan.highlight ? {
-                    background: "linear-gradient(160deg, #daf3fb 0%, #c8edf7 100%)",
-                    border: "1.5px solid rgba(0,163,204,0.45)",
-                    boxShadow: "0 0 35px rgba(0,180,220,0.15), 0 8px 28px rgba(0,140,190,0.10)",
-                  } : {
-                    background: "var(--color-surface)",
-                    border: "1.5px solid var(--color-border)",
-                  }}
-                >
-                  {/* Popular badge */}
-                  {plan.highlight && (
-                    <div className="flex items-center justify-center gap-1.5 py-2"
-                      style={{ background: "rgba(0,163,204,0.12)", borderBottom: "1px solid rgba(0,163,204,0.25)" }}>
-                      <Zap className="w-3.5 h-3.5" style={{ color: "#0088aa" }} />
-                      <span className="font-mono text-xs tracking-widest uppercase font-semibold" style={{ color: "#0088aa" }}>
-                        Most Popular
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="p-8 flex flex-col flex-1 gap-6">
-                    {/* Header */}
-                    <div>
-                      <h3 className="text-xl font-serif font-bold"
-                        style={{ color: plan.highlight ? "var(--color-foreground)" : "var(--color-foreground)" }}>
-                        {plan.name}
-                      </h3>
-                      <p className="mt-1 text-sm leading-snug"
-                        style={{ color: plan.highlight ? "rgba(10,18,42,0.60)" : "var(--color-muted-foreground)" }}>
-                        {plan.tagline}
-                      </p>
-                    </div>
-
-                    {/* Price */}
-                    <div>
-                      <div className="text-3xl font-serif font-bold"
-                        style={{ color: plan.highlight ? "#007099" : "var(--color-foreground)" }}>
-                        {plan.price}
-                      </div>
-                      <div className="font-mono text-xs mt-1 uppercase tracking-wider"
-                        style={{ color: plan.highlight ? "rgba(10,18,42,0.55)" : "var(--color-muted-foreground)" }}>
-                        {plan.period}
-                      </div>
-                    </div>
-
-                    {/* Features */}
-                    <ul className="space-y-3 flex-1">
-                      {plan.features.map(f => (
-                        <li key={f} className="flex items-start gap-3 text-sm"
-                          style={{ color: plan.highlight ? "rgba(10,18,42,0.85)" : "var(--color-foreground)" }}>
-                          <Check className="w-4 h-4 mt-0.5 flex-shrink-0"
-                            style={{ color: plan.highlight ? "#008aaa" : "var(--color-primary)" }} />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* CTA */}
-                    <a href="#contact"
-                      className="mt-2 block text-center rounded-xl py-3 px-6 font-mono text-sm font-semibold tracking-wide transition-all duration-200"
-                      style={plan.highlight ? {
-                        background: "linear-gradient(135deg, #7c3aed, #00e5ff)",
-                        color: "#ffffff",
-                        boxShadow: "0 4px 20px rgba(0,229,255,0.28)",
-                      } : {
-                        background: "transparent",
-                        border: "1.5px solid var(--color-border)",
-                        color: "var(--color-foreground)",
-                      }}
-                      onMouseEnter={e => {
-                        if (!plan.highlight) {
-                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(0,229,255,0.5)";
-                          (e.currentTarget as HTMLAnchorElement).style.color = "#00e5ff";
-                        }
-                      }}
-                      onMouseLeave={e => {
-                        if (!plan.highlight) {
-                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--color-border)";
-                          (e.currentTarget as HTMLAnchorElement).style.color = "var(--color-foreground)";
-                        }
-                      }}
-                    >
-                      {plan.cta}
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Fine print */}
-            <p className="text-center text-xs text-muted-foreground mt-10 font-mono">
-              {pricingTab === "project"
-                ? "All prices are estimates. Final scope agreed before any work begins. · VAT may apply."
-                : "Monthly plans billed every 30 days. Minimum 3-month commitment. Cancel anytime after. · VAT may apply."}
-            </p>
-          </div>
-        </section>
-
-        {/* CONTACT SECTION */}
-        <section id="contact" className="py-32 relative z-10" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(124,58,237,0.04) 15%, rgba(0,163,204,0.07) 50%, rgba(0,163,204,0.05) 85%, transparent 100%)" }}>
-          <div className="container mx-auto px-6 max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl md:text-6xl font-serif font-bold tracking-tight text-foreground">
-                Let's Build Something <br className="hidden md:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-glow">Together</span>
-              </h2>
-              <p className="mt-6 text-muted-foreground font-mono text-lg">info@lxclouds.com</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-glow opacity-60" />
-              
-              {isSubmitSuccess ? (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-16"
-                >
-                  <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,163,204,0.2)]">
-                    <Check className="w-10 h-10" />
-                  </div>
-                  <h3 className="text-3xl font-serif font-bold text-foreground">Message Sent</h3>
-                  <p className="text-muted-foreground mt-4 text-lg">We will be in touch with you shortly to discuss your vision.</p>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit(onContactSubmit)} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                      <label className="block text-xs uppercase tracking-wider font-mono text-muted-foreground mb-2">Your Name</label>
-                      <Input
-                        {...register("name")}
-                        placeholder="John Doe"
-                      />
-                      {errors.name && <p className="text-destructive/80 text-xs mt-2 font-mono">{errors.name.message}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-wider font-mono text-muted-foreground mb-2">Email Address</label>
-                      <Input
-                        {...register("email")}
-                        placeholder="john@example.com"
-                      />
-                      {errors.email && <p className="text-destructive/80 text-xs mt-2 font-mono">{errors.email.message}</p>}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider font-mono text-muted-foreground mb-2">Project Details</label>
-                    <Textarea
-                      {...register("message")}
-                      placeholder="Tell us about your project, timeline, and goals..."
-                    />
-                    {errors.message && <p className="text-destructive/80 text-xs mt-2 font-mono">{errors.message.message}</p>}
-                  </div>
-                  <div className="pt-4 text-center md:text-left flex flex-col md:flex-row items-center gap-4">
-                    <Button type="submit" disabled={isSubmitting} size="lg" className="w-full md:w-auto">
-                      {isSubmitting ? "Sending..." : "Send Message"}
-                    </Button>
-                    {isSubmitError && (
-                      <p className="text-destructive/80 text-sm font-mono">
-                        {(submitError as Error)?.message ?? "Something went wrong. Please try again."}
-                      </p>
-                    )}
-                  </div>
-                </form>
-              )}
-            </motion.div>
           </div>
         </section>
       </main>
 
       {/* FOOTER */}
-      <footer className="py-16 relative z-10 text-center" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(0,163,204,0.05) 30%, rgba(0,163,204,0.07) 60%, rgba(0,163,204,0.04) 100%)" }}>
-        <div className="mb-4 flex justify-center items-center">
-          <span className="font-serif font-bold text-2xl tracking-wide text-foreground">LX CLOUDS</span>
+      <footer className="border-t border-white/10 py-8">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Cloud className="w-5 h-5 text-glow" fill="currentColor" strokeWidth={0} />
+            <span className="font-serif font-bold tracking-[0.15em] text-foreground text-sm">LX CLOUDS</span>
+            <span className="hidden md:inline text-muted-foreground text-sm">— {t.footerTagline}</span>
+          </div>
+          <p className="text-xs text-muted-foreground font-mono">{t.rights}</p>
         </div>
-        <p className="text-muted-foreground font-sans mb-8 tracking-widest uppercase text-sm font-light">Where Precision Meets Elegance</p>
-        <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/40 to-transparent mx-auto mb-8" />
-        <p className="text-sm text-border font-mono tracking-wider">© {new Date().getFullYear()} LX CLOUDS. ALL RIGHTS RESERVED.</p>
       </footer>
     </div>
   );

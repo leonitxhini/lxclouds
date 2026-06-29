@@ -1,21 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme inline {
   --color-background: hsl(var(--background));
   --color-background-secondary: hsl(var(--background-secondary));
   --color-surface: hsl(var(--surface));
-  
+
   --color-primary: hsl(var(--primary));
   --color-primary-hover: hsl(var(--primary-hover));
   --color-glow: hsl(var(--glow));
-  
+  --color-violet: hsl(var(--violet));
+
   --color-foreground: hsl(var(--foreground));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-border: hsl(var(--border));
 
-  /* Standard shadcn aliases mapping to our brand palette */
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
@@ -39,49 +39,49 @@
 }
 
 :root {
-  /* LX CLOUDS Ice Style — pure white/frosted light theme */
-  --background: 200 60% 98%;           /* #f3fafd near-white ice */
-  --background-secondary: 202 55% 95%; /* #e7f4fb soft ice blue */
-  --surface: 0 0% 100%;                /* pure white for cards */
+  /* LX CLOUDS — luxury deep-navy theme */
+  --background: 222 64% 5%;            /* #06090f deep navy-black */
+  --background-secondary: 221 52% 8%;  /* #0a1018 panels */
+  --surface: 221 46% 11%;              /* #111a2b cards */
 
-  --primary: 198 100% 40%;             /* #00a3cc vivid sky-cyan */
-  --primary-hover: 198 95% 50%;        /* #0bc5f0 lighter hover */
-  --glow: 200 100% 62%;                /* #3dd5ff soft glow */
+  --primary: 217 91% 60%;              /* #3b82f6 royal blue */
+  --primary-hover: 213 94% 68%;        /* #60a5fa */
+  --glow: 189 94% 55%;                 /* #22d3ee cyan */
+  --violet: 256 90% 72%;               /* #a78bfa violet */
 
-  --foreground: 220 65% 10%;           /* #0a1226 dark navy text */
-  --muted: 202 45% 94%;
-  --muted-foreground: 215 30% 42%;     /* #566888 blue-grey secondary */
-  --border: 200 50% 86%;               /* #bce0ee light ice border */
+  --foreground: 210 40% 98%;           /* near white */
+  --muted: 221 40% 14%;
+  --muted-foreground: 215 25% 67%;     /* #94a3b8 slate */
+  --border: 217 35% 22%;               /* subtle navy border */
 
-  /* Standard Shadcn Mappings */
   --card: var(--surface);
   --card-foreground: var(--foreground);
-  --popover: 0 0% 100%;
+  --popover: var(--surface);
   --popover-foreground: var(--foreground);
   --secondary: var(--background-secondary);
   --secondary-foreground: var(--foreground);
-  --accent: 198 100% 40%;
+  --accent: 217 91% 60%;
   --accent-foreground: 0 0% 100%;
-  --destructive: 0 70% 55%;
+  --destructive: 0 72% 60%;
   --destructive-foreground: 0 0% 100%;
   --input: var(--border);
   --ring: var(--primary);
-  --radius: 0.75rem;
+  --radius: 1rem;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
     font-feature-settings: "kern" 1, "liga" 1;
@@ -97,6 +97,13 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/80 border border-border/60 backdrop-blur-xl shadow-md shadow-sky-100/60;
+    @apply bg-white/[0.03] border border-white/10 backdrop-blur-xl;
+  }
+  .gradient-text {
+    background-image: linear-gradient(105deg, #22d3ee 0%, #3b82f6 45%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 }
