@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { clsx } from "clsx";
 import {
-  Cloud, Check, ArrowRight, ArrowUpRight, Menu, X, BadgeEuro, Sparkles, MessageCircle,
-  Monitor, LayoutTemplate, Code2, PenTool, Settings, Server, Globe, Mail,
+  Cloud, ArrowRight, ArrowUpRight, Menu, X,
+  Monitor, Code2, PenTool, Server, Globe, Mail,
   MessageSquare, Layers, Rocket,
+  Clock, Sparkles, Bot, TrendingUp,
+  FileStack, Repeat, EyeOff, CalendarClock, MessageCircle,
+  LayoutTemplate, AppWindow, Smartphone, Database,
 } from "lucide-react";
 
 // --- Constants ---
@@ -22,193 +25,170 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// --- Shared (non-translated) icon / image maps ---
+// --- Shared (non-translated) icon maps ---
 
-const ABOUT_ICONS = [BadgeEuro, Sparkles, MessageCircle];
-const SERVICE_ICONS = [Monitor, LayoutTemplate, Code2, Cloud, PenTool, Settings];
-const HOSTING_ICONS = [Server, Server, Globe, Mail];
+const PROBLEM_ICONS = [CalendarClock, Repeat, EyeOff, FileStack];
+const BENEFIT_ICONS = [Clock, Sparkles, Bot, TrendingUp];
+const SERVICE_ICONS = [PenTool, Monitor, LayoutTemplate, AppWindow, Smartphone, Database, CalendarClock, MessageCircle, Server];
 const PROCESS_ICONS = [MessageSquare, Layers, Code2, Rocket];
-const WORK_IMAGES: (string | null)[] = [null, null, null, "/project-lonorix.png"];
 
 // --- Translations ---
 
 const T = {
   en: {
-    nav: ["Pricing", "Contact"],
+    nav: ["Services", "Solutions", "Process", "Contact"],
     getInTouch: "Get in Touch",
-    heroEyebrow: "WE BUILD SOLUTIONS",
+    heroEyebrow: "YOUR DIGITAL AGENCY",
     heroLine1: "We Build",
     heroGradient: "Digital Experiences",
     heroLine3: "That Last.",
     heroText:
-      "LX CLOUDS crafts websites, web apps, mobile apps, and custom booking systems — designed with precision, built for growth, delivered with care.",
-    heroCta1: "View Pricing",
-    heroCta2: "Get in Touch",
-    stats: [["50+", "Projects Delivered"], ["100%", "Client Satisfaction"], ["Germany", "Based in Germany"]],
-    aboutEyebrow: "ABOUT",
-    aboutTitle: "Personal. Clean. Reliable.",
-    aboutP1:
-      "LX CLOUDS is a personal web design project focused on creating modern websites for small businesses, creators, local brands and private projects.",
-    aboutP2:
-      "No agency overhead. No complicated processes. Just clean design, reliable development and fair communication from start to finish.",
-    aboutCards: [
-      { title: "Fair Pricing", desc: "Transparent prices without hidden costs." },
-      { title: "Modern Design", desc: "Clean layouts, responsive structure and strong visual quality." },
-      { title: "Personal Support", desc: "Direct communication and simple project handling." },
+      "LX CLOUDS is your digital agency for web design, websites, web apps, mobile apps and custom systems — designed with precision, built for growth, delivered with care.",
+    heroChips: ["Web Design", "Websites", "Web Apps", "Mobile Apps", "Systems", "Automation"],
+    heroCta1: "Start a Project",
+    heroCta2: "What We Build",
+    stats: [["50+", "Projects Delivered"], ["100%", "Client Satisfaction"], ["<24h", "Response Time"]],
+    problemsEyebrow: "DIGITALIZATION",
+    problemsTitle: "Real Problems. Digital Solutions.",
+    problemsSub:
+      "Digitalization in practice: we turn time-consuming routines into digital processes that simply work.",
+    problemLabel: "The Problem",
+    solutionLabel: "Our Solution",
+    problems: [
+      {
+        problem: "Bookings, requests and appointments arrive by phone or on paper — and things get lost.",
+        solution: "Digital booking & request forms that collect everything automatically in one place.",
+      },
+      {
+        problem: "You answer the same questions every single day — again and again.",
+        solution: "WhatsApp automations and smart forms that answer for you, around the clock.",
+      },
+      {
+        problem: "Customers search for you online — and find nothing, or something outdated.",
+        solution: "A modern website that builds trust and wins customers while you work.",
+      },
+      {
+        problem: "Excel chaos: orders, stock or jobs buried in endless lists.",
+        solution: "Simple custom tools and dashboards — everything clear at a glance.",
+      },
+    ],
+    benefitsEyebrow: "WHY DIGITAL",
+    benefitsTitle: "Digital Pays Off From Day One.",
+    benefits: [
+      { title: "Save Time", desc: "Automate repetitive work and win back hours every week." },
+      { title: "Simplify", desc: "One clear system instead of paper, phone calls and chaos." },
+      { title: "Always On", desc: "Your website and automations work 24/7 — even while you sleep." },
+      { title: "Grow", desc: "A professional appearance that wins trust and new customers." },
     ],
     servicesEyebrow: "SERVICES",
-    servicesTitle: "What I Build",
+    servicesTitle: "What We Build",
+    servicesSub: "From web design to complete systems — everything from one hand.",
     services: [
-      { title: "Websites", desc: "Modern websites for businesses, creators and personal brands." },
-      { title: "Landing Pages", desc: "Focused one-page websites for offers, campaigns and portfolios." },
-      { title: "Custom Functions", desc: "Forms, WhatsApp automations, filters, galleries and small tools." },
-      { title: "Hosting Setup", desc: "Domain, hosting, SSL and email setup for your project." },
-      { title: "Branding Basics", desc: "Simple logos, colors and visual direction for your website." },
-      { title: "Maintenance", desc: "Small changes, updates and support after launch." },
+      { title: "Web Design", desc: "Modern, clean design that makes your brand look professional and trustworthy." },
+      { title: "Websites", desc: "Fast, responsive websites that present your business and win customers." },
+      { title: "Landing Pages", desc: "Focused one-pagers for offers, campaigns and product launches." },
+      { title: "Web Apps", desc: "Browser-based applications, dashboards and portals — tailored to your workflow." },
+      { title: "Mobile Apps", desc: "iOS & Android apps that put your service into your customers' pockets." },
+      { title: "Custom Systems", desc: "Management systems for orders, inventory, returns & more — goodbye Excel chaos." },
+      { title: "Booking & Requests", desc: "Booking systems and request flows your customers love to use." },
+      { title: "WhatsApp & Automation", desc: "Automatic replies, notifications and workflows — 24/7, no extra staff needed." },
+      { title: "Hosting & Care", desc: "We host, maintain and keep everything running. You focus on your business." },
     ],
-    workEyebrow: "WORK",
-    workTitle: "Selected Work",
-    work: [
-      { title: "Holzwurm-Lindheim", desc: "Boutique website for handmade wooden decorations.", features: ["Warm handmade design", "Product overview", "Gallery", "Contact form", "WhatsApp request", "Responsive layout"] },
-      { title: "RGM System", desc: "Returns and credit management system.", features: ["Dashboard interface", "Data structure", "Admin workflow", "Clean UI"] },
-      { title: "AFM Manager", desc: "Vehicle preparation management platform.", features: ["Task overview", "Status tracking", "Internal workflow", "Custom interface"] },
-      { title: "AI Album Cover Generator", desc: "Creative tool for generating album cover ideas.", features: ["Modern interface", "Prompt input", "Image result layout", "Clean user experience"] },
-    ],
-    pricingEyebrow: "PRICING",
-    pricingTitle: "Fair Pricing for Digital Projects",
-    pricingSub: "Every project is different. These prices are a starting point.",
-    mostPopular: "MOST POPULAR",
-    from: "from",
-    possibleFeatures: "Possible features:",
-    packages: [
-      { name: "Landing Page", price: "399", desc: "For simple one-page websites with a clear message.", features: ["One modern page", "Responsive design", "Contact section", "WhatsApp button", "Basic SEO"] },
-      { name: "Website", price: "1.500", desc: "For small businesses, local brands and personal projects.", features: ["Custom homepage", "Multiple content sections", "Gallery or product overview", "Contact form", "Mobile optimization", "Basic SEO"] },
-      { name: "Custom Website", price: "2.500", desc: "For projects with special functions or more advanced requirements.", features: ["Request forms", "WhatsApp automation", "Filters", "Upload fields", "Booking forms", "Custom JavaScript functions"] },
-    ],
-    addonsTitle: "ADD-ONS",
-    addons: [
-      { label: "Logo / Simple Branding", price: "from 30 €" },
-      { label: "Additional Page", price: "from 80 €" },
-      { label: "Contact Form", price: "from 50 €" },
-      { label: "WhatsApp Integration", price: "from 50 €" },
-      { label: "Gallery / Lightbox", price: "from 80 €" },
-      { label: "Product Request Function", price: "from 250 €" },
-      { label: "Hosting & Domain Setup", price: "from 50 €" },
-      { label: "Maintenance", price: "from 20 € / month" },
-    ],
-    hostingTitle: "HOSTING & RUNNING COSTS",
-    hosting: [
-      { label: "Simple Website Hosting", price: "ca. 5 – 15 €", unit: "/ month" },
-      { label: "Business Hosting", price: "ca. 15 – 30 €", unit: "/ month" },
-      { label: "Domain", price: "ca. 10 – 20 €", unit: "/ year" },
-      { label: "Business Email", price: "ca. 1 – 5 €", unit: "/ month" },
-    ],
-    hostingNote: "Hosting and domain costs are separate from the website price and depend on the provider and project requirements.",
     processEyebrow: "PROCESS",
     processTitle: "Simple Process. Clear Result.",
     process: [
-      { title: "Brief", desc: "You tell me what you need." },
-      { title: "Concept", desc: "We define structure, design direction and features." },
-      { title: "Design & Build", desc: "I create the website and keep you updated." },
-      { title: "Launch", desc: "The website goes online with domain, hosting and basic setup." },
+      { title: "Listen", desc: "You tell us your problem — we listen and understand your workflow." },
+      { title: "Concept", desc: "We design the simplest digital solution that fits your business." },
+      { title: "Build", desc: "We build it and keep you updated — no tech jargon, no surprises." },
+      { title: "Launch & Care", desc: "Your solution goes live. We stay by your side and keep it running." },
     ],
     contactEyebrow: "CONTACT",
     contactTitle: "Let's Build Your Project.",
-    contactSub: "Need a website, landing page or custom function? Send me a message and I'll give you a clear estimate.",
+    contactSub:
+      "Website, app or custom system — in a short, free conversation we'll find the right solution. Clear fixed price afterwards, no obligation.",
     labelWebsite: "Website",
     labelEmail: "Email",
     labelWhatsApp: "WhatsApp",
-    startProject: "Start a Project",
-    footerTagline: "Personal web design, clean development and fair digital solutions.",
+    startProject: "Free Consultation",
+    footerTagline: "Your digital agency for websites, apps and systems.",
     rights: `© ${YEAR} LX CLOUDS. All rights reserved.`,
   },
   de: {
-    nav: ["Preise", "Kontakt"],
+    nav: ["Leistungen", "Lösungen", "Ablauf", "Kontakt"],
     getInTouch: "Kontakt aufnehmen",
-    heroEyebrow: "WIR BAUEN LÖSUNGEN",
-    heroLine1: "Wir gestalten",
+    heroEyebrow: "DEINE DIGITALAGENTUR",
+    heroLine1: "Wir bauen",
     heroGradient: "digitale Erlebnisse,",
     heroLine3: "die bleiben.",
     heroText:
-      "LX CLOUDS gestaltet Websites, Web-Apps, mobile Apps und individuelle Buchungssysteme — mit Präzision entworfen, für Wachstum gebaut, mit Sorgfalt geliefert.",
-    heroCta1: "Preise ansehen",
-    heroCta2: "Kontakt aufnehmen",
-    stats: [["50+", "Projekte umgesetzt"], ["100%", "Kundenzufriedenheit"], ["Germany", "Sitz in Deutschland"]],
-    aboutEyebrow: "ÜBER MICH",
-    aboutTitle: "Persönlich. Sauber. Zuverlässig.",
-    aboutP1:
-      "LX CLOUDS ist ein persönliches Webdesign-Projekt mit Fokus auf moderne Websites für kleine Unternehmen, Creators, lokale Marken und private Projekte.",
-    aboutP2:
-      "Kein Agentur-Overhead. Keine komplizierten Prozesse. Nur sauberes Design, zuverlässige Entwicklung und faire Kommunikation von Anfang bis Ende.",
-    aboutCards: [
-      { title: "Faire Preise", desc: "Transparente Preise ohne versteckte Kosten." },
-      { title: "Modernes Design", desc: "Klare Layouts, responsive Struktur und starke visuelle Qualität." },
-      { title: "Persönlicher Support", desc: "Direkte Kommunikation und einfache Projektabwicklung." },
+      "LX CLOUDS ist deine Digitalagentur für Webdesign, Websites, Web-Apps, mobile Apps und individuelle Systeme — mit Präzision entworfen, für Wachstum gebaut, mit Sorgfalt geliefert.",
+    heroChips: ["Webdesign", "Websites", "Web-Apps", "Mobile Apps", "Systeme", "Automation"],
+    heroCta1: "Projekt starten",
+    heroCta2: "Was wir bauen",
+    stats: [["50+", "Umgesetzte Projekte"], ["100%", "Kundenzufriedenheit"], ["<24h", "Antwortzeit"]],
+    problemsEyebrow: "DIGITALISIERUNG",
+    problemsTitle: "Echte Probleme. Digitale Lösungen.",
+    problemsSub:
+      "Digitalisierung in der Praxis: Wir machen aus zeitraubenden Routinen digitale Abläufe, die einfach funktionieren.",
+    problemLabel: "Das Problem",
+    solutionLabel: "Unsere Lösung",
+    problems: [
+      {
+        problem: "Buchungen, Anfragen und Termine kommen per Telefon oder Zettel — und gehen unter.",
+        solution: "Digitale Buchungs- & Anfrageformulare, die alles automatisch an einem Ort sammeln.",
+      },
+      {
+        problem: "Du beantwortest jeden Tag die gleichen Fragen — immer und immer wieder.",
+        solution: "WhatsApp-Automationen und smarte Formulare, die für dich antworten — rund um die Uhr.",
+      },
+      {
+        problem: "Kunden suchen dich online — und finden nichts oder etwas Veraltetes.",
+        solution: "Eine moderne Website, die Vertrauen schafft und Kunden gewinnt, während du arbeitest.",
+      },
+      {
+        problem: "Excel-Chaos: Aufträge, Bestände oder Jobs in endlosen Listen.",
+        solution: "Einfache individuelle Tools und Dashboards — alles auf einen Blick.",
+      },
+    ],
+    benefitsEyebrow: "WARUM DIGITAL",
+    benefitsTitle: "Digital lohnt sich ab Tag eins.",
+    benefits: [
+      { title: "Zeit sparen", desc: "Automatisiere wiederkehrende Arbeit und gewinn jede Woche Stunden zurück." },
+      { title: "Vereinfachen", desc: "Ein klares System statt Zettel, Anrufe und Chaos." },
+      { title: "Immer erreichbar", desc: "Deine Website und Automationen arbeiten 24/7 — auch wenn du schläfst." },
+      { title: "Wachsen", desc: "Ein professioneller Auftritt, der Vertrauen und Neukunden bringt." },
     ],
     servicesEyebrow: "LEISTUNGEN",
-    servicesTitle: "Was ich baue",
+    servicesTitle: "Was wir bauen",
+    servicesSub: "Von Webdesign bis zum kompletten System — alles aus einer Hand.",
     services: [
-      { title: "Websites", desc: "Moderne Websites für Unternehmen, Creators und persönliche Marken." },
-      { title: "Landingpages", desc: "Fokussierte One-Page-Websites für Angebote, Aktionen und Portfolios." },
-      { title: "Individuelle Funktionen", desc: "Formulare, WhatsApp-Automationen, Filter, Galerien und kleine Tools." },
-      { title: "Hosting-Setup", desc: "Domain, Hosting, SSL und E-Mail-Einrichtung für dein Projekt." },
-      { title: "Branding-Basics", desc: "Einfache Logos, Farben und visuelle Richtung für deine Website." },
-      { title: "Wartung", desc: "Kleine Änderungen, Updates und Support nach dem Launch." },
+      { title: "Webdesign", desc: "Modernes, klares Design, das deine Marke professionell und vertrauenswürdig zeigt." },
+      { title: "Websites", desc: "Schnelle, responsive Websites, die dein Unternehmen präsentieren und Kunden gewinnen." },
+      { title: "Landingpages", desc: "Fokussierte One-Pager für Angebote, Aktionen und Produkt-Launches." },
+      { title: "Web-Apps", desc: "Browserbasierte Anwendungen, Dashboards und Portale — passend zu deinem Ablauf." },
+      { title: "Mobile Apps", desc: "iOS- & Android-Apps, die deinen Service in die Hosentasche deiner Kunden bringen." },
+      { title: "Individuelle Systeme", desc: "Verwaltungssysteme für Aufträge, Bestände, Retouren & mehr — Schluss mit Excel-Chaos." },
+      { title: "Buchung & Anfragen", desc: "Buchungssysteme und Anfrage-Abläufe, die deine Kunden gern nutzen." },
+      { title: "WhatsApp & Automation", desc: "Automatische Antworten, Benachrichtigungen und Abläufe — 24/7, ohne extra Personal." },
+      { title: "Hosting & Betreuung", desc: "Wir hosten, warten und halten alles am Laufen. Du kümmerst dich um dein Geschäft." },
     ],
-    workEyebrow: "ARBEITEN",
-    workTitle: "Ausgewählte Arbeiten",
-    work: [
-      { title: "Holzwurm-Lindheim", desc: "Boutique-Website für handgemachte Holzdekorationen.", features: ["Warmes handgemachtes Design", "Produktübersicht", "Galerie", "Kontaktformular", "WhatsApp-Anfrage", "Responsives Layout"] },
-      { title: "RGM System", desc: "Retouren- und Gutschriften-Management-System.", features: ["Dashboard-Oberfläche", "Datenstruktur", "Admin-Workflow", "Klares UI"] },
-      { title: "AFM Manager", desc: "Plattform für Fahrzeugaufbereitungs-Management.", features: ["Aufgabenübersicht", "Status-Tracking", "Interner Workflow", "Individuelles Interface"] },
-      { title: "KI-Album-Cover-Generator", desc: "Kreatives Tool zum Generieren von Album-Cover-Ideen.", features: ["Modernes Interface", "Prompt-Eingabe", "Bild-Ergebnis-Layout", "Klare Bedienung"] },
-    ],
-    pricingEyebrow: "PREISE",
-    pricingTitle: "Faire Preise für digitale Projekte",
-    pricingSub: "Jedes Projekt ist anders. Diese Preise sind ein Startpunkt.",
-    mostPopular: "BELIEBT",
-    from: "ab",
-    possibleFeatures: "Mögliche Funktionen:",
-    packages: [
-      { name: "Landingpage", price: "399", desc: "Für einfache One-Page-Websites mit einer klaren Botschaft.", features: ["Eine moderne Seite", "Responsives Design", "Kontaktbereich", "WhatsApp-Button", "Basis-SEO"] },
-      { name: "Website", price: "1.500", desc: "Für kleine Unternehmen, lokale Marken und persönliche Projekte.", features: ["Individuelle Startseite", "Mehrere Inhaltsbereiche", "Galerie oder Produktübersicht", "Kontaktformular", "Mobile Optimierung", "Basis-SEO"] },
-      { name: "Individuelle Website", price: "2.500", desc: "Für Projekte mit Sonderfunktionen oder höheren Anforderungen.", features: ["Anfrageformulare", "WhatsApp-Automation", "Filter", "Upload-Felder", "Buchungsformulare", "Individuelle JavaScript-Funktionen"] },
-    ],
-    addonsTitle: "ZUSATZLEISTUNGEN",
-    addons: [
-      { label: "Logo / einfaches Branding", price: "ab 30 €" },
-      { label: "Zusätzliche Unterseite", price: "ab 80 €" },
-      { label: "Kontaktformular", price: "ab 50 €" },
-      { label: "WhatsApp-Integration", price: "ab 50 €" },
-      { label: "Galerie / Lightbox", price: "ab 80 €" },
-      { label: "Produkt-Anfragefunktion", price: "ab 250 €" },
-      { label: "Hosting & Domain Einrichtung", price: "ab 50 €" },
-      { label: "Wartung", price: "ab 20 € / Monat" },
-    ],
-    hostingTitle: "HOSTING & LAUFENDE KOSTEN",
-    hosting: [
-      { label: "Einfaches Website-Hosting", price: "ca. 5 – 15 €", unit: "/ Monat" },
-      { label: "Business-Hosting", price: "ca. 15 – 30 €", unit: "/ Monat" },
-      { label: "Domain", price: "ca. 10 – 20 €", unit: "/ Jahr" },
-      { label: "Business-E-Mail", price: "ca. 1 – 5 €", unit: "/ Monat" },
-    ],
-    hostingNote: "Hosting- und Domainkosten sind unabhängig vom Website-Preis und hängen vom Anbieter und den Projektanforderungen ab.",
     processEyebrow: "ABLAUF",
     processTitle: "Einfacher Ablauf. Klares Ergebnis.",
     process: [
-      { title: "Briefing", desc: "Du sagst mir, was du brauchst." },
-      { title: "Konzept", desc: "Wir definieren Struktur, Design-Richtung und Funktionen." },
-      { title: "Design & Bau", desc: "Ich erstelle die Website und halte dich auf dem Laufenden." },
-      { title: "Launch", desc: "Die Website geht online — mit Domain, Hosting und Basis-Setup." },
+      { title: "Zuhören", desc: "Du erzählst uns dein Problem — wir hören zu und verstehen deinen Ablauf." },
+      { title: "Konzept", desc: "Wir entwerfen die einfachste digitale Lösung, die zu deinem Business passt." },
+      { title: "Umsetzen", desc: "Wir bauen sie und halten dich auf dem Laufenden — ohne Fachchinesisch, ohne Überraschungen." },
+      { title: "Launch & Betreuung", desc: "Deine Lösung geht live. Wir bleiben an deiner Seite und halten sie am Laufen." },
     ],
     contactEyebrow: "KONTAKT",
     contactTitle: "Lass uns dein Projekt bauen.",
-    contactSub: "Brauchst du eine Website, Landingpage oder Sonderfunktion? Schreib mir und ich gebe dir eine klare Einschätzung.",
+    contactSub:
+      "Website, App oder individuelles System — in einem kurzen, kostenlosen Gespräch finden wir die passende Lösung. Danach klarer Festpreis, unverbindlich.",
     labelWebsite: "Website",
     labelEmail: "E-Mail",
     labelWhatsApp: "WhatsApp",
-    startProject: "Projekt starten",
-    footerTagline: "Persönliches Webdesign, saubere Entwicklung und faire digitale Lösungen.",
+    startProject: "Kostenloses Erstgespräch",
+    footerTagline: "Deine Digitalagentur für Websites, Apps und Systeme.",
     rights: `© ${YEAR} LX CLOUDS. Alle Rechte vorbehalten.`,
   },
 } as const;
@@ -244,8 +224,8 @@ const LangSwitch = ({ lang, setLang, className }: { lang: Lang; setLang: (l: Lan
 );
 
 const Logo = () => (
-  <a href="#home" className="flex items-center gap-2.5" aria-label="LX CLOUDS">
-    <Cloud className="w-7 h-7 text-glow" fill="currentColor" strokeWidth={0} />
+  <a href="#home" className="flex items-center gap-2" aria-label="LX CLOUDS">
+    <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-11 w-auto mix-blend-screen contrast-125" />
     <span className="text-xl font-serif font-bold tracking-[0.15em] text-foreground">LX CLOUDS</span>
   </a>
 );
@@ -255,7 +235,7 @@ const Logo = () => (
 const Navbar = ({ t, lang, setLang }: { t: Translation; lang: Lang; setLang: (l: Lang) => void }) => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const hrefs = ["#pricing", "#contact"];
+  const hrefs = ["#services", "#solutions", "#process", "#contact"];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -293,337 +273,64 @@ const Navbar = ({ t, lang, setLang }: { t: Translation; lang: Lang; setLang: (l:
   );
 };
 
+// --- Hero image with 3D tilt + parallax (uses the exact hero-servers.png) ---
+
+const HeroImage3D = () => {
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener("change", onChange);
+    const onMove = (e: PointerEvent) => {
+      mx.set((e.clientX / window.innerWidth) * 2 - 1);
+      my.set((e.clientY / window.innerHeight) * 2 - 1);
+    };
+    window.addEventListener("pointermove", onMove);
+    return () => {
+      mq.removeEventListener("change", onChange);
+      window.removeEventListener("pointermove", onMove);
+    };
+  }, [mx, my]);
+
+  // smooth spring follow
+  const sx = useSpring(mx, { stiffness: 55, damping: 18, mass: 0.6 });
+  const sy = useSpring(my, { stiffness: 55, damping: 18, mass: 0.6 });
+  const rotateY = useTransform(sx, [-1, 1], [-5.5, 5.5]);
+  const rotateX = useTransform(sy, [-1, 1], [3.5, -3.5]);
+  const x = useTransform(sx, [-1, 1], [-16, 16]);
+  const y = useTransform(sy, [-1, 1], [-10, 10]);
+
+  return (
+    <div className="absolute inset-0" style={{ perspective: 1100 }}>
+      <motion.div className="absolute inset-0 will-change-transform" style={reduced ? undefined : { rotateX, rotateY, x, y }}>
+        <motion.img
+          src="/hero-servers.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "right center" }}
+          initial={{ scale: reduced ? 1 : 1.08 }}
+          animate={reduced ? undefined : { scale: [1.08, 1.14, 1.08] }}
+          transition={reduced ? undefined : { duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
+    </div>
+  );
+};
+
 // --- Section eyebrow + title ---
 
-const SectionTitle = ({ eyebrow, title, sub, center = true }: { eyebrow: string; title: string; sub?: string; center?: boolean }) => (
-  <div className={clsx("mb-12", center && "text-center")}>
-    <div className={clsx("font-mono text-xs tracking-[0.25em] text-glow mb-3", center && "flex justify-center")}>{eyebrow}</div>
+const SectionTitle = ({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) => (
+  <div className="mb-12 text-center">
+    <div className="font-mono text-xs tracking-[0.25em] text-glow mb-3">{eyebrow}</div>
     <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground">{title}</h2>
     {sub && <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">{sub}</p>}
   </div>
 );
-
-// --- Work card with image / mock fallback ---
-
-const WorkCard = ({ item, image, index }: { item: Translation["work"][number]; image: string | null; index: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 26 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-60px" }}
-    transition={{ duration: 0.5, delay: (index % 2) * 0.1 }}
-    className="glass-card rounded-2xl overflow-hidden flex flex-col group"
-  >
-    <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#0c1830] to-[#0a1424]">
-      {image ? (
-        <img src={image} alt={item.title} className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-500" />
-      ) : (
-        <div className="absolute inset-0 flex flex-col p-4">
-          <div className="flex gap-1.5 mb-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-            <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-          </div>
-          <div className="flex-1 grid grid-cols-3 gap-2">
-            <div className="col-span-1 rounded-lg bg-white/[0.04] border border-white/5" />
-            <div className="col-span-2 flex flex-col gap-2">
-              <div className="h-3 w-2/3 rounded bg-white/10" />
-              <div className="h-2 w-full rounded bg-white/[0.06]" />
-              <div className="h-2 w-5/6 rounded bg-white/[0.06]" />
-              <div className="mt-auto h-6 w-24 rounded-md bg-gradient-to-r from-glow/40 to-primary/40" />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-    <div className="p-6 flex flex-col flex-1">
-      <h3 className="text-xl font-serif font-bold text-foreground">{item.title}</h3>
-      <p className="mt-1.5 text-sm text-muted-foreground">{item.desc}</p>
-      <ul className="mt-4 space-y-2">
-        {item.features.map((f) => (
-          <li key={f} className="flex items-center gap-2.5 text-sm text-foreground/85">
-            <Check className="w-4 h-4 text-glow flex-shrink-0" strokeWidth={2.5} />
-            {f}
-          </li>
-        ))}
-      </ul>
-    </div>
-  </motion.div>
-);
-
-// --- Pricing section (bilingual: German primary, English secondary) ---
-
-type Pkg = {
-  name: string; nameEn?: string; priceDe: string; priceEn: string; descDe: string; descEn: string;
-  highlight: boolean; features: [string, string][]; notIncludedDe?: string; notIncludedEn?: string;
-};
-
-const WEBSITE_PACKAGES: Pkg[] = [
-  {
-    name: "Landing Page", priceDe: "ab 399 €", priceEn: "from 399 €", highlight: false,
-    descDe: "Für eine einfache statische One-Page-Website mit klarer Struktur.",
-    descEn: "For a simple static one-page website with a clean structure.",
-    features: [
-      ["Statische HTML/CSS-Website", "Static HTML/CSS website"],
-      ["Einfache Hero Section", "Simple hero section"],
-      ["Einfacher Inhaltsbereich", "Basic content section"],
-      ["Footer", "Footer section"],
-      ["Responsives Layout", "Responsive layout"],
-      ["Sauberes Design", "Clean visual design"],
-      ["Basis SEO Titel & Beschreibung", "Basic SEO title and description"],
-      ["Upload zum Hosting falls benötigt", "Upload to hosting if needed"],
-    ],
-    notIncludedDe: "Kein Kontaktformular, keine Animationen, keine Galerie, kein CMS, kein Buchungssystem, kein Konfigurator.",
-    notIncludedEn: "No contact form, no animations, no gallery, no CMS, no booking system, no configurator.",
-  },
-  {
-    name: "Website", priceDe: "ab 1.500 €", priceEn: "from 1,500 €", highlight: true,
-    descDe: "Für eine professionelle Website mit starkem Design, mehreren Bereichen und seriösem Online-Auftritt.",
-    descEn: "For a professional website with strong design, multiple sections and a serious online presence.",
-    features: [
-      ["Individuelles Webdesign", "Custom website design"],
-      ["Mehrere Inhaltsbereiche", "Multiple content sections"],
-      ["Sticky Navigation", "Sticky navigation"],
-      ["Mobile Burger-Menü", "Mobile burger menu"],
-      ["Hero Section mit starkem Look", "Hero section with strong visual direction"],
-      ["Über-uns Bereich", "About section"],
-      ["Leistungen oder Produkte", "Services or products section"],
-      ["Galerie oder Portfolio", "Gallery or portfolio section"],
-      ["Bewertungen / Testimonials", "Testimonials section"],
-      ["FAQ falls benötigt", "FAQ if needed"],
-      ["Kontaktbereich", "Contact section"],
-      ["Kontaktformular mit einfacher Validierung", "Contact form with basic validation"],
-      ["WhatsApp Integration", "WhatsApp integration"],
-      ["Smooth Scrolling", "Smooth scrolling"],
-      ["Dezente Animationen", "Subtle animations"],
-      ["Basis SEO", "Basic SEO setup"],
-      ["Impressum & Datenschutz falls benötigt", "Imprint and privacy pages if needed"],
-      ["Hosting & Domain Setup Support", "Hosting and domain setup support"],
-    ],
-  },
-  {
-    name: "Individuelle Website", nameEn: "Custom Website", priceDe: "ab 2.500 €", priceEn: "from 2,500 €", highlight: false,
-    descDe: "Für Websites mit besonderen Funktionen, komplexeren Abläufen und individuellen Anforderungen.",
-    descEn: "For websites with special features, advanced user flows and custom requirements.",
-    features: [
-      ["Alles aus dem Website-Paket", "Everything from the Website package"],
-      ["Individuelles UI/UX Konzept", "Custom UI/UX concept"],
-      ["Mehrstufige Konfiguratoren", "Multi-step configurators"],
-      ["Produkt-Anfragesysteme", "Product request systems"],
-      ["WhatsApp Automation", "WhatsApp automation"],
-      ["Automatisch generierte Nachrichten", "Auto-generated messages"],
-      ["Produktfilter", "Product filters"],
-      ["Terminbuchung", "Booking or appointment forms"],
-      ["Upload-Felder", "Upload fields"],
-      ["Erweiterte Galerie / Slider", "Advanced galleries or sliders"],
-      ["Lightbox Funktion", "Lightbox functionality"],
-      ["Countdown Bereiche", "Countdown sections"],
-      ["Individuelle JavaScript-Funktionen", "Custom JavaScript functions"],
-      ["API-Anbindungen falls möglich", "API integrations where possible"],
-      ["Strukturierte Daten / JSON-LD", "Structured data / JSON-LD"],
-      ["Erweiterte SEO-Struktur", "Advanced SEO structure"],
-      ["Performance Optimierung", "Performance optimization"],
-      ["Detailliertes Testing", "Detailed testing"],
-    ],
-  },
-];
-
-const HOSTING_PACKAGES: Omit<Pkg, "notIncludedDe" | "notIncludedEn">[] = [
-  {
-    name: "Basic Hosting", priceDe: "15 € / Monat", priceEn: "15 € / month", highlight: false,
-    descDe: "Für kleine statische Websites und einfache Online-Auftritte.",
-    descEn: "For small static websites and simple online presences.",
-    features: [
-      ["Hosting für 1 Website", "Hosting for 1 website"],
-      ["SSL-Zertifikat", "SSL certificate"],
-      ["Cloudflare Setup", "Cloudflare setup"],
-      ["Basis Performance", "Basic performance"],
-      ["Technische Einrichtung", "Technical setup"],
-      ["Kleine technische Hilfe", "Small technical support"],
-    ],
-  },
-  {
-    name: "Business Hosting", priceDe: "29 € / Monat", priceEn: "29 € / month", highlight: true,
-    descDe: "Für professionelle Websites mit mehr Anforderungen und regelmäßiger Betreuung.",
-    descEn: "For professional websites with higher requirements and regular support.",
-    features: [
-      ["Hosting für bis zu 3 Websites", "Hosting for up to 3 websites"],
-      ["SSL-Zertifikat", "SSL certificate"],
-      ["Cloudflare Optimierung", "Cloudflare optimization"],
-      ["Performance Setup", "Performance setup"],
-      ["Sicherheits-Grundsetup", "Basic security setup"],
-      ["Monatliche technische Kontrolle", "Monthly technical check"],
-      ["Kleine Inhaltsänderungen", "Small content changes"],
-      ["Priorisierter Support", "Priority support"],
-    ],
-  },
-  {
-    name: "Premium Hosting", priceDe: "49 € / Monat", priceEn: "49 € / month", highlight: false,
-    descDe: "Für anspruchsvollere Projekte mit mehr Betreuung, Sicherheit und Performance.",
-    descEn: "For more demanding projects with stronger support, security and performance.",
-    features: [
-      ["Hosting für bis zu 5 Websites", "Hosting for up to 5 websites"],
-      ["SSL-Zertifikat", "SSL certificate"],
-      ["Erweiterte Cloudflare Optimierung", "Advanced Cloudflare optimization"],
-      ["Performance Monitoring", "Performance monitoring"],
-      ["Sicherheitskontrolle", "Security checks"],
-      ["Regelmäßige Backups falls möglich", "Regular backups if possible"],
-      ["Kleine Änderungen inklusive", "Small changes included"],
-      ["Priorisierter Support", "Priority support"],
-      ["Technische Beratung", "Technical consulting"],
-    ],
-  },
-];
-
-const DOMAIN_COSTS: [string, string][] = [
-  ["Domain: ca. 18 € / Jahr", "Domain: approx. 18 € / year"],
-  ["Business E-Mail: ab 3 € / Monat", "Business email: from 3 € / month"],
-  ["Zusätzliche Domain: nach Anbieterpreis", "Additional domain: depending on provider"],
-  ["Größere Änderungen: nach Aufwand", "Larger changes: based on effort"],
-];
-
-const PRICING_ADDONS: [string, string, string, string][] = [
-  ["Logo / einfaches Branding", "Logo / simple branding", "ab 30 €", "from 30 €"],
-  ["Zusätzliche Unterseite", "Additional page", "ab 80 €", "from 80 €"],
-  ["Kontaktformular", "Contact form", "ab 50 €", "from 50 €"],
-  ["WhatsApp Integration", "WhatsApp integration", "ab 50 €", "from 50 €"],
-  ["Galerie / Lightbox", "Gallery / lightbox", "ab 80 €", "from 80 €"],
-  ["Produkt-Anfragefunktion", "Product request function", "ab 250 €", "from 250 €"],
-  ["Google Unternehmensprofil", "Google Business Profile", "ab 100 €", "from 100 €"],
-  ["Wartung & kleine Änderungen", "Maintenance & small changes", "ab 20 € / Monat", "from 20 € / month"],
-];
-
-const PricingSection = ({ lang }: { lang: Lang }) => {
-  const pick = (de: string, en: string) => (lang === "de" ? de : en);
-
-  const featureGrid = (features: [string, string][]) => (
-    <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-      {features.map(([de, en]) => (
-        <li key={de} className="flex gap-1.5 items-start text-xs text-foreground/85">
-          <Check className="w-3 h-3 text-glow mt-[3px] shrink-0" strokeWidth={3} />
-          <span className="leading-snug">{pick(de, en)}</span>
-        </li>
-      ))}
-    </ul>
-  );
-
-  const includedLabel = (
-    <div className="mt-4 mb-2.5 font-mono text-[10px] tracking-[0.2em] uppercase text-glow">{pick("Enthalten", "Included")}</div>
-  );
-
-  const cta = (highlight: boolean) => (
-    <a href="#contact" className={clsx("mt-5 block text-center rounded-lg py-2.5 font-semibold text-sm transition-colors", highlight ? "bg-primary hover:bg-primary-hover text-white" : "border border-white/15 hover:border-white/35 hover:bg-white/5 text-foreground")}>
-      {pick("Anfragen", "Get a quote")}
-    </a>
-  );
-
-  return (
-    <section id="pricing" className="py-24 scroll-mt-24">
-      <div className="container mx-auto px-6">
-        {/* header */}
-        <div className="text-center mb-12 max-w-2xl mx-auto">
-          <div className="font-mono text-xs tracking-[0.25em] text-glow mb-3">{pick("PREISE", "PRICING")}</div>
-          <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground">{pick("Preise für digitale Projekte", "Pricing for Digital Projects")}</h2>
-          <p className="mt-5 text-foreground/75">{pick("Transparente Startpreise für Websites, individuelle Funktionen und Hosting.", "Transparent starting prices for websites, custom features and hosting.")}</p>
-        </div>
-
-        {/* website packages */}
-        <div className="grid md:grid-cols-3 gap-5 items-start">
-          {WEBSITE_PACKAGES.map((p) => (
-            <div key={p.name} className={clsx("relative rounded-2xl p-6 flex flex-col", p.highlight ? "bg-primary/[0.07] border border-primary/40 shadow-[0_0_45px_rgba(59,130,246,0.14)]" : "glass-card")}>
-              {p.highlight && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-glow to-primary text-white text-[10px] font-bold tracking-wider px-3 py-1 uppercase whitespace-nowrap">{pick("Beliebt", "Most Popular")}</span>
-              )}
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="text-lg font-serif font-bold text-foreground">{pick(p.name, p.nameEn ?? p.name)}</h3>
-                <div className="text-2xl font-serif font-bold gradient-text whitespace-nowrap">{pick(p.priceDe, p.priceEn)}</div>
-              </div>
-              <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed">{pick(p.descDe, p.descEn)}</p>
-              {includedLabel}
-              <div className="flex-1">{featureGrid(p.features)}</div>
-              {p.notIncludedDe && (
-                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-3">
-                  <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1.5">{pick("Nicht enthalten", "Not included")}</div>
-                  <p className="text-xs text-foreground/65 leading-relaxed">{pick(p.notIncludedDe, p.notIncludedEn!)}</p>
-                </div>
-              )}
-              {cta(p.highlight)}
-            </div>
-          ))}
-        </div>
-
-        {/* hosting */}
-        <div className="text-center mt-16 mb-8">
-          <h3 className="text-2xl md:text-3xl font-serif font-bold text-foreground">{pick("Hosting-Pakete", "Hosting Packages")}</h3>
-        </div>
-        <div className="flex flex-col gap-4 max-w-5xl mx-auto">
-          {HOSTING_PACKAGES.map((h) => (
-            <div key={h.name} className={clsx("relative rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center gap-5", h.highlight ? "bg-primary/[0.06] border border-primary/40 shadow-[0_0_40px_rgba(59,130,246,0.12)]" : "glass-card")}>
-              {/* left: name + price */}
-              <div className="lg:w-60 lg:shrink-0">
-                <div className="flex items-center gap-2.5">
-                  <h3 className="text-lg font-serif font-bold text-foreground">{h.name}</h3>
-                  {h.highlight && (
-                    <span className="rounded-full bg-gradient-to-r from-glow to-primary text-white text-[9px] font-bold tracking-wider px-2 py-0.5 uppercase">{pick("Beliebt", "Most Popular")}</span>
-                  )}
-                </div>
-                <div className="mt-1.5 text-2xl font-serif font-bold gradient-text">{pick(h.priceDe, h.priceEn)}</div>
-                <p className="mt-1 text-xs text-muted-foreground leading-snug">{pick(h.descDe, h.descEn)}</p>
-              </div>
-              {/* divider */}
-              <div className="hidden lg:block w-px self-stretch bg-white/10" />
-              {/* features as chips */}
-              <div className="flex-1 flex flex-wrap gap-2">
-                {h.features.map(([de, en]) => (
-                  <span key={de} className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] border border-white/10 px-2.5 py-1 text-xs text-foreground/85">
-                    <Check className="w-3 h-3 text-glow shrink-0" strokeWidth={3} />
-                    {pick(de, en)}
-                  </span>
-                ))}
-              </div>
-              {/* cta */}
-              <a href="#contact" className={clsx("lg:shrink-0 text-center rounded-lg px-6 py-2.5 text-sm font-semibold transition-colors", h.highlight ? "bg-primary hover:bg-primary-hover text-white" : "border border-white/15 hover:border-white/35 hover:bg-white/5 text-foreground")}>
-                {pick("Anfragen", "Get a quote")}
-              </a>
-            </div>
-          ))}
-        </div>
-
-        {/* domains + add-ons */}
-        <div className="grid lg:grid-cols-2 gap-5 mt-14">
-          <div className="glass-card rounded-2xl p-6">
-            <h3 className="text-base font-serif font-bold text-foreground mb-3">{pick("Domains & laufende Kosten", "Domains & running costs")}</h3>
-            <ul className="divide-y divide-white/10">
-              {DOMAIN_COSTS.map(([de, en]) => (
-                <li key={de} className="py-2.5 text-sm text-foreground/85">{pick(de, en)}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="glass-card rounded-2xl p-6">
-            <h3 className="text-base font-serif font-bold text-foreground mb-3">{pick("Zusatzleistungen", "Add-ons")}</h3>
-            <ul className="divide-y divide-white/10">
-              {PRICING_ADDONS.map(([de, en, pde, pen]) => (
-                <li key={de} className="py-2.5 flex items-center justify-between gap-4">
-                  <span className="text-sm text-foreground/85">{pick(de, en)}</span>
-                  <span className="text-sm font-semibold text-glow whitespace-nowrap">{pick(pde, pen)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* footer note */}
-        <div className="glass-card rounded-2xl p-6 mt-8 max-w-3xl mx-auto text-center">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {pick(
-              "Alle Preise sind Startpreise und hängen vom finalen Umfang, Design, Inhalt und den gewünschten Funktionen ab. Nach einem kurzen Gespräch erhältst du ein klares Festpreis-Angebot.",
-              "All prices are starting prices and depend on the final scope, design, content and required features. After a short conversation, you receive a clear fixed-price offer."
-            )}
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-};
 
 // --- Main page ---
 
@@ -643,9 +350,9 @@ export default function Home() {
       <main>
         {/* HERO */}
         <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden">
-          {/* background server image */}
+          {/* background server image — animated with 3D tilt/parallax */}
           <div className="absolute inset-0 z-0">
-            <img src="/hero-servers.png" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "right center" }} />
+            <HeroImage3D />
             <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, #06090f 0%, #06090f 30%, rgba(6,9,15,0.55) 41%, rgba(6,9,15,0) 55%)" }} />
             <div className="absolute inset-x-0 bottom-0 h-28" style={{ background: "linear-gradient(to bottom, transparent, #06090f)" }} />
             <div className="absolute inset-x-0 top-0 h-16" style={{ background: "linear-gradient(to bottom, #06090f, transparent)" }} />
@@ -663,15 +370,22 @@ export default function Home() {
               </h1>
               <p className="mt-7 text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">{t.heroText}</p>
               <div className="mt-9 flex flex-wrap gap-4">
-                <a href="#pricing" className="inline-flex items-center gap-2 rounded-xl text-white font-semibold px-7 py-3.5 shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
+                <a href="#contact" className="inline-flex items-center gap-2 rounded-xl text-white font-semibold px-7 py-3.5 shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
                   style={{ background: "linear-gradient(110deg, #2563eb 0%, #6d5cf5 100%)" }}>
                   {t.heroCta1} <ArrowUpRight className="w-4 h-4" />
                 </a>
-                <a href="#contact" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.03] hover:bg-white/[0.07] text-foreground font-semibold px-7 py-3.5 transition-colors">
+                <a href="#services" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.03] hover:bg-white/[0.07] text-foreground font-semibold px-7 py-3.5 transition-colors">
                   {t.heroCta2} <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
-              <div className="mt-12 flex">
+              <div className="mt-8 flex flex-wrap gap-2 max-w-lg">
+                {t.heroChips.map((chip) => (
+                  <span key={chip} className="rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-foreground/80">
+                    {chip}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-10 flex">
                 {t.stats.map(([n, l], i) => (
                   <div key={l} className={clsx("px-6 first:pl-0", i > 0 && "border-l border-white/15")}>
                     <div className="text-2xl md:text-3xl font-serif font-bold gradient-text">{n}</div>
@@ -683,7 +397,136 @@ export default function Home() {
           </div>
         </section>
 
-        <PricingSection lang={lang} />
+        {/* SERVICES */}
+        <section id="services" className="py-20 scroll-mt-24">
+          <div className="container mx-auto px-6">
+            <SectionTitle eyebrow={t.servicesEyebrow} title={t.servicesTitle} sub={t.servicesSub} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {t.services.map((s, i) => {
+                const Icon = SERVICE_ICONS[i];
+                return (
+                  <motion.div
+                    key={s.title}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
+                    className="glass-card rounded-2xl p-7 hover:border-glow/30 hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <span className="w-12 h-12 rounded-xl bg-primary/15 text-glow flex items-center justify-center mb-5">
+                      <Icon className="w-6 h-6" />
+                    </span>
+                    <h3 className="text-xl font-serif font-bold text-foreground">{s.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* PROBLEMS → SOLUTIONS */}
+        <section id="solutions" className="py-20 scroll-mt-24">
+          <div className="container mx-auto px-6">
+            <SectionTitle eyebrow={t.problemsEyebrow} title={t.problemsTitle} sub={t.problemsSub} />
+            <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto">
+              {t.problems.map((p, i) => {
+                const Icon = PROBLEM_ICONS[i];
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.45, delay: (i % 2) * 0.08 }}
+                    className="glass-card rounded-2xl p-7 flex flex-col"
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="w-11 h-11 rounded-xl bg-white/[0.05] border border-white/10 text-muted-foreground flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5" />
+                      </span>
+                      <div>
+                        <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1.5">{t.problemLabel}</div>
+                        <p className="text-foreground/85 leading-relaxed">{p.problem}</p>
+                      </div>
+                    </div>
+                    <div className="my-5 flex items-center gap-3">
+                      <div className="flex-1 h-px bg-white/10" />
+                      <ArrowRight className="w-4 h-4 text-glow rotate-90" />
+                      <div className="flex-1 h-px bg-white/10" />
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-5 h-5" />
+                      </span>
+                      <div>
+                        <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-glow mb-1.5">{t.solutionLabel}</div>
+                        <p className="text-foreground leading-relaxed font-medium">{p.solution}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* BENEFITS */}
+        <section className="py-20">
+          <div className="container mx-auto px-6">
+            <SectionTitle eyebrow={t.benefitsEyebrow} title={t.benefitsTitle} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+              {t.benefits.map((b, i) => {
+                const Icon = BENEFIT_ICONS[i];
+                return (
+                  <motion.div
+                    key={b.title}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.45, delay: i * 0.08 }}
+                    className="glass-card rounded-2xl p-6 text-center hover:border-glow/30 hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <span className="w-12 h-12 rounded-xl bg-primary/15 text-glow flex items-center justify-center mx-auto mb-4">
+                      <Icon className="w-6 h-6" />
+                    </span>
+                    <h3 className="text-lg font-serif font-bold text-foreground">{b.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{b.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* PROCESS */}
+        <section id="process" className="py-20 scroll-mt-24">
+          <div className="container mx-auto px-6">
+            <SectionTitle eyebrow={t.processEyebrow} title={t.processTitle} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {t.process.map((p, i) => {
+                const Icon = PROCESS_ICONS[i];
+                return (
+                  <motion.div
+                    key={p.title}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.45, delay: i * 0.1 }}
+                    className="glass-card rounded-2xl p-6 relative"
+                  >
+                    <span className="absolute top-5 right-5 font-serif text-3xl font-bold text-white/10">{i + 1}</span>
+                    <span className="w-12 h-12 rounded-xl bg-primary/15 text-glow flex items-center justify-center mb-5">
+                      <Icon className="w-6 h-6" />
+                    </span>
+                    <h3 className="text-lg font-serif font-bold text-foreground">{p.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
 
         {/* CONTACT */}
         <section id="contact" className="py-20 scroll-mt-24">
@@ -694,7 +537,8 @@ export default function Home() {
                   <div className="font-mono text-xs tracking-[0.25em] text-glow mb-3">{t.contactEyebrow}</div>
                   <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">{t.contactTitle}</h2>
                   <p className="mt-4 text-muted-foreground leading-relaxed max-w-md">{t.contactSub}</p>
-                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-primary hover:bg-primary-hover text-white font-semibold px-7 py-3.5 transition-colors shadow-lg shadow-primary/30">
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-2 rounded-xl text-white font-semibold px-7 py-3.5 shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
+                    style={{ background: "linear-gradient(110deg, #2563eb 0%, #6d5cf5 100%)" }}>
                     {t.startProject} <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
@@ -721,8 +565,8 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="border-t border-white/10 py-8">
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Cloud className="w-5 h-5 text-glow" fill="currentColor" strokeWidth={0} />
+          <div className="flex items-center gap-2">
+            <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-8 w-auto mix-blend-screen contrast-125" />
             <span className="font-serif font-bold tracking-[0.15em] text-foreground text-sm">LX CLOUDS</span>
             <span className="hidden md:inline text-muted-foreground text-sm">— {t.footerTagline}</span>
           </div>
