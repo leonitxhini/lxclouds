@@ -1,8 +1,6 @@
-import { useState, useEffect, lazy, Suspense } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { clsx } from "clsx";
-
-const HeroClouds = lazy(() => import("@/components/HeroClouds"));
 import {
   Cloud, ArrowRight, ArrowUpRight, Menu, X,
   Monitor, Code2, PenTool, Server, Globe, Mail,
@@ -275,6 +273,55 @@ const Navbar = ({ t, lang, setLang }: { t: Translation; lang: Lang; setLang: (l:
   );
 };
 
+// --- Hero image with 3D tilt + parallax (uses the exact hero-servers.png) ---
+
+const HeroImage3D = () => {
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener("change", onChange);
+    const onMove = (e: PointerEvent) => {
+      mx.set((e.clientX / window.innerWidth) * 2 - 1);
+      my.set((e.clientY / window.innerHeight) * 2 - 1);
+    };
+    window.addEventListener("pointermove", onMove);
+    return () => {
+      mq.removeEventListener("change", onChange);
+      window.removeEventListener("pointermove", onMove);
+    };
+  }, [mx, my]);
+
+  // smooth spring follow
+  const sx = useSpring(mx, { stiffness: 55, damping: 18, mass: 0.6 });
+  const sy = useSpring(my, { stiffness: 55, damping: 18, mass: 0.6 });
+  const rotateY = useTransform(sx, [-1, 1], [-5.5, 5.5]);
+  const rotateX = useTransform(sy, [-1, 1], [3.5, -3.5]);
+  const x = useTransform(sx, [-1, 1], [-16, 16]);
+  const y = useTransform(sy, [-1, 1], [-10, 10]);
+
+  return (
+    <div className="absolute inset-0" style={{ perspective: 1100 }}>
+      <motion.div className="absolute inset-0 will-change-transform" style={reduced ? undefined : { rotateX, rotateY, x, y }}>
+        <motion.img
+          src="/hero-servers.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "right center" }}
+          initial={{ scale: reduced ? 1 : 1.08 }}
+          animate={reduced ? undefined : { scale: [1.08, 1.14, 1.08] }}
+          transition={reduced ? undefined : { duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
+    </div>
+  );
+};
+
 // --- Section eyebrow + title ---
 
 const SectionTitle = ({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) => (
@@ -303,23 +350,10 @@ export default function Home() {
       <main>
         {/* HERO */}
         <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden">
-          {/* animated cloud background (static image as fallback / while loading) */}
+          {/* background server image — animated with 3D tilt/parallax */}
           <div className="absolute inset-0 z-0">
-            <img src="/hero-servers.png" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "right center" }} />
-            <Suspense fallback={null}>
-              <HeroClouds />
-            </Suspense>
-            {/* server racks floating above the animated clouds */}
-            <motion.img
-              src="/hero-servers-cutout.png"
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-              style={{ objectPosition: "right center" }}
-              animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(90deg, #06090f 0%, rgba(6,9,15,0.9) 26%, rgba(6,9,15,0.45) 42%, rgba(6,9,15,0) 58%)" }} />
+            <HeroImage3D />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, #06090f 0%, #06090f 30%, rgba(6,9,15,0.55) 41%, rgba(6,9,15,0) 55%)" }} />
             <div className="absolute inset-x-0 bottom-0 h-28" style={{ background: "linear-gradient(to bottom, transparent, #06090f)" }} />
             <div className="absolute inset-x-0 top-0 h-16" style={{ background: "linear-gradient(to bottom, #06090f, transparent)" }} />
           </div>
