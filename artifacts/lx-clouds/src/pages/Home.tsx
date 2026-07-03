@@ -309,6 +309,16 @@ export default function Home() {
             <Suspense fallback={null}>
               <HeroClouds />
             </Suspense>
+            {/* server racks floating above the animated clouds */}
+            <motion.img
+              src="/hero-servers-cutout.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+              style={{ objectPosition: "right center" }}
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+            />
             <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(90deg, #06090f 0%, rgba(6,9,15,0.9) 26%, rgba(6,9,15,0.45) 42%, rgba(6,9,15,0) 58%)" }} />
             <div className="absolute inset-x-0 bottom-0 h-28" style={{ background: "linear-gradient(to bottom, transparent, #06090f)" }} />
             <div className="absolute inset-x-0 top-0 h-16" style={{ background: "linear-gradient(to bottom, #06090f, transparent)" }} />
