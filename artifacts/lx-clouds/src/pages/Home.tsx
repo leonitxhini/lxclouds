@@ -225,7 +225,7 @@ const LangSwitch = ({ lang, setLang, className }: { lang: Lang; setLang: (l: Lan
 
 const Logo = () => (
   <a href="#home" className="flex items-center gap-2" aria-label="LX CLOUDS">
-    <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-11 w-auto mix-blend-screen contrast-125" />
+    <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-11 w-auto" />
     <span className="text-xl font-serif font-bold tracking-[0.15em] text-foreground">LX CLOUDS</span>
   </a>
 );
@@ -566,7 +566,7 @@ export default function Home() {
       <footer className="border-t border-white/10 py-8">
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-8 w-auto mix-blend-screen contrast-125" />
+            <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-8 w-auto" />
             <span className="font-serif font-bold tracking-[0.15em] text-foreground text-sm">LX CLOUDS</span>
             <span className="hidden md:inline text-muted-foreground text-sm">— {t.footerTagline}</span>
           </div>
