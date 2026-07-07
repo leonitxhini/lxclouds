@@ -214,17 +214,17 @@ const Navbar = ({ goTo }: { goTo: (hash: string) => void }) => {
 // --- Hero ---
 
 const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
-  const visualRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLImageElement>(null);
 
-  // mouse parallax on the hero visual
+  // subtle mouse parallax on the background image
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    const el = visualRef.current;
+    const el = bgRef.current;
     if (!el) return;
     const onMove = (e: PointerEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 22;
-      const y = (e.clientY / window.innerHeight - 0.5) * 14;
-      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      const x = (e.clientX / window.innerWidth - 0.5) * -14;
+      const y = (e.clientY / window.innerHeight - 0.5) * -8;
+      el.style.transform = `scale(1.06) translate3d(${x}px, ${y}px, 0)`;
     };
     window.addEventListener("pointermove", onMove);
     return () => window.removeEventListener("pointermove", onMove);
@@ -237,14 +237,17 @@ const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
 
   return (
     <section id="home" className="relative overflow-hidden pt-36 pb-24 lg:pt-44 lg:pb-32">
-      {/* background: depth, grid, volumetric light, particles */}
+      {/* background: datacenter scene + readability gradients + particles */}
       <div className="absolute inset-0" aria-hidden="true">
-        <div className="absolute inset-0 bg-grid opacity-60 [mask-image:radial-gradient(ellipse_75%_60%_at_50%_35%,black,transparent)]" />
-        <div className="animate-drift absolute -top-40 left-1/4 h-[560px] w-[560px] rounded-full bg-primary/15 blur-[140px]" />
-        <div className="animate-drift absolute top-1/3 right-[-8%] h-[520px] w-[520px] rounded-full bg-glow/10 blur-[140px] [animation-delay:-7s]" />
-        <div className="absolute right-[8%] top-0 h-[70%] w-40 rotate-[24deg] bg-gradient-to-b from-glow/[0.07] to-transparent blur-2xl" />
-        <div className="absolute right-[24%] top-0 h-[55%] w-24 rotate-[24deg] bg-gradient-to-b from-primary/[0.08] to-transparent blur-2xl" />
-        <Particles className="absolute inset-0 h-full w-full" />
+        <img
+          ref={bgRef}
+          src="/hero-datacenter.png"
+          alt=""
+          className="absolute inset-0 h-full w-full scale-[1.06] object-cover object-[70%_center] transition-transform duration-300 ease-out will-change-transform"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#05070B] via-[#05070B]/70 to-transparent lg:via-[#05070B]/45 lg:to-[#05070B]/10" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#05070B]/90 to-transparent" />
+        <Particles className="absolute inset-0 h-full w-full" count={45} />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#05070B]" />
       </div>
 
@@ -280,32 +283,6 @@ const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
           </motion.div>
         </div>
 
-        {/* Right: interactive 3D cloud */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92, filter: "blur(12px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{ duration: 1, delay: 1.35, ease: EASE }}
-          className="relative hidden items-center justify-center lg:flex"
-        >
-          <div ref={visualRef} className="relative transition-transform duration-300 ease-out will-change-transform">
-            {/* glow core */}
-            <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/25 blur-[90px]" aria-hidden="true" />
-            <div className="absolute left-1/2 top-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-glow/20 blur-[60px]" aria-hidden="true" />
-            {/* orbit rings */}
-            <div className="animate-spin-slower absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/15" aria-hidden="true">
-              <span className="absolute -top-1 left-1/2 h-2 w-2 rounded-full bg-glow shadow-[0_0_12px_3px] shadow-glow/60" />
-            </div>
-            <div className="animate-spin-slower absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-white/10 [animation-direction:reverse] [animation-duration:55s]" aria-hidden="true" />
-            {/* the cloud */}
-            <motion.img
-              src="/logo-mark.png"
-              alt="LX CLOUDS cloud logo"
-              className="animate-float-slow relative w-[420px] max-w-full drop-shadow-[0_30px_80px_rgba(29,124,255,0.35)]"
-              animate={prefersReducedMotion() ? undefined : { rotate: [0, 2.5, 0, -2.5, 0] }}
-              transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-        </motion.div>
       </div>
     </section>
   );
