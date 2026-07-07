@@ -236,7 +236,7 @@ const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
   };
 
   return (
-    <section id="home" className="relative overflow-hidden pt-36 pb-24 lg:pt-44 lg:pb-32">
+    <section id="home" className="relative overflow-hidden pt-36 pb-14 lg:pt-44 lg:pb-16">
       {/* background: datacenter scene + readability gradients + particles */}
       <div className="absolute inset-0" aria-hidden="true">
         <img
@@ -291,12 +291,14 @@ const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
 // --- Trust bar (marquee) ---
 
 const TrustBar = () => (
-  <section className="border-y border-white/5 bg-white/[0.015] py-5" aria-label="Highlights">
+  <section className="bg-white py-6" aria-label="Highlights">
     <div className="mask-fade-x overflow-hidden">
-      <div className="animate-marquee flex w-max items-center gap-14 pr-14">
+      <div className="animate-marquee flex w-max items-center gap-16 pr-16">
         {[...TRUST_ITEMS, ...TRUST_ITEMS].map((t, i) => (
-          <span key={i} className="inline-flex items-center gap-2.5 whitespace-nowrap font-mono text-xs uppercase tracking-[0.22em] text-foreground/45">
-            <t.icon className="h-4 w-4 text-primary/70" />
+          <span key={i} className="inline-flex items-center gap-3 whitespace-nowrap font-mono text-xs font-semibold uppercase tracking-[0.22em] text-[#0A0F1A]/75">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <t.icon className="h-4 w-4 text-primary" />
+            </span>
             {t.label}
           </span>
         ))}
