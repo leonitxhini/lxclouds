@@ -243,7 +243,7 @@ const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
           ref={bgRef}
           src="/hero-datacenter.png"
           alt=""
-          className="absolute bottom-0 right-0 h-[78%] w-auto max-w-none scale-[1.03] transition-transform duration-300 ease-out will-change-transform [mask-image:radial-gradient(115%_115%_at_72%_58%,black_50%,transparent_92%)]"
+          className="absolute right-0 top-0 h-[82%] w-auto max-w-none scale-[1.03] transition-transform duration-300 ease-out will-change-transform [mask-image:radial-gradient(115%_115%_at_72%_45%,black_50%,transparent_92%)]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#05070B] via-[#05070B]/70 to-transparent lg:via-[#05070B]/45 lg:to-[#05070B]/10" />
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#05070B]/90 to-transparent" />
