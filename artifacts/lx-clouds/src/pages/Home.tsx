@@ -6,7 +6,7 @@ import {
   ArrowRight, ArrowUpRight, Check, X as XIcon, Menu, X,
   Monitor, Server, Cpu, Network, Bot, Code2,
   ShieldCheck, Gauge, DatabaseBackup, Maximize2, Activity, Wrench, BarChart3, Webhook,
-  Zap, Lock, TrendingUp, Quote, Mail, Globe, ExternalLink, MapPin,
+  Zap, Lock, TrendingUp, Mail, Globe, MapPin,
   Instagram, Linkedin, Github, Send,
 } from "lucide-react";
 import { Reveal, Magnetic, TiltCard, Counter, ripple, EASE, prefersReducedMotion } from "@/lib/fx";
@@ -23,7 +23,6 @@ const YEAR = new Date().getFullYear();
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
   { label: "Services", href: "#services" },
-  { label: "Projects", href: "#projects" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
@@ -67,13 +66,6 @@ const FEATURES = [
   { icon: Webhook, title: "API Integrations", desc: "Connect any tool you rely on." },
 ];
 
-const PROJECTS = [
-  { title: "Lonorix", tag: "AI Platform", img: "/project-lonorix.png", url: "https://lonorix.com" },
-  { title: "ZgjedhPlus", tag: "Price Comparison", img: "/project-zgjedhplus.png", url: "https://zgjedhplus.com" },
-  { title: "Rent a Car Ron", tag: "Booking Platform", img: "/project-rentacarron.png", url: "https://rentacarron.com" },
-  { title: "AutoElite", tag: "Automotive Platform", img: "/project-autoelite.png", url: null },
-];
-
 const PROCESS = [
   { n: "01", title: "Discovery", desc: "We understand your goals, users and requirements." },
   { n: "02", title: "Design", desc: "Custom UI direction and pixel-perfect screens." },
@@ -87,12 +79,6 @@ const STATS = [
   { to: 50, suffix: "+", label: "Projects Delivered" },
   { to: 30, suffix: "+", label: "Happy Clients" },
   { to: 24, prefix: "<", suffix: "h", label: "Response Time" },
-];
-
-const TESTIMONIALS = [
-  { quote: "LX CLOUDS rebuilt our entire web presence and automated our booking flow. We save hours every single week — and the site finally looks like us.", name: "Sarah M.", role: "Boutique Owner" },
-  { quote: "Fast, reliable and always reachable. Our new platform loads instantly and our customers notice the difference immediately.", name: "Daniel K.", role: "Logistics Manager" },
-  { quote: "From first call to launch in three weeks. The quality feels like a big agency — without the overhead or the buzzwords.", name: "Amir R.", role: "Startup Founder" },
 ];
 
 // --- Small building blocks ---
@@ -279,7 +265,7 @@ const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-4">
               <PrimaryButton href="#contact" onClick={anchor("#contact")}>Get Started</PrimaryButton>
-              <GhostButton href="#projects" onClick={anchor("#projects")}>View Projects</GhostButton>
+              <GhostButton href="#services" onClick={anchor("#services")}>Our Services</GhostButton>
             </div>
             <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3">
               {["Cloud Hosting", "Web Development", "Enterprise Solutions"].map((t) => (
@@ -459,64 +445,6 @@ const Features = () => (
   </section>
 );
 
-// --- Projects ---
-
-const Projects = () => (
-  <section id="projects" className="scroll-mt-24 py-24 lg:py-32">
-    <div className="container mx-auto px-6">
-      <SectionHead
-        eyebrow="Selected Work"
-        title={<>Projects that ship<br />and perform.</>}
-        sub="A selection of platforms we designed, built and launched."
-      />
-      <div className="grid gap-6 md:grid-cols-2">
-        {PROJECTS.map((p, i) => {
-          const Wrapper = p.url ? "a" : "div";
-          return (
-            <Reveal key={p.title} delay={(i % 2) * 0.1}>
-              <TiltCard max={4} className="group">
-                <Wrapper
-                  {...(p.url ? { href: p.url, target: "_blank", rel: "noopener noreferrer" } : {})}
-                  className="block overflow-hidden rounded-2xl border border-white/10 bg-surface transition-colors duration-300 group-hover:border-primary/40"
-                >
-                  {/* browser chrome */}
-                  <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
-                    <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                    <span className="ml-3 flex-1 truncate rounded-md bg-white/[0.05] px-3 py-1 font-mono text-[10px] text-muted-foreground">
-                      {p.url ? p.url.replace("https://", "") : "internal project"}
-                    </span>
-                  </div>
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <img
-                      src={p.img}
-                      alt={`${p.title} — ${p.tag}`}
-                      loading="lazy"
-                      className="h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.045]"
-                    />
-                    <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-[#05070B]/95 via-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                      <div>
-                        <div className="font-display text-lg font-bold">{p.title}</div>
-                        <div className="text-xs text-glow">{p.tag}</div>
-                      </div>
-                      {p.url && (
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-primary to-glow text-white">
-                          <ExternalLink className="h-4 w-4" />
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </Wrapper>
-              </TiltCard>
-            </Reveal>
-          );
-        })}
-      </div>
-    </div>
-  </section>
-);
-
 // --- Process (timeline) ---
 
 const Process = () => (
@@ -591,72 +519,6 @@ const About = () => (
     </div>
   </section>
 );
-
-// --- Testimonials (auto slider) ---
-
-const Testimonials = () => {
-  const [idx, setIdx] = useState(0);
-  const paused = useRef(false);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (!paused.current) setIdx((i) => (i + 1) % TESTIMONIALS.length);
-    }, 5500);
-    return () => clearInterval(id);
-  }, []);
-
-  const t = TESTIMONIALS[idx];
-
-  return (
-    <section className="py-24 lg:py-32">
-      <div className="container mx-auto px-6">
-        <SectionHead eyebrow="Testimonials" title="What clients say." />
-        <div
-          className="relative mx-auto max-w-3xl"
-          onMouseEnter={() => { paused.current = true; }}
-          onMouseLeave={() => { paused.current = false; }}
-        >
-          <div className="glass relative min-h-[260px] overflow-hidden rounded-3xl p-10 md:p-12">
-            <Quote className="absolute right-8 top-8 h-10 w-10 text-primary/20" aria-hidden="true" />
-            <AnimatePresence mode="wait">
-              <motion.figure
-                key={idx}
-                initial={{ opacity: 0, y: 22, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -18, filter: "blur(6px)" }}
-                transition={{ duration: 0.55, ease: EASE }}
-              >
-                <blockquote className="text-lg leading-relaxed text-foreground/90 md:text-xl">“{t.quote}”</blockquote>
-                <figcaption className="mt-7 flex items-center gap-4">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-glow font-display text-sm font-bold text-white">
-                    {t.name.charAt(0)}
-                  </span>
-                  <span>
-                    <span className="block font-semibold">{t.name}</span>
-                    <span className="block text-sm text-muted-foreground">{t.role}</span>
-                  </span>
-                </figcaption>
-              </motion.figure>
-            </AnimatePresence>
-          </div>
-          <div className="mt-6 flex justify-center gap-2.5">
-            {TESTIMONIALS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setIdx(i)}
-                aria-label={`Testimonial ${i + 1}`}
-                className={clsx(
-                  "h-1.5 rounded-full transition-all duration-300",
-                  i === idx ? "w-8 bg-gradient-to-r from-primary to-glow" : "w-3 bg-white/15 hover:bg-white/30"
-                )}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
 
 // --- Contact ---
 
@@ -889,10 +751,8 @@ export default function Home() {
         <Services />
         <WhyUs goTo={goTo} />
         <Features />
-        <Projects />
         <Process />
         <About />
-        <Testimonials />
         <Contact />
       </main>
 
