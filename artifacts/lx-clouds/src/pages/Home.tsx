@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Lenis from "lenis";
 import { clsx } from "clsx";
 import {
-  Cloud, ArrowRight, ArrowUpRight, Menu, X,
-  Monitor, Code2, PenTool, Server, Globe, Mail,
-  MessageSquare, Layers, Rocket,
-  Clock, Sparkles, Bot, TrendingUp,
-  FileStack, Repeat, EyeOff, CalendarClock, MessageCircle,
-  LayoutTemplate, AppWindow, Smartphone, Database,
+  ArrowRight, ArrowUpRight, Check, X as XIcon, Menu, X,
+  Monitor, Server, Cpu, Network, Bot, Code2,
+  ShieldCheck, Gauge, DatabaseBackup, Maximize2, Activity, Wrench, BarChart3, Webhook,
+  Zap, Lock, TrendingUp, Quote, Mail, Globe, ExternalLink, MapPin,
+  Instagram, Linkedin, Github, Send,
 } from "lucide-react";
+import { Reveal, Magnetic, TiltCard, Counter, ripple, EASE, prefersReducedMotion } from "@/lib/fx";
+import { Loader, CursorFX, Particles } from "@/components/site/Effects";
+import { useSubmitContact } from "@/hooks/use-contact";
 
 // --- Constants ---
 
@@ -17,562 +20,883 @@ const WHATSAPP_URL = "https://wa.me/4915780998115";
 const EMAIL = "info@lxclouds.com";
 const YEAR = new Date().getFullYear();
 
-type Lang = "en" | "de";
+const NAV_LINKS = [
+  { label: "Home", href: "#home" },
+  { label: "Services", href: "#services" },
+  { label: "Projects", href: "#projects" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" },
+];
 
-const WhatsAppIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-  </svg>
-);
+// --- Data ---
 
-// --- Shared (non-translated) icon maps ---
+const TRUST_ITEMS = [
+  { icon: Zap, label: "Fast" },
+  { icon: ShieldCheck, label: "Secure" },
+  { icon: TrendingUp, label: "Scalable" },
+  { icon: Activity, label: "99.99% Uptime" },
+  { icon: Lock, label: "SSL" },
+  { icon: Network, label: "Cloud Infrastructure" },
+];
 
-const PROBLEM_ICONS = [CalendarClock, Repeat, EyeOff, FileStack];
-const BENEFIT_ICONS = [Clock, Sparkles, Bot, TrendingUp];
-const SERVICE_ICONS = [PenTool, Monitor, LayoutTemplate, AppWindow, Smartphone, Database, CalendarClock, MessageCircle, Server];
-const PROCESS_ICONS = [MessageSquare, Layers, Code2, Rocket];
+const SERVICES = [
+  { icon: Monitor, title: "Website Development", desc: "High-end websites and web apps — engineered for speed, SEO and conversion, designed to feel expensive.", span: true },
+  { icon: Server, title: "Cloud Hosting", desc: "Blazing fast, reliable hosting for websites and applications.", span: false },
+  { icon: Cpu, title: "Virtual Servers", desc: "Full-control VPS with dedicated resources and root access.", span: false },
+  { icon: Network, title: "Cloud Infrastructure", desc: "Scalable infrastructure, storage and networking that grows with your business — without the complexity.", span: true },
+  { icon: Bot, title: "Business Automation", desc: "Workflows, WhatsApp bots and integrations that save hours every week.", span: false },
+  { icon: Code2, title: "Custom Software", desc: "Tailored systems, dashboards and tools built around your exact workflow — goodbye spreadsheet chaos.", span: true },
+];
 
-// --- Translations ---
+const COMPARISON: [string, string][] = [
+  ["Slow handoffs and ticket queues", "Direct line to the people who build"],
+  ["Recycled templates", "Custom design systems"],
+  ["Hidden costs and surprises", "Transparent fixed pricing"],
+  ["Weeks of waiting", "Days, not weeks"],
+  ["Outsourced support", "Personal 24/7 support"],
+];
 
-const T = {
-  en: {
-    nav: ["Services", "Solutions", "Process", "Contact"],
-    getInTouch: "Get in Touch",
-    heroEyebrow: "YOUR DIGITAL AGENCY",
-    heroLine1: "We Build",
-    heroGradient: "Digital Experiences",
-    heroLine3: "That Last.",
-    heroText:
-      "LX CLOUDS is your digital agency for web design, websites, web apps, mobile apps and custom systems — designed with precision, built for growth, delivered with care.",
-    heroChips: ["Web Design", "Websites", "Web Apps", "Mobile Apps", "Systems", "Automation"],
-    heroCta1: "Start a Project",
-    heroCta2: "What We Build",
-    stats: [["50+", "Projects Delivered"], ["100%", "Client Satisfaction"], ["<24h", "Response Time"]],
-    problemsEyebrow: "DIGITALIZATION",
-    problemsTitle: "Real Problems. Digital Solutions.",
-    problemsSub:
-      "Digitalization in practice: we turn time-consuming routines into digital processes that simply work.",
-    problemLabel: "The Problem",
-    solutionLabel: "Our Solution",
-    problems: [
-      {
-        problem: "Bookings, requests and appointments arrive by phone or on paper — and things get lost.",
-        solution: "Digital booking & request forms that collect everything automatically in one place.",
-      },
-      {
-        problem: "You answer the same questions every single day — again and again.",
-        solution: "WhatsApp automations and smart forms that answer for you, around the clock.",
-      },
-      {
-        problem: "Customers search for you online — and find nothing, or something outdated.",
-        solution: "A modern website that builds trust and wins customers while you work.",
-      },
-      {
-        problem: "Excel chaos: orders, stock or jobs buried in endless lists.",
-        solution: "Simple custom tools and dashboards — everything clear at a glance.",
-      },
-    ],
-    benefitsEyebrow: "WHY DIGITAL",
-    benefitsTitle: "Digital Pays Off From Day One.",
-    benefits: [
-      { title: "Save Time", desc: "Automate repetitive work and win back hours every week." },
-      { title: "Simplify", desc: "One clear system instead of paper, phone calls and chaos." },
-      { title: "Always On", desc: "Your website and automations work 24/7 — even while you sleep." },
-      { title: "Grow", desc: "A professional appearance that wins trust and new customers." },
-    ],
-    servicesEyebrow: "SERVICES",
-    servicesTitle: "What We Build",
-    servicesSub: "From web design to complete systems — everything from one hand.",
-    services: [
-      { title: "Web Design", desc: "Modern, clean design that makes your brand look professional and trustworthy." },
-      { title: "Websites", desc: "Fast, responsive websites that present your business and win customers." },
-      { title: "Landing Pages", desc: "Focused one-pagers for offers, campaigns and product launches." },
-      { title: "Web Apps", desc: "Browser-based applications, dashboards and portals — tailored to your workflow." },
-      { title: "Mobile Apps", desc: "iOS & Android apps that put your service into your customers' pockets." },
-      { title: "Custom Systems", desc: "Management systems for orders, inventory, returns & more — goodbye Excel chaos." },
-      { title: "Booking & Requests", desc: "Booking systems and request flows your customers love to use." },
-      { title: "WhatsApp & Automation", desc: "Automatic replies, notifications and workflows — 24/7, no extra staff needed." },
-      { title: "Hosting & Care", desc: "We host, maintain and keep everything running. You focus on your business." },
-    ],
-    processEyebrow: "PROCESS",
-    processTitle: "Simple Process. Clear Result.",
-    process: [
-      { title: "Listen", desc: "You tell us your problem — we listen and understand your workflow." },
-      { title: "Concept", desc: "We design the simplest digital solution that fits your business." },
-      { title: "Build", desc: "We build it and keep you updated — no tech jargon, no surprises." },
-      { title: "Launch & Care", desc: "Your solution goes live. We stay by your side and keep it running." },
-    ],
-    contactEyebrow: "CONTACT",
-    contactTitle: "Let's Build Your Project.",
-    contactSub:
-      "Website, app or custom system — in a short, free conversation we'll find the right solution. Clear fixed price afterwards, no obligation.",
-    labelWebsite: "Website",
-    labelEmail: "Email",
-    labelWhatsApp: "WhatsApp",
-    startProject: "Free Consultation",
-    footerTagline: "Your digital agency for websites, apps and systems.",
-    rights: `© ${YEAR} LX CLOUDS. All rights reserved.`,
-  },
-  de: {
-    nav: ["Leistungen", "Lösungen", "Ablauf", "Kontakt"],
-    getInTouch: "Kontakt aufnehmen",
-    heroEyebrow: "DEINE DIGITALAGENTUR",
-    heroLine1: "Wir bauen",
-    heroGradient: "digitale Erlebnisse,",
-    heroLine3: "die bleiben.",
-    heroText:
-      "LX CLOUDS ist deine Digitalagentur für Webdesign, Websites, Web-Apps, mobile Apps und individuelle Systeme — mit Präzision entworfen, für Wachstum gebaut, mit Sorgfalt geliefert.",
-    heroChips: ["Webdesign", "Websites", "Web-Apps", "Mobile Apps", "Systeme", "Automation"],
-    heroCta1: "Projekt starten",
-    heroCta2: "Was wir bauen",
-    stats: [["50+", "Umgesetzte Projekte"], ["100%", "Kundenzufriedenheit"], ["<24h", "Antwortzeit"]],
-    problemsEyebrow: "DIGITALISIERUNG",
-    problemsTitle: "Echte Probleme. Digitale Lösungen.",
-    problemsSub:
-      "Digitalisierung in der Praxis: Wir machen aus zeitraubenden Routinen digitale Abläufe, die einfach funktionieren.",
-    problemLabel: "Das Problem",
-    solutionLabel: "Unsere Lösung",
-    problems: [
-      {
-        problem: "Buchungen, Anfragen und Termine kommen per Telefon oder Zettel — und gehen unter.",
-        solution: "Digitale Buchungs- & Anfrageformulare, die alles automatisch an einem Ort sammeln.",
-      },
-      {
-        problem: "Du beantwortest jeden Tag die gleichen Fragen — immer und immer wieder.",
-        solution: "WhatsApp-Automationen und smarte Formulare, die für dich antworten — rund um die Uhr.",
-      },
-      {
-        problem: "Kunden suchen dich online — und finden nichts oder etwas Veraltetes.",
-        solution: "Eine moderne Website, die Vertrauen schafft und Kunden gewinnt, während du arbeitest.",
-      },
-      {
-        problem: "Excel-Chaos: Aufträge, Bestände oder Jobs in endlosen Listen.",
-        solution: "Einfache individuelle Tools und Dashboards — alles auf einen Blick.",
-      },
-    ],
-    benefitsEyebrow: "WARUM DIGITAL",
-    benefitsTitle: "Digital lohnt sich ab Tag eins.",
-    benefits: [
-      { title: "Zeit sparen", desc: "Automatisiere wiederkehrende Arbeit und gewinn jede Woche Stunden zurück." },
-      { title: "Vereinfachen", desc: "Ein klares System statt Zettel, Anrufe und Chaos." },
-      { title: "Immer erreichbar", desc: "Deine Website und Automationen arbeiten 24/7 — auch wenn du schläfst." },
-      { title: "Wachsen", desc: "Ein professioneller Auftritt, der Vertrauen und Neukunden bringt." },
-    ],
-    servicesEyebrow: "LEISTUNGEN",
-    servicesTitle: "Was wir bauen",
-    servicesSub: "Von Webdesign bis zum kompletten System — alles aus einer Hand.",
-    services: [
-      { title: "Webdesign", desc: "Modernes, klares Design, das deine Marke professionell und vertrauenswürdig zeigt." },
-      { title: "Websites", desc: "Schnelle, responsive Websites, die dein Unternehmen präsentieren und Kunden gewinnen." },
-      { title: "Landingpages", desc: "Fokussierte One-Pager für Angebote, Aktionen und Produkt-Launches." },
-      { title: "Web-Apps", desc: "Browserbasierte Anwendungen, Dashboards und Portale — passend zu deinem Ablauf." },
-      { title: "Mobile Apps", desc: "iOS- & Android-Apps, die deinen Service in die Hosentasche deiner Kunden bringen." },
-      { title: "Individuelle Systeme", desc: "Verwaltungssysteme für Aufträge, Bestände, Retouren & mehr — Schluss mit Excel-Chaos." },
-      { title: "Buchung & Anfragen", desc: "Buchungssysteme und Anfrage-Abläufe, die deine Kunden gern nutzen." },
-      { title: "WhatsApp & Automation", desc: "Automatische Antworten, Benachrichtigungen und Abläufe — 24/7, ohne extra Personal." },
-      { title: "Hosting & Betreuung", desc: "Wir hosten, warten und halten alles am Laufen. Du kümmerst dich um dein Geschäft." },
-    ],
-    processEyebrow: "ABLAUF",
-    processTitle: "Einfacher Ablauf. Klares Ergebnis.",
-    process: [
-      { title: "Zuhören", desc: "Du erzählst uns dein Problem — wir hören zu und verstehen deinen Ablauf." },
-      { title: "Konzept", desc: "Wir entwerfen die einfachste digitale Lösung, die zu deinem Business passt." },
-      { title: "Umsetzen", desc: "Wir bauen sie und halten dich auf dem Laufenden — ohne Fachchinesisch, ohne Überraschungen." },
-      { title: "Launch & Betreuung", desc: "Deine Lösung geht live. Wir bleiben an deiner Seite und halten sie am Laufen." },
-    ],
-    contactEyebrow: "KONTAKT",
-    contactTitle: "Lass uns dein Projekt bauen.",
-    contactSub:
-      "Website, App oder individuelles System — in einem kurzen, kostenlosen Gespräch finden wir die passende Lösung. Danach klarer Festpreis, unverbindlich.",
-    labelWebsite: "Website",
-    labelEmail: "E-Mail",
-    labelWhatsApp: "WhatsApp",
-    startProject: "Kostenloses Erstgespräch",
-    footerTagline: "Deine Digitalagentur für Websites, Apps und Systeme.",
-    rights: `© ${YEAR} LX CLOUDS. Alle Rechte vorbehalten.`,
-  },
-} as const;
+const FEATURES = [
+  { icon: ShieldCheck, title: "Enterprise Security", desc: "Hardened setups, SSL everywhere." },
+  { icon: Gauge, title: "High Performance", desc: "Optimized for instant load times." },
+  { icon: DatabaseBackup, title: "Automatic Backups", desc: "Your data, safe every single day." },
+  { icon: Maximize2, title: "Cloud Scaling", desc: "Resources that grow on demand." },
+  { icon: Activity, title: "Monitoring", desc: "24/7 uptime and health checks." },
+  { icon: Wrench, title: "Maintenance", desc: "Updates handled in the background." },
+  { icon: BarChart3, title: "Analytics", desc: "Know what your visitors do." },
+  { icon: Webhook, title: "API Integrations", desc: "Connect any tool you rely on." },
+];
 
-type Translation = (typeof T)[Lang];
+const PROJECTS = [
+  { title: "Lonorix", tag: "AI Platform", img: "/project-lonorix.png", url: "https://lonorix.com" },
+  { title: "ZgjedhPlus", tag: "Price Comparison", img: "/project-zgjedhplus.png", url: "https://zgjedhplus.com" },
+  { title: "Rent a Car Ron", tag: "Booking Platform", img: "/project-rentacarron.png", url: "https://rentacarron.com" },
+  { title: "AutoElite", tag: "Automotive Platform", img: "/project-autoelite.png", url: null },
+];
 
-// --- Background glow ribbons ---
+const PROCESS = [
+  { n: "01", title: "Discovery", desc: "We understand your goals, users and requirements." },
+  { n: "02", title: "Design", desc: "Custom UI direction and pixel-perfect screens." },
+  { n: "03", title: "Development", desc: "Clean, fast, scalable code — built to last." },
+  { n: "04", title: "Launch", desc: "Deployment, domains, SSL and go-live support." },
+  { n: "05", title: "Support", desc: "Monitoring, updates and a direct line to us." },
+];
 
-const BackgroundGlow = () => (
-  <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 75% 8%, rgba(34,211,238,0.10), transparent 60%)" }} />
-    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 50% 45% at 85% 30%, rgba(59,130,246,0.14), transparent 60%)" }} />
-    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 45% 40% at 10% 18%, rgba(99,102,241,0.10), transparent 60%)" }} />
-    <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(37,99,235,0.08), transparent 65%)" }} />
+const STATS = [
+  { to: 5, suffix: "+", label: "Years Experience" },
+  { to: 50, suffix: "+", label: "Projects Delivered" },
+  { to: 30, suffix: "+", label: "Happy Clients" },
+  { to: 24, prefix: "<", suffix: "h", label: "Response Time" },
+];
+
+const TESTIMONIALS = [
+  { quote: "LX CLOUDS rebuilt our entire web presence and automated our booking flow. We save hours every single week — and the site finally looks like us.", name: "Sarah M.", role: "Boutique Owner" },
+  { quote: "Fast, reliable and always reachable. Our new platform loads instantly and our customers notice the difference immediately.", name: "Daniel K.", role: "Logistics Manager" },
+  { quote: "From first call to launch in three weeks. The quality feels like a big agency — without the overhead or the buzzwords.", name: "Amir R.", role: "Startup Founder" },
+];
+
+// --- Small building blocks ---
+
+const Eyebrow = ({ children }: { children: React.ReactNode }) => (
+  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5">
+    <span className="h-1.5 w-1.5 rounded-full bg-glow shadow-[0_0_8px_2px] shadow-glow/60" />
+    <span className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-glow">{children}</span>
   </div>
 );
 
-// --- Language switcher ---
-
-const LangSwitch = ({ lang, setLang, className }: { lang: Lang; setLang: (l: Lang) => void; className?: string }) => (
-  <div className={clsx("inline-flex items-center rounded-lg border border-white/15 overflow-hidden text-xs font-bold", className)}>
-    {(["en", "de"] as const).map((l) => (
-      <button
-        key={l}
-        onClick={() => setLang(l)}
-        className={clsx("px-2.5 py-1.5 transition-colors uppercase", lang === l ? "bg-primary text-white" : "text-foreground/50 hover:text-foreground")}
-        aria-pressed={lang === l}
-      >
-        {l}
-      </button>
-    ))}
-  </div>
+const SectionHead = ({ eyebrow, title, sub, align = "center" }: { eyebrow: string; title: React.ReactNode; sub?: string; align?: "center" | "left" }) => (
+  <Reveal className={clsx("mb-14 max-w-3xl", align === "center" ? "mx-auto text-center" : "")}>
+    <Eyebrow>{eyebrow}</Eyebrow>
+    <h2 className="font-display text-4xl font-bold leading-[1.06] md:text-5xl">{title}</h2>
+    {sub && <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">{sub}</p>}
+  </Reveal>
 );
 
-const Logo = () => (
-  <a href="#home" className="flex items-center gap-2" aria-label="LX CLOUDS">
-    <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-11 w-auto" />
-    <span className="text-xl font-serif font-bold tracking-[0.15em] text-foreground">LX CLOUDS</span>
-  </a>
+const PrimaryButton = ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
+  <Magnetic>
+    <a
+      href={href}
+      onClick={(e) => { ripple(e); onClick?.(e); }}
+      className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-glow px-7 py-3.5 font-semibold text-white shadow-[0_8px_32px_rgba(29,124,255,0.35)] transition-shadow hover:shadow-[0_8px_44px_rgba(29,124,255,0.55)]"
+    >
+      {children}
+      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+    </a>
+  </Magnetic>
+);
+
+const GhostButton = ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void }) => (
+  <Magnetic strength={0.22}>
+    <a
+      href={href}
+      onClick={(e) => { ripple(e); onClick?.(e); }}
+      className="relative inline-flex items-center gap-2 overflow-hidden rounded-xl glass px-7 py-3.5 font-semibold text-foreground transition-colors hover:border-white/25 hover:bg-white/[0.07]"
+    >
+      {children}
+    </a>
+  </Magnetic>
 );
 
 // --- Navbar ---
 
-const Navbar = ({ t, lang, setLang }: { t: Translation; lang: Lang; setLang: (l: Lang) => void }) => {
+const Navbar = ({ goTo }: { goTo: (hash: string) => void }) => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const hrefs = ["#services", "#solutions", "#process", "#contact"];
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const click = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setOpen(false);
+    goTo(href);
+  };
+
   return (
-    <header className={clsx("fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b", scrolled ? "bg-background/80 backdrop-blur-xl border-white/10 py-3" : "border-transparent py-5")}>
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        <Logo />
-        <nav className="hidden lg:flex items-center gap-8">
-          {t.nav.map((label, i) => (
-            <a key={i} href={hrefs[i]} className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">{label}</a>
-          ))}
-          <LangSwitch lang={lang} setLang={setLang} />
-          <a href="#contact" className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 hover:border-glow/50 hover:bg-white/5 text-foreground text-sm font-semibold px-5 py-2.5 transition-colors">
-            {t.getInTouch} <ArrowUpRight className="w-3.5 h-3.5" />
-          </a>
-        </nav>
-        <div className="lg:hidden flex items-center gap-3">
-          <LangSwitch lang={lang} setLang={setLang} />
-          <button className="text-foreground p-2" onClick={() => setOpen((o) => !o)} aria-label="Menu">{open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}</button>
-        </div>
-      </div>
-      {open && (
-        <div className="lg:hidden bg-background/95 backdrop-blur-xl border-t border-white/10 px-6 py-4 flex flex-col gap-1">
-          {t.nav.map((label, i) => (
-            <a key={i} href={hrefs[i]} onClick={() => setOpen(false)} className="py-2.5 text-sm font-medium text-foreground/80">{label}</a>
-          ))}
-          <a href="#contact" onClick={() => setOpen(false)} className="mt-2 rounded-lg bg-primary text-white text-sm font-semibold px-5 py-3 text-center">{t.getInTouch}</a>
-        </div>
+    <motion.header
+      initial={{ y: -70, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.7, delay: 1.15, ease: EASE }}
+      className={clsx(
+        "fixed inset-x-0 top-0 z-50 border-b transition-all duration-300",
+        scrolled ? "border-white/10 bg-[#05070B]/70 py-3 backdrop-blur-xl" : "border-transparent bg-transparent py-5"
       )}
-    </header>
+    >
+      <div className="container mx-auto flex items-center justify-between px-6">
+        <a href="#home" onClick={(e) => click(e, "#home")} className="flex items-center gap-2.5" aria-label="LX CLOUDS home">
+          <img src="/logo-mark.png" alt="" className="h-9 w-auto" />
+          <span className="font-display text-lg font-bold tracking-[0.14em]">
+            LX <span className="text-gradient">CLOUDS</span>
+          </span>
+        </a>
+
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Main">
+          {NAV_LINKS.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={(e) => click(e, l.href)}
+              className="text-sm font-medium text-foreground/65 transition-colors hover:text-foreground"
+            >
+              {l.label}
+            </a>
+          ))}
+          <Magnetic strength={0.25}>
+            <a
+              href="#contact"
+              onClick={(e) => { ripple(e); click(e, "#contact"); }}
+              className="relative inline-flex items-center gap-1.5 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-glow px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_24px_rgba(29,124,255,0.35)]"
+            >
+              Get Started <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
+          </Magnetic>
+        </nav>
+
+        <button className="p-2 lg:hidden" onClick={() => setOpen((o) => !o)} aria-label="Menu">
+          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden border-t border-white/10 bg-[#05070B]/95 backdrop-blur-xl lg:hidden"
+          >
+            <div className="flex flex-col gap-1 px-6 py-4">
+              {NAV_LINKS.map((l) => (
+                <a key={l.href} href={l.href} onClick={(e) => click(e, l.href)} className="py-2.5 text-sm font-medium text-foreground/80">
+                  {l.label}
+                </a>
+              ))}
+              <a href="#contact" onClick={(e) => click(e, "#contact")} className="mt-2 rounded-xl bg-gradient-to-r from-primary to-glow px-5 py-3 text-center text-sm font-semibold text-white">
+                Get Started
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 };
 
-// --- Hero image with 3D tilt + parallax (uses the exact hero-servers.png) ---
+// --- Hero ---
 
-const HeroImage3D = () => {
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const [reduced, setReduced] = useState(false);
+const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
+  const visualRef = useRef<HTMLDivElement>(null);
 
+  // mouse parallax on the hero visual
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", onChange);
+    if (prefersReducedMotion()) return;
+    const el = visualRef.current;
+    if (!el) return;
     const onMove = (e: PointerEvent) => {
-      mx.set((e.clientX / window.innerWidth) * 2 - 1);
-      my.set((e.clientY / window.innerHeight) * 2 - 1);
+      const x = (e.clientX / window.innerWidth - 0.5) * 22;
+      const y = (e.clientY / window.innerHeight - 0.5) * 14;
+      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     };
     window.addEventListener("pointermove", onMove);
-    return () => {
-      mq.removeEventListener("change", onChange);
-      window.removeEventListener("pointermove", onMove);
-    };
-  }, [mx, my]);
+    return () => window.removeEventListener("pointermove", onMove);
+  }, []);
 
-  // smooth spring follow
-  const sx = useSpring(mx, { stiffness: 55, damping: 18, mass: 0.6 });
-  const sy = useSpring(my, { stiffness: 55, damping: 18, mass: 0.6 });
-  const rotateY = useTransform(sx, [-1, 1], [-5.5, 5.5]);
-  const rotateX = useTransform(sy, [-1, 1], [3.5, -3.5]);
-  const x = useTransform(sx, [-1, 1], [-16, 16]);
-  const y = useTransform(sy, [-1, 1], [-10, 10]);
+  const anchor = (hash: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    goTo(hash);
+  };
 
   return (
-    <div className="absolute inset-0" style={{ perspective: 1100 }}>
-      <motion.div className="absolute inset-0 will-change-transform" style={reduced ? undefined : { rotateX, rotateY, x, y }}>
-        <motion.img
-          src="/hero-servers.png"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "right center" }}
-          initial={{ scale: reduced ? 1 : 1.08 }}
-          animate={reduced ? undefined : { scale: [1.08, 1.14, 1.08] }}
-          transition={reduced ? undefined : { duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
-    </div>
+    <section id="home" className="relative overflow-hidden pt-36 pb-24 lg:pt-44 lg:pb-32">
+      {/* background: depth, grid, volumetric light, particles */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <div className="absolute inset-0 bg-grid opacity-60 [mask-image:radial-gradient(ellipse_75%_60%_at_50%_35%,black,transparent)]" />
+        <div className="animate-drift absolute -top-40 left-1/4 h-[560px] w-[560px] rounded-full bg-primary/15 blur-[140px]" />
+        <div className="animate-drift absolute top-1/3 right-[-8%] h-[520px] w-[520px] rounded-full bg-glow/10 blur-[140px] [animation-delay:-7s]" />
+        <div className="absolute right-[8%] top-0 h-[70%] w-40 rotate-[24deg] bg-gradient-to-b from-glow/[0.07] to-transparent blur-2xl" />
+        <div className="absolute right-[24%] top-0 h-[55%] w-24 rotate-[24deg] bg-gradient-to-b from-primary/[0.08] to-transparent blur-2xl" />
+        <Particles className="absolute inset-0 h-full w-full" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#05070B]" />
+      </div>
+
+      <div className="container relative z-10 mx-auto grid items-center gap-16 px-6 lg:grid-cols-2">
+        {/* Left: copy */}
+        <div>
+          <motion.div initial={{ opacity: 0, y: 26, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 1.2, ease: EASE }}>
+            <Eyebrow>Cloud Solutions</Eyebrow>
+            <h1 className="font-display text-5xl font-bold leading-[1.03] tracking-tight md:text-6xl xl:text-7xl">
+              Cloud Infrastructure
+              <br />
+              Built for
+              <br />
+              <span className="text-gradient-animated">Modern Business.</span>
+            </h1>
+            <p className="mt-7 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+              LX CLOUDS builds premium websites, cloud infrastructure, hosting, automation and digital solutions for modern businesses.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <PrimaryButton href="#contact" onClick={anchor("#contact")}>Get Started</PrimaryButton>
+              <GhostButton href="#projects" onClick={anchor("#projects")}>View Projects</GhostButton>
+            </div>
+            <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3">
+              {["Cloud Hosting", "Web Development", "Enterprise Solutions"].map((t) => (
+                <span key={t} className="inline-flex items-center gap-2 text-sm text-foreground/75">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-glow">
+                    <Check className="h-3 w-3" strokeWidth={3} />
+                  </span>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right: interactive 3D cloud */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92, filter: "blur(12px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 1, delay: 1.35, ease: EASE }}
+          className="relative hidden items-center justify-center lg:flex"
+        >
+          <div ref={visualRef} className="relative transition-transform duration-300 ease-out will-change-transform">
+            {/* glow core */}
+            <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/25 blur-[90px]" aria-hidden="true" />
+            <div className="absolute left-1/2 top-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-glow/20 blur-[60px]" aria-hidden="true" />
+            {/* orbit rings */}
+            <div className="animate-spin-slower absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/15" aria-hidden="true">
+              <span className="absolute -top-1 left-1/2 h-2 w-2 rounded-full bg-glow shadow-[0_0_12px_3px] shadow-glow/60" />
+            </div>
+            <div className="animate-spin-slower absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-white/10 [animation-direction:reverse] [animation-duration:55s]" aria-hidden="true" />
+            {/* the cloud */}
+            <motion.img
+              src="/logo-mark.png"
+              alt="LX CLOUDS cloud logo"
+              className="animate-float-slow relative w-[420px] max-w-full drop-shadow-[0_30px_80px_rgba(29,124,255,0.35)]"
+              animate={prefersReducedMotion() ? undefined : { rotate: [0, 2.5, 0, -2.5, 0] }}
+              transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 };
 
-// --- Section eyebrow + title ---
+// --- Trust bar (marquee) ---
 
-const SectionTitle = ({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) => (
-  <div className="mb-12 text-center">
-    <div className="font-mono text-xs tracking-[0.25em] text-glow mb-3">{eyebrow}</div>
-    <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground">{title}</h2>
-    {sub && <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">{sub}</p>}
+const TrustBar = () => (
+  <section className="border-y border-white/5 bg-white/[0.015] py-5" aria-label="Highlights">
+    <div className="mask-fade-x overflow-hidden">
+      <div className="animate-marquee flex w-max items-center gap-14 pr-14">
+        {[...TRUST_ITEMS, ...TRUST_ITEMS].map((t, i) => (
+          <span key={i} className="inline-flex items-center gap-2.5 whitespace-nowrap font-mono text-xs uppercase tracking-[0.22em] text-foreground/45">
+            <t.icon className="h-4 w-4 text-primary/70" />
+            {t.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// --- Services (bento) ---
+
+const Services = () => (
+  <section id="services" className="scroll-mt-24 py-24 lg:py-32">
+    <div className="container mx-auto px-6">
+      <SectionHead
+        eyebrow="Our Services"
+        title={<>Everything You Need.<br />All in One Cloud.</>}
+        sub="From powerful hosting to custom software — one partner for your entire digital stack."
+      />
+      <div className="grid gap-5 md:grid-cols-3">
+        {SERVICES.map((s, i) => (
+          <Reveal key={s.title} delay={(i % 3) * 0.08} className={clsx(s.span && "md:col-span-2")}>
+            <TiltCard className="group glass h-full rounded-3xl p-8 transition-colors duration-300 hover:border-primary/40">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/25 to-glow/10 text-glow ring-1 ring-inset ring-primary/30 transition-transform duration-300 group-hover:scale-110">
+                <s.icon className="h-7 w-7" />
+              </div>
+              <h3 className="font-display text-xl font-bold">{s.title}</h3>
+              <p className="mt-2.5 max-w-md text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
+                Learn more <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </TiltCard>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// --- Why LX CLOUDS (comparison) ---
+
+const WhyUs = ({ goTo }: { goTo: (hash: string) => void }) => (
+  <section className="relative py-24 lg:py-32">
+    <div className="absolute left-[-10%] top-1/3 h-[420px] w-[420px] rounded-full bg-primary/10 blur-[130px]" aria-hidden="true" />
+    <div className="container relative mx-auto grid items-center gap-14 px-6 lg:grid-cols-2">
+      <Reveal>
+        <Eyebrow>Why LX CLOUDS</Eyebrow>
+        <h2 className="font-display text-4xl font-bold leading-[1.05] md:text-6xl">
+          An agency that
+          <br />
+          works like a
+          <br />
+          <span className="text-gradient-animated">product team.</span>
+        </h2>
+        <p className="mt-6 max-w-md text-muted-foreground md:text-lg">
+          No layers, no hand-offs, no waiting. You talk directly to the people who design, build and run your platform.
+        </p>
+        <div className="mt-8">
+          <PrimaryButton href="#contact" onClick={(e) => { e.preventDefault(); goTo("#contact"); }}>Work With Us</PrimaryButton>
+        </div>
+      </Reveal>
+
+      <Reveal delay={0.12}>
+        <div className="glass overflow-hidden rounded-3xl">
+          <div className="grid grid-cols-2 border-b border-white/10">
+            <div className="px-6 py-5 text-center font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Traditional Agency</div>
+            <div className="border-l border-white/10 bg-primary/[0.06] px-6 py-5 text-center font-mono text-xs uppercase tracking-[0.18em] text-glow">LX CLOUDS</div>
+          </div>
+          {COMPARISON.map(([bad, good], i) => (
+            <motion.div
+              key={bad}
+              className="grid grid-cols-2 border-b border-white/5 last:border-0"
+              initial={{ opacity: 0, x: -18 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ delay: i * 0.09, duration: 0.5, ease: EASE }}
+            >
+              <div className="flex items-center gap-3 px-6 py-4 text-sm text-muted-foreground">
+                <XIcon className="h-4 w-4 shrink-0 text-red-400/70" />
+                {bad}
+              </div>
+              <div className="flex items-center gap-3 border-l border-white/10 bg-primary/[0.05] px-6 py-4 text-sm text-foreground/90">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.25 + i * 0.09, type: "spring", stiffness: 400, damping: 15 }}
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-glow text-white"
+                >
+                  <Check className="h-3 w-3" strokeWidth={3.5} />
+                </motion.span>
+                {good}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </Reveal>
+    </div>
+  </section>
+);
+
+// --- Features ---
+
+const Features = () => (
+  <section className="py-24 lg:py-32">
+    <div className="container mx-auto px-6">
+      <SectionHead
+        eyebrow="Platform"
+        title={<>Enterprise-grade.<br />By default.</>}
+        sub="Every project ships with the details that keep it fast, safe and worry-free."
+      />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {FEATURES.map((f, i) => (
+          <Reveal key={f.title} delay={(i % 4) * 0.07}>
+            <TiltCard max={5} className="group glass h-full rounded-2xl p-6 transition-colors duration-300 hover:border-glow/40">
+              <f.icon className="mb-4 h-6 w-6 text-glow transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110" />
+              <h3 className="font-display text-base font-bold">{f.title}</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">{f.desc}</p>
+            </TiltCard>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// --- Projects ---
+
+const Projects = () => (
+  <section id="projects" className="scroll-mt-24 py-24 lg:py-32">
+    <div className="container mx-auto px-6">
+      <SectionHead
+        eyebrow="Selected Work"
+        title={<>Projects that ship<br />and perform.</>}
+        sub="A selection of platforms we designed, built and launched."
+      />
+      <div className="grid gap-6 md:grid-cols-2">
+        {PROJECTS.map((p, i) => {
+          const Wrapper = p.url ? "a" : "div";
+          return (
+            <Reveal key={p.title} delay={(i % 2) * 0.1}>
+              <TiltCard max={4} className="group">
+                <Wrapper
+                  {...(p.url ? { href: p.url, target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="block overflow-hidden rounded-2xl border border-white/10 bg-surface transition-colors duration-300 group-hover:border-primary/40"
+                >
+                  {/* browser chrome */}
+                  <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
+                    <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
+                    <span className="ml-3 flex-1 truncate rounded-md bg-white/[0.05] px-3 py-1 font-mono text-[10px] text-muted-foreground">
+                      {p.url ? p.url.replace("https://", "") : "internal project"}
+                    </span>
+                  </div>
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <img
+                      src={p.img}
+                      alt={`${p.title} — ${p.tag}`}
+                      loading="lazy"
+                      className="h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+                    />
+                    <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-[#05070B]/95 via-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      <div>
+                        <div className="font-display text-lg font-bold">{p.title}</div>
+                        <div className="text-xs text-glow">{p.tag}</div>
+                      </div>
+                      {p.url && (
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-primary to-glow text-white">
+                          <ExternalLink className="h-4 w-4" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Wrapper>
+              </TiltCard>
+            </Reveal>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+);
+
+// --- Process (timeline) ---
+
+const Process = () => (
+  <section className="py-24 lg:py-32">
+    <div className="container mx-auto px-6">
+      <SectionHead
+        eyebrow="How We Work"
+        title={<>From idea<br />to launch.</>}
+      />
+      <div className="relative">
+        {/* animated connecting line */}
+        <motion.div
+          className="absolute left-0 top-6 hidden h-px w-full bg-gradient-to-r from-primary via-glow to-primary/20 lg:block"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, margin: "-80px" }}
+          style={{ transformOrigin: "left" }}
+          transition={{ duration: 1.6, ease: EASE }}
+          aria-hidden="true"
+        />
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
+          {PROCESS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.12}>
+              <div className="relative">
+                <div className="relative z-10 mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-primary/40 bg-[#05070B] font-mono text-sm font-semibold text-glow shadow-[0_0_24px_rgba(29,124,255,0.25)]">
+                  {s.n}
+                </div>
+                <span className="pointer-events-none absolute -top-7 right-0 font-display text-6xl font-black text-white/[0.04]">{s.n}</span>
+                <h3 className="font-display text-lg font-bold">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// --- About / stats ---
+
+const About = () => (
+  <section id="about" className="relative scroll-mt-24 py-24 lg:py-32">
+    <div className="absolute right-[-8%] top-1/4 h-[380px] w-[380px] rounded-full bg-glow/10 blur-[120px]" aria-hidden="true" />
+    <div className="container relative mx-auto px-6">
+      <div className="grid items-center gap-14 lg:grid-cols-2">
+        <Reveal>
+          <Eyebrow>About LX CLOUDS</Eyebrow>
+          <h2 className="font-display text-4xl font-bold leading-[1.06] md:text-5xl">
+            Built in Germany.
+            <br />
+            <span className="text-gradient">Trusted everywhere.</span>
+          </h2>
+          <p className="mt-6 max-w-md leading-relaxed text-muted-foreground">
+            LX CLOUDS is a digital studio for businesses that expect more: more speed, more polish, more ownership.
+            We combine design, engineering and infrastructure under one roof — so your project has one responsible team from idea to operation.
+          </p>
+        </Reveal>
+        <div className="grid grid-cols-2 gap-4">
+          {STATS.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.08}>
+              <div className="glass rounded-2xl p-7 text-center transition-colors duration-300 hover:border-primary/35">
+                <div className="font-display text-4xl font-bold md:text-5xl">
+                  <Counter to={s.to} prefix={s.prefix ?? ""} suffix={s.suffix} className="text-gradient" />
+                </div>
+                <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{s.label}</div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// --- Testimonials (auto slider) ---
+
+const Testimonials = () => {
+  const [idx, setIdx] = useState(0);
+  const paused = useRef(false);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!paused.current) setIdx((i) => (i + 1) % TESTIMONIALS.length);
+    }, 5500);
+    return () => clearInterval(id);
+  }, []);
+
+  const t = TESTIMONIALS[idx];
+
+  return (
+    <section className="py-24 lg:py-32">
+      <div className="container mx-auto px-6">
+        <SectionHead eyebrow="Testimonials" title="What clients say." />
+        <div
+          className="relative mx-auto max-w-3xl"
+          onMouseEnter={() => { paused.current = true; }}
+          onMouseLeave={() => { paused.current = false; }}
+        >
+          <div className="glass relative min-h-[260px] overflow-hidden rounded-3xl p-10 md:p-12">
+            <Quote className="absolute right-8 top-8 h-10 w-10 text-primary/20" aria-hidden="true" />
+            <AnimatePresence mode="wait">
+              <motion.figure
+                key={idx}
+                initial={{ opacity: 0, y: 22, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -18, filter: "blur(6px)" }}
+                transition={{ duration: 0.55, ease: EASE }}
+              >
+                <blockquote className="text-lg leading-relaxed text-foreground/90 md:text-xl">“{t.quote}”</blockquote>
+                <figcaption className="mt-7 flex items-center gap-4">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-glow font-display text-sm font-bold text-white">
+                    {t.name.charAt(0)}
+                  </span>
+                  <span>
+                    <span className="block font-semibold">{t.name}</span>
+                    <span className="block text-sm text-muted-foreground">{t.role}</span>
+                  </span>
+                </figcaption>
+              </motion.figure>
+            </AnimatePresence>
+          </div>
+          <div className="mt-6 flex justify-center gap-2.5">
+            {TESTIMONIALS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                aria-label={`Testimonial ${i + 1}`}
+                className={clsx(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  i === idx ? "w-8 bg-gradient-to-r from-primary to-glow" : "w-3 bg-white/15 hover:bg-white/30"
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- Contact ---
+
+const Field = ({ label, name, type = "text", textarea = false, required = true }: { label: string; name: string; type?: string; textarea?: boolean; required?: boolean }) => (
+  <div className="relative">
+    {textarea ? (
+      <textarea
+        id={name}
+        name={name}
+        rows={4}
+        required={required}
+        placeholder=" "
+        className="peer w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 pb-3 pt-6 text-sm text-foreground outline-none transition-colors focus:border-primary/60"
+      />
+    ) : (
+      <input
+        id={name}
+        name={name}
+        type={type}
+        required={required}
+        placeholder=" "
+        className="peer w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 pb-3 pt-6 text-sm text-foreground outline-none transition-colors focus:border-primary/60"
+      />
+    )}
+    <label
+      htmlFor={name}
+      className="pointer-events-none absolute left-4 top-4.5 text-sm text-muted-foreground transition-all duration-200 peer-focus:top-2 peer-focus:text-[11px] peer-focus:text-glow peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-[11px]"
+    >
+      {label}
+    </label>
   </div>
 );
 
-// --- Main page ---
+const Contact = () => {
+  const { mutate, isPending, isSuccess, isError, error } = useSubmitContact();
 
-export default function Home() {
-  const [lang, setLang] = useState<Lang>("en");
-  const t = T[lang];
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    mutate({
+      name: String(fd.get("name") ?? ""),
+      email: String(fd.get("email") ?? ""),
+      message: String(fd.get("message") ?? ""),
+    });
+  };
 
   return (
-    <div id="home" className="relative bg-background text-foreground min-h-screen overflow-x-hidden">
-      <BackgroundGlow />
-      <Navbar t={t} lang={lang} setLang={setLang} />
+    <section id="contact" className="scroll-mt-24 py-24 lg:py-32">
+      <div className="container mx-auto px-6">
+        <SectionHead
+          eyebrow="Contact"
+          title={<>Let's build<br />something great.</>}
+          sub="Tell us about your project — we reply within 24 hours."
+        />
+        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-5">
+          {/* form */}
+          <Reveal className="lg:col-span-3">
+            <div className="glass h-full rounded-3xl p-8 md:p-10">
+              {isSuccess ? (
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex h-full flex-col items-center justify-center py-14 text-center">
+                  <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-glow text-white">
+                    <Check className="h-8 w-8" strokeWidth={3} />
+                  </span>
+                  <h3 className="font-display text-2xl font-bold">Message sent</h3>
+                  <p className="mt-2 text-muted-foreground">Thanks! We'll get back to you within 24 hours.</p>
+                </motion.div>
+              ) : (
+                <form onSubmit={onSubmit} className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Your Name" name="name" />
+                    <Field label="Email Address" name="email" type="email" />
+                  </div>
+                  <Field label="Tell us about your project" name="message" textarea />
+                  <div className="flex flex-wrap items-center gap-4 pt-2">
+                    <Magnetic>
+                      <button
+                        type="submit"
+                        disabled={isPending}
+                        onClick={(e) => ripple(e)}
+                        className="relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-glow px-8 py-3.5 font-semibold text-white shadow-[0_8px_32px_rgba(29,124,255,0.35)] transition-shadow hover:shadow-[0_8px_44px_rgba(29,124,255,0.55)] disabled:opacity-60"
+                      >
+                        {isPending ? "Sending…" : "Send Message"} <Send className="h-4 w-4" />
+                      </button>
+                    </Magnetic>
+                    {isError && <p className="text-sm text-destructive">{(error as Error)?.message ?? "Something went wrong."}</p>}
+                  </div>
+                </form>
+              )}
+            </div>
+          </Reveal>
+
+          {/* info + map */}
+          <Reveal delay={0.12} className="lg:col-span-2">
+            <div className="flex h-full flex-col gap-4">
+              <a href={`mailto:${EMAIL}`} className="glass flex items-center gap-4 rounded-2xl p-5 transition-colors hover:border-primary/40">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-glow"><Mail className="h-5 w-5" /></span>
+                <span><span className="block text-xs text-muted-foreground">Email</span><span className="text-sm font-semibold">{EMAIL}</span></span>
+              </a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="glass flex items-center gap-4 rounded-2xl p-5 transition-colors hover:border-primary/40">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-glow"><Globe className="h-5 w-5" /></span>
+                <span><span className="block text-xs text-muted-foreground">WhatsApp</span><span className="text-sm font-semibold">{PHONE_DISPLAY}</span></span>
+              </a>
+              <div className="glass flex items-center gap-4 rounded-2xl p-5">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-glow"><MapPin className="h-5 w-5" /></span>
+                <span><span className="block text-xs text-muted-foreground">Based in</span><span className="text-sm font-semibold">Offenbach am Main, Germany</span></span>
+              </div>
+              <div className="glass flex-1 overflow-hidden rounded-2xl">
+                <iframe
+                  title="LX CLOUDS location"
+                  src="https://www.google.com/maps?q=Offenbach%20am%20Main&z=11&output=embed"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-full min-h-[180px] w-full border-0 opacity-80 grayscale invert-[0.92] hue-rotate-180 transition-opacity hover:opacity-100"
+                />
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- Footer ---
+
+const Footer = ({ goTo }: { goTo: (hash: string) => void }) => (
+  <footer className="border-t border-white/5 py-14">
+    <div className="container mx-auto px-6">
+      <div className="flex flex-col items-start justify-between gap-10 md:flex-row">
+        <div className="max-w-xs">
+          <a href="#home" onClick={(e) => { e.preventDefault(); goTo("#home"); }} className="flex items-center gap-2.5">
+            <img src="/logo-mark.png" alt="" className="h-9 w-auto" />
+            <span className="font-display text-lg font-bold tracking-[0.14em]">LX <span className="text-gradient">CLOUDS</span></span>
+          </a>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">Cloud Solutions. Limitless Possibilities.</p>
+        </div>
+        <div className="flex flex-wrap gap-14">
+          <div>
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Pages</div>
+            <ul className="space-y-2.5">
+              {NAV_LINKS.map((l) => (
+                <li key={l.href}>
+                  <a href={l.href} onClick={(e) => { e.preventDefault(); goTo(l.href); }} className="text-sm text-foreground/70 transition-colors hover:text-foreground">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Legal</div>
+            <ul className="space-y-2.5">
+              <li><a href="#" className="text-sm text-foreground/70 transition-colors hover:text-foreground">Imprint</a></li>
+              <li><a href="#" className="text-sm text-foreground/70 transition-colors hover:text-foreground">Privacy</a></li>
+            </ul>
+          </div>
+          <div>
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Social</div>
+            <div className="flex gap-3">
+              {[Instagram, Linkedin, Github].map((Icon, i) => (
+                <a key={i} href="#" aria-label="Social link" className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-foreground/60 transition-colors hover:border-primary/40 hover:text-foreground">
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 md:flex-row">
+        <p className="font-mono text-xs text-muted-foreground">© {YEAR} LX CLOUDS. All rights reserved.</p>
+        <p className="font-mono text-xs text-muted-foreground">lxclouds.com</p>
+      </div>
+    </div>
+  </footer>
+);
+
+// --- Page ---
+
+export default function Home() {
+  const [loaded, setLoaded] = useState(false);
+  const lenisRef = useRef<Lenis | null>(null);
+
+  // loader
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 1250);
+    return () => clearTimeout(t);
+  }, []);
+
+  // smooth scrolling
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const lenis = new Lenis({ lerp: 0.1 });
+    lenisRef.current = lenis;
+    let raf = 0;
+    const loop = (time: number) => {
+      lenis.raf(time);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
+
+  const goTo = useCallback((hash: string) => {
+    const el = document.querySelector(hash);
+    if (!el) return;
+    if (lenisRef.current) lenisRef.current.scrollTo(el as HTMLElement, { offset: -72 });
+    else el.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  return (
+    <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
+      <Loader done={loaded} />
+      <CursorFX />
+
+      {/* ambient background */}
+      <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
+        <div className="absolute left-[12%] top-[8%] h-[420px] w-[420px] rounded-full bg-primary/[0.06] blur-[140px]" />
+        <div className="absolute bottom-[10%] right-[8%] h-[420px] w-[420px] rounded-full bg-glow/[0.05] blur-[140px]" />
+      </div>
+
+      <Navbar goTo={goTo} />
 
       <main>
-        {/* HERO */}
-        <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden">
-          {/* background server image — animated with 3D tilt/parallax */}
-          <div className="absolute inset-0 z-0">
-            <HeroImage3D />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, #06090f 0%, #06090f 30%, rgba(6,9,15,0.55) 41%, rgba(6,9,15,0) 55%)" }} />
-            <div className="absolute inset-x-0 bottom-0 h-28" style={{ background: "linear-gradient(to bottom, transparent, #06090f)" }} />
-            <div className="absolute inset-x-0 top-0 h-16" style={{ background: "linear-gradient(to bottom, #06090f, transparent)" }} />
-          </div>
-          <div className="container mx-auto px-6 relative z-10">
-            <motion.div key={lang} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-xl">
-              <div className="flex items-center gap-2.5 mb-5">
-                <span className="w-2 h-2 rounded-full bg-glow shadow-[0_0_10px_2px] shadow-glow/60" />
-                <span className="font-mono text-xs tracking-[0.35em] text-glow">{t.heroEyebrow}</span>
-              </div>
-              <h1 className="font-serif font-bold leading-[1.04] text-5xl md:text-6xl lg:text-7xl text-foreground">
-                {t.heroLine1}<br />
-                <span className="gradient-text">{t.heroGradient}</span><br />
-                {t.heroLine3}
-              </h1>
-              <p className="mt-7 text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg">{t.heroText}</p>
-              <div className="mt-9 flex flex-wrap gap-4">
-                <a href="#contact" className="inline-flex items-center gap-2 rounded-xl text-white font-semibold px-7 py-3.5 shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
-                  style={{ background: "linear-gradient(110deg, #2563eb 0%, #6d5cf5 100%)" }}>
-                  {t.heroCta1} <ArrowUpRight className="w-4 h-4" />
-                </a>
-                <a href="#services" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.03] hover:bg-white/[0.07] text-foreground font-semibold px-7 py-3.5 transition-colors">
-                  {t.heroCta2} <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-              <div className="mt-8 flex flex-wrap gap-2 max-w-lg">
-                {t.heroChips.map((chip) => (
-                  <span key={chip} className="rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-foreground/80">
-                    {chip}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-10 flex">
-                {t.stats.map(([n, l], i) => (
-                  <div key={l} className={clsx("px-6 first:pl-0", i > 0 && "border-l border-white/15")}>
-                    <div className="text-2xl md:text-3xl font-serif font-bold gradient-text">{n}</div>
-                    <div className="mt-1 font-mono text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground">{l}</div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* SERVICES */}
-        <section id="services" className="py-20 scroll-mt-24">
-          <div className="container mx-auto px-6">
-            <SectionTitle eyebrow={t.servicesEyebrow} title={t.servicesTitle} sub={t.servicesSub} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {t.services.map((s, i) => {
-                const Icon = SERVICE_ICONS[i];
-                return (
-                  <motion.div
-                    key={s.title}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
-                    className="glass-card rounded-2xl p-7 hover:border-glow/30 hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <span className="w-12 h-12 rounded-xl bg-primary/15 text-glow flex items-center justify-center mb-5">
-                      <Icon className="w-6 h-6" />
-                    </span>
-                    <h3 className="text-xl font-serif font-bold text-foreground">{s.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* PROBLEMS → SOLUTIONS */}
-        <section id="solutions" className="py-20 scroll-mt-24">
-          <div className="container mx-auto px-6">
-            <SectionTitle eyebrow={t.problemsEyebrow} title={t.problemsTitle} sub={t.problemsSub} />
-            <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto">
-              {t.problems.map((p, i) => {
-                const Icon = PROBLEM_ICONS[i];
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.45, delay: (i % 2) * 0.08 }}
-                    className="glass-card rounded-2xl p-7 flex flex-col"
-                  >
-                    <div className="flex items-start gap-4">
-                      <span className="w-11 h-11 rounded-xl bg-white/[0.05] border border-white/10 text-muted-foreground flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5" />
-                      </span>
-                      <div>
-                        <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1.5">{t.problemLabel}</div>
-                        <p className="text-foreground/85 leading-relaxed">{p.problem}</p>
-                      </div>
-                    </div>
-                    <div className="my-5 flex items-center gap-3">
-                      <div className="flex-1 h-px bg-white/10" />
-                      <ArrowRight className="w-4 h-4 text-glow rotate-90" />
-                      <div className="flex-1 h-px bg-white/10" />
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center flex-shrink-0">
-                        <Sparkles className="w-5 h-5" />
-                      </span>
-                      <div>
-                        <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-glow mb-1.5">{t.solutionLabel}</div>
-                        <p className="text-foreground leading-relaxed font-medium">{p.solution}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* BENEFITS */}
-        <section className="py-20">
-          <div className="container mx-auto px-6">
-            <SectionTitle eyebrow={t.benefitsEyebrow} title={t.benefitsTitle} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
-              {t.benefits.map((b, i) => {
-                const Icon = BENEFIT_ICONS[i];
-                return (
-                  <motion.div
-                    key={b.title}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.45, delay: i * 0.08 }}
-                    className="glass-card rounded-2xl p-6 text-center hover:border-glow/30 hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <span className="w-12 h-12 rounded-xl bg-primary/15 text-glow flex items-center justify-center mx-auto mb-4">
-                      <Icon className="w-6 h-6" />
-                    </span>
-                    <h3 className="text-lg font-serif font-bold text-foreground">{b.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{b.desc}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* PROCESS */}
-        <section id="process" className="py-20 scroll-mt-24">
-          <div className="container mx-auto px-6">
-            <SectionTitle eyebrow={t.processEyebrow} title={t.processTitle} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {t.process.map((p, i) => {
-                const Icon = PROCESS_ICONS[i];
-                return (
-                  <motion.div
-                    key={p.title}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.45, delay: i * 0.1 }}
-                    className="glass-card rounded-2xl p-6 relative"
-                  >
-                    <span className="absolute top-5 right-5 font-serif text-3xl font-bold text-white/10">{i + 1}</span>
-                    <span className="w-12 h-12 rounded-xl bg-primary/15 text-glow flex items-center justify-center mb-5">
-                      <Icon className="w-6 h-6" />
-                    </span>
-                    <h3 className="text-lg font-serif font-bold text-foreground">{p.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* CONTACT */}
-        <section id="contact" className="py-20 scroll-mt-24">
-          <div className="container mx-auto px-6">
-            <div className="glass-card rounded-3xl p-8 md:p-12">
-              <div className="grid lg:grid-cols-2 gap-10 items-center">
-                <div>
-                  <div className="font-mono text-xs tracking-[0.25em] text-glow mb-3">{t.contactEyebrow}</div>
-                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">{t.contactTitle}</h2>
-                  <p className="mt-4 text-muted-foreground leading-relaxed max-w-md">{t.contactSub}</p>
-                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-2 rounded-xl text-white font-semibold px-7 py-3.5 shadow-lg shadow-primary/30 transition-transform hover:-translate-y-0.5"
-                    style={{ background: "linear-gradient(110deg, #2563eb 0%, #6d5cf5 100%)" }}>
-                    {t.startProject} <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-                <div className="flex flex-col gap-4">
-                  <a href="https://lxclouds.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-xl bg-white/[0.03] border border-white/5 p-4 hover:border-glow/30 transition-colors">
-                    <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center"><Globe className="w-5 h-5" /></span>
-                    <span><span className="block text-xs text-muted-foreground">{t.labelWebsite}</span><span className="font-semibold text-foreground">lxclouds.com</span></span>
-                  </a>
-                  <a href={`mailto:${EMAIL}`} className="flex items-center gap-4 rounded-xl bg-white/[0.03] border border-white/5 p-4 hover:border-glow/30 transition-colors">
-                    <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center"><Mail className="w-5 h-5" /></span>
-                    <span><span className="block text-xs text-muted-foreground">{t.labelEmail}</span><span className="font-semibold text-foreground">{EMAIL}</span></span>
-                  </a>
-                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-xl bg-white/[0.03] border border-white/5 p-4 hover:border-glow/30 transition-colors">
-                    <span className="w-11 h-11 rounded-xl bg-primary/15 text-glow flex items-center justify-center"><WhatsAppIcon className="w-5 h-5" /></span>
-                    <span><span className="block text-xs text-muted-foreground">{t.labelWhatsApp}</span><span className="font-semibold text-foreground">{PHONE_DISPLAY}</span></span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Hero goTo={goTo} />
+        <TrustBar />
+        <Services />
+        <WhyUs goTo={goTo} />
+        <Features />
+        <Projects />
+        <Process />
+        <About />
+        <Testimonials />
+        <Contact />
       </main>
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 py-8">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <img src="/logo-cloud.png" alt="" aria-hidden="true" className="h-8 w-auto" />
-            <span className="font-serif font-bold tracking-[0.15em] text-foreground text-sm">LX CLOUDS</span>
-            <span className="hidden md:inline text-muted-foreground text-sm">— {t.footerTagline}</span>
-          </div>
-          <p className="text-xs text-muted-foreground font-mono">{t.rights}</p>
-        </div>
-      </footer>
+      <Footer goTo={goTo} />
     </div>
   );
 }
