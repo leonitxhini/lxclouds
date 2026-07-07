@@ -236,7 +236,7 @@ const Hero = ({ goTo }: { goTo: (hash: string) => void }) => {
   };
 
   return (
-    <section id="home" className="relative overflow-hidden pt-36 pb-14 lg:pt-44 lg:pb-16">
+    <section id="home" className="relative overflow-hidden pt-36 pb-5 lg:pt-44 lg:pb-6">
       {/* background: datacenter scene + readability gradients + particles */}
       <div className="absolute inset-0" aria-hidden="true">
         <img
