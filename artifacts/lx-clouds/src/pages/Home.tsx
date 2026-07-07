@@ -7,10 +7,11 @@ import {
   Monitor, Server, Cpu, Network, Bot, Code2,
   ShieldCheck, Gauge, DatabaseBackup, Maximize2, Activity, Wrench, BarChart3, Webhook,
   Zap, Lock, TrendingUp, Mail, Globe, MapPin,
-  Instagram, Linkedin, Github, Send,
+  MessageCircle, Send,
 } from "lucide-react";
 import { Reveal, Magnetic, TiltCard, Counter, ripple, EASE, prefersReducedMotion } from "@/lib/fx";
 import { Loader, CursorFX, Particles } from "@/components/site/Effects";
+import { Configurator } from "@/components/site/Configurator";
 import { useSubmitContact } from "@/hooks/use-contact";
 
 // --- Constants ---
@@ -23,6 +24,7 @@ const YEAR = new Date().getFullYear();
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
   { label: "Services", href: "#services" },
+  { label: "Pricing", href: "#configurator" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
 ];
@@ -309,7 +311,7 @@ const TrustBar = () => (
 
 // --- Services (bento) ---
 
-const Services = () => (
+const Services = ({ goTo }: { goTo: (hash: string) => void }) => (
   <section id="services" className="scroll-mt-24 py-24 lg:py-32">
     <div className="container mx-auto px-6">
       <SectionHead
@@ -326,9 +328,13 @@ const Services = () => (
               </div>
               <h3 className="font-display text-xl font-bold">{s.title}</h3>
               <p className="mt-2.5 max-w-md text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
-              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
-                Learn more <ArrowRight className="h-3.5 w-3.5" />
-              </span>
+              <a
+                href="#configurator"
+                onClick={(e) => { e.preventDefault(); goTo("#configurator"); }}
+                className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
+              >
+                Configure & estimate <ArrowRight className="h-3.5 w-3.5" />
+              </a>
             </TiltCard>
           </Reveal>
         ))}
@@ -623,7 +629,33 @@ const Contact = () => {
 
 // --- Footer ---
 
-const Footer = ({ goTo }: { goTo: (hash: string) => void }) => (
+const LEGAL_CONTENT = {
+  imprint: {
+    title: "Imprint",
+    body: [
+      "LX CLOUDS — Digital Agency",
+      "Offenbach am Main, Germany",
+      "",
+      "Email: info@lxclouds.com",
+      "WhatsApp: +49 157 8099 8115",
+      "Web: lxclouds.com",
+    ],
+  },
+  privacy: {
+    title: "Privacy Policy",
+    body: [
+      "We only use the data you submit through the contact form (name, email, message) to answer your inquiry — nothing else. Form submissions are processed via Web3Forms.",
+      "This site does not use advertising trackers or analytics cookies.",
+      "The embedded Google Map is loaded from Google and may set its own cookies when displayed.",
+      "Questions or deletion requests: info@lxclouds.com.",
+    ],
+  },
+} as const;
+
+const Footer = ({ goTo }: { goTo: (hash: string) => void }) => {
+  const [legal, setLegal] = useState<keyof typeof LEGAL_CONTENT | null>(null);
+
+  return (
   <footer className="border-t border-white/5 py-14">
     <div className="container mx-auto px-6">
       <div className="flex flex-col items-start justify-between gap-10 md:flex-row">
@@ -650,16 +682,20 @@ const Footer = ({ goTo }: { goTo: (hash: string) => void }) => (
           <div>
             <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Legal</div>
             <ul className="space-y-2.5">
-              <li><a href="#" className="text-sm text-foreground/70 transition-colors hover:text-foreground">Imprint</a></li>
-              <li><a href="#" className="text-sm text-foreground/70 transition-colors hover:text-foreground">Privacy</a></li>
+              <li><button onClick={() => setLegal("imprint")} className="text-sm text-foreground/70 transition-colors hover:text-foreground">Imprint</button></li>
+              <li><button onClick={() => setLegal("privacy")} className="text-sm text-foreground/70 transition-colors hover:text-foreground">Privacy</button></li>
             </ul>
           </div>
           <div>
-            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Social</div>
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Reach Us</div>
             <div className="flex gap-3">
-              {[Instagram, Linkedin, Github].map((Icon, i) => (
-                <a key={i} href="#" aria-label="Social link" className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-foreground/60 transition-colors hover:border-primary/40 hover:text-foreground">
-                  <Icon className="h-4 w-4" />
+              {[
+                { icon: MessageCircle, href: WHATSAPP_URL, label: "WhatsApp" },
+                { icon: Mail, href: `mailto:${EMAIL}`, label: "Email" },
+                { icon: Globe, href: "https://lxclouds.com", label: "Website" },
+              ].map((s) => (
+                <a key={s.label} href={s.href} target={s.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" aria-label={s.label} className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-foreground/60 transition-colors hover:border-primary/40 hover:text-foreground">
+                  <s.icon className="h-4 w-4" />
                 </a>
               ))}
             </div>
@@ -671,8 +707,46 @@ const Footer = ({ goTo }: { goTo: (hash: string) => void }) => (
         <p className="font-mono text-xs text-muted-foreground">lxclouds.com</p>
       </div>
     </div>
+
+    {/* legal modal */}
+    <AnimatePresence>
+      {legal && (
+        <motion.div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#05070B]/80 p-6 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setLegal(null)}
+        >
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={LEGAL_CONTENT[legal].title}
+            className="glass w-full max-w-md rounded-3xl p-8"
+            initial={{ opacity: 0, y: 26, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: 0.97 }}
+            transition={{ duration: 0.35, ease: EASE }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="font-display text-xl font-bold">{LEGAL_CONTENT[legal].title}</h3>
+              <button onClick={() => setLegal(null)} aria-label="Close" className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-foreground/60 transition-colors hover:border-primary/40 hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              {LEGAL_CONTENT[legal].body.map((line, i) =>
+                line === "" ? <div key={i} className="h-1" /> : <p key={i} className="text-sm leading-relaxed text-muted-foreground">{line}</p>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   </footer>
-);
+  );
+};
 
 // --- Page ---
 
@@ -727,9 +801,10 @@ export default function Home() {
       <main>
         <Hero goTo={goTo} />
         <TrustBar />
-        <Services />
+        <Services goTo={goTo} />
         <WhyUs goTo={goTo} />
         <Features />
+        <Configurator goTo={goTo} />
         <Process />
         <About />
         <Contact />
