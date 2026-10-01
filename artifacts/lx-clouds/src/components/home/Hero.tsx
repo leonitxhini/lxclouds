@@ -279,7 +279,8 @@ export function Hero() {
         {wide && <GlassPlate mx={mx} my={my} scroll={scroll} />}
         {wide && <GlassSpheres mx={mx} my={my} scroll={scroll} />}
 
-        <div className="absolute inset-0 z-[3] hidden xl:block" role="group" aria-label={t.cardsLabel}>
+        {/* above the copy block, which spans the full width; only the cards themselves take clicks */}
+        <div className="pointer-events-none absolute inset-0 z-[4] hidden xl:block" role="group" aria-label={t.cardsLabel}>
           {t.cards.map((copy, i) => {
             const layout = cardLayout[i];
             const open = openCard === i;
@@ -291,7 +292,7 @@ export function Hero() {
                 scroll={scroll}
                 depth={layout.depth}
                 speed={-60 - i * 26}
-                className={cn(layout.place, open ? "z-30" : "z-10")}
+                className={cn("pointer-events-auto", layout.place, open ? "z-30" : "z-10")}
               >
                 <motion.div
                   initial={{ opacity: 0, x: layout.from, rotate: layout.rotate * 1.6 }}
