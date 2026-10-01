@@ -86,7 +86,7 @@ export function Nav() {
       <div className="mx-auto flex h-[68px] w-full max-w-[1240px] items-center justify-between px-5 md:px-6">
         <Link href="/" className="flex items-center gap-2.5">
           <LogoMark size={27} />
-          <span className="text-[17px] font-semibold tracking-[-0.01em]">{site.name}</span>
+          <span className="text-[17px] font-semibold tracking-[-0.01em]">{site.domain}</span>
         </Link>
 
         <nav aria-label={t.nav.main} className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
@@ -146,7 +146,7 @@ export function Nav() {
               <div className="flex h-[68px] items-center justify-between px-5">
                 <span className="flex items-center gap-2.5">
                   <LogoMark size={27} />
-                  <span className="text-[17px] font-semibold tracking-[-0.01em]">{site.name}</span>
+                  <span className="text-[17px] font-semibold tracking-[-0.01em]">{site.domain}</span>
                 </span>
                 <Dialog.Close className="-mr-2 flex size-11 items-center justify-center rounded-full" aria-label={t.nav.closeMenu}>
                   <X className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
