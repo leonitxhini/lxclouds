@@ -125,6 +125,13 @@ export default function CaseStudy({ slug }: { slug: string }) {
               ))}
             </ul>
           )}
+
+          <Reveal className="mt-4">
+            <div className="rounded-[22px] bg-night px-6 py-7 text-white sm:px-9 sm:py-9">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#A9A6FF]">{c.forYou}</p>
+              <p className="mt-3 max-w-[820px] text-[20px] leading-[1.45] tracking-[-0.01em] sm:text-[24px]">{copy.forYou}</p>
+            </div>
+          </Reveal>
         </div>
       </header>
 

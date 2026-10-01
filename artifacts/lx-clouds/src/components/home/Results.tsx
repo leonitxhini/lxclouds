@@ -7,14 +7,16 @@ import { getProject } from "@/data/projects";
 import { useT } from "@/i18n";
 import { asset, cn } from "@/lib/utils";
 
-/** The project each figure belongs to – same order as the copy. */
-const sources = ["zgjedhplus", "rron-rent-a-car", "framenotion", "zgjedhplus", "rron-rent-a-car", "zgjedhplus"];
+/** The project each figure belongs to – same order as the copy; null for figures about the work as a whole. */
+const sources = ["zgjedhplus", "rron-rent-a-car", "framenotion", "subtoapi", null, null];
 
 /** Splits a figure like "Top 10", "#1", "1.3M+", "1,3 Mio.+" or "1.000" into prefix, number and suffix. */
 function parseFigure(value: string) {
   const match = value.match(/^(\D*)(\d[\d.,]*\d|\d)(.*)$/);
   if (!match) return null;
   const [, prefix, raw, suffix] = match;
+  // "24/7" or "4×100" are names, not quantities – they stay as written
+  if (/^[/×]/.test(suffix)) return null;
   const grouped = /^\d{1,3}([.,]\d{3})+$/.test(raw); // 1,000 or 1.000
   const separator = grouped ? raw.replace(/\d/g, "")[0] : "";
   const decimalMark = grouped ? "" : (raw.match(/[.,]/)?.[0] ?? "");
@@ -76,8 +78,26 @@ export function Results() {
 
       <ul className="mt-8 grid gap-px overflow-hidden rounded-[22px] border border-ink/[0.07] bg-ink/[0.07] sm:grid-cols-2 lg:grid-cols-3">
         {t.items.map((item, i) => {
-          const project = getProject(sources[i]);
-          if (!project) return null;
+          const slug = sources[i];
+          const project = slug ? getProject(slug) : undefined;
+          const figure = (
+            <>
+              <span className="text-gradient w-fit text-[52px] font-semibold leading-none tracking-[-0.045em] sm:text-[58px]">
+                <CountUp value={item.value} />
+              </span>
+              <span className="mt-3 text-[16px] font-semibold tracking-[-0.01em]">{item.label}</span>
+              <span className="mt-1.5 text-[13.5px] leading-[1.45] text-muted">{item.note}</span>
+            </>
+          );
+          if (!project) {
+            return (
+              <li key={item.label} className="bg-paper">
+                <Reveal delay={(i % 3) * 0.07} className="flex h-full flex-col bg-white px-6 pb-6 pt-7">
+                  {figure}
+                </Reveal>
+              </li>
+            );
+          }
           return (
             <li key={item.label} className="bg-paper">
               <Reveal delay={(i % 3) * 0.07} className="h-full">
@@ -90,11 +110,7 @@ export function Results() {
                     style={{ background: project.brand.color }}
                     aria-hidden="true"
                   />
-                  <span className="text-gradient w-fit text-[52px] font-semibold leading-none tracking-[-0.045em] sm:text-[58px]">
-                    <CountUp value={item.value} />
-                  </span>
-                  <span className="mt-3 text-[16px] font-semibold tracking-[-0.01em]">{item.label}</span>
-                  <span className="mt-1.5 text-[13.5px] leading-[1.45] text-muted">{item.note}</span>
+                  {figure}
                   <span className="mt-auto flex items-center justify-between pt-6">
                     <span className="flex items-center gap-2 text-[13px] font-medium text-ink/80">
                       <span

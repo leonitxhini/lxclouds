@@ -166,12 +166,12 @@ export const de: Dict = {
     title: "Belege statt Versprechen.",
     sub: "Was aus der Arbeit bisher geworden ist.",
     items: [
-      { value: "Top 10", label: "der Apps im Kosovo", note: "ZgjedhPlus – die App fürs iPhone." },
+      { value: "Top 10", label: "der Apps im Kosovo", note: "ZgjedhPlus – Website und iPhone-App aus einer Hand." },
       { value: "#1", label: "bei Google", note: "RRON Rent a Car – seitdem deutlich mehr Kunden." },
       { value: "200", label: "Besucher pro Tag", note: "FrameNotion, laut eigener Statistik." },
-      { value: "1,3 Mio.+", label: "verglichene Produkte", note: "Aus 229 Shops im Kosovo und in Albanien." },
-      { value: "5,0", label: "Google-Bewertung", note: "RRON Rent a Car, aus 21 Rezensionen." },
-      { value: "5,2 Mio.+", label: "Preisprüfungen", note: "Über den gesamten ZgjedhPlus-Katalog." },
+      { value: "100", label: "SEO-Wert in Lighthouse", note: "Bei ZgjedhPlus, FrameNotion und SubToAPI – damit das Produkt gefunden wird." },
+      { value: "4/4", label: "Projekte live im Einsatz", note: "Alles hier Gezeigte ist online und in Benutzung, kein Entwurf." },
+      { value: "1", label: "Ansprechpartner", note: "Konzept, Design, Entwicklung und Launch – ohne Übergaben dazwischen." },
     ],
   },
 
@@ -261,6 +261,7 @@ export const de: Dict = {
     resultsTitle: "In Zahlen.",
     resultsTitleNone: "Live und im Einsatz.",
     visit: (domain: string) => `${domain} besuchen`,
+    forYou: "Was das für Ihr Projekt heißt",
     next: "Nächstes Projekt",
   },
 
@@ -274,9 +275,11 @@ export const de: Dict = {
     zgjedhplus: {
       tag: "Marktplatz / Preisvergleich",
       category: "Marktplatz / Preisvergleich",
-      blurb: "Der Preisvergleich für Kosovo & Albanien – 1,3 Mio.+ Produkte aus 229 Shops.",
+      blurb: "Ein Marktplatz mit eigener iPhone-App – von der Idee in die Top 10 im Kosovo.",
       summary:
         "Die Preisvergleichsplattform für Kosovo und Albanien: mehr als 1,3 Millionen Produkte aus 229 Shops in einer Suche – mit Preisverlauf, Preisalarm und eigener iPhone-App.",
+      forYou:
+        "Sie brauchen eine Plattform, einen Marktplatz oder eine App? So weit kann eine Person eine Idee bringen: Website, Backend und iPhone-App aus einer Hand – bis in die Top 10 der Apps eines Landes.",
       role: "Konzept, Design, Entwicklung und Betrieb",
       overview: [
         "ZgjedhPlus ist eine Preisvergleichsplattform für Kosovo und Albanien. Sie bündelt die Angebote lokaler Onlineshops in einem durchsuchbaren Katalog: Käufer sehen, wer ein Produkt verkauft, was es in jedem Shop kostet und wie sich der Preis entwickelt hat.",
@@ -331,19 +334,21 @@ export const de: Dict = {
       },
       results: [
         { value: "Top 10", label: "der Apps im Kosovo" },
-        { value: "1,3 Mio.+", label: "gelistete Produkte" },
-        { value: "229", label: "verglichene Shops" },
-        { value: "5,2 Mio.+", label: "Preisprüfungen" },
+        { value: "2", label: "Plattformen: Website und iPhone-App" },
+        { value: "100", label: "SEO-Wert in Lighthouse" },
+        { value: "1", label: "Person, vom Konzept bis zum Betrieb" },
       ],
       resultsNote:
-        "Katalogzahlen laut zgjedhplus.com, Stand Oktober 2026.",
+        "App-Platzierung nach eigener Angabe. Lighthouse auf der Live-Seite gemessen, Oktober 2026, mobil und Desktop.",
     },
     framenotion: {
       tag: "KI / Creative SaaS",
       category: "KI / kreative Automatisierung",
-      blurb: "Produktlink einfügen, fertige 30-Sekunden-Video-Ad bekommen.",
+      blurb: "Ein KI-Produkt, das aus einem Link eine fertige Video-Ad macht.",
       summary:
         "Eine KI-Plattform, die aus jedem Produktlink eine fertige 30-Sekunden-Video-Ad macht – geschrieben, vertont, mit Musik unterlegt und in Minuten statt Tagen gerendert.",
+      forYou:
+        "Sie wollen KI in Ihrem Produkt? Hier leistet sie echte Arbeit: Sie liest eine Seite, schreibt die Ad und rendert das Video – mit Konten und Online-Zahlung drumherum.",
       role: "Konzept, Design und Entwicklung",
       overview: [
         "FrameNotion macht aus einem Produktlink ein kurzes Werbevideo im Hochformat. Man fügt eine URL ein; die Plattform liest die Seite, schreibt dafür eine individuelle Motion-Ad und rendert ein fertiges Video mit Sprecherstimme und Musik.",
@@ -397,21 +402,23 @@ export const de: Dict = {
       },
       results: [
         { value: "200", label: "Besucher pro Tag" },
-        { value: "30 s", label: "Ads, gerendert mit Ton" },
-        { value: "4", label: "Formate aus einer Ad" },
-        { value: "10", label: "Beispiel-Ads, unverändert gezeigt" },
+        { value: "100", label: "SEO-Wert in Lighthouse" },
+        { value: "3", label: "Abo-Tarife mit Online-Zahlung" },
+        { value: "KI", label: "schreibt, vertont und rendert die Ad selbst" },
       ],
       resultsNote:
-        "Besucherzahl aus der eigenen Statistik des Produkts; alles Weitere laut framenotion.com, Stand Oktober 2026.",
+        "Besucherzahl aus der eigenen Statistik des Produkts. Lighthouse auf der Live-Seite gemessen, Oktober 2026, mobil und Desktop.",
       missing:
         "Editor und Konto-Dashboard liegen hinter dem Login und werden hier nicht gezeigt. Alle Screenshots oben stammen von der öffentlichen Seite.",
     },
     "rron-rent-a-car": {
       tag: "Kundenprojekt",
       category: "Automotive / Website-Entwicklung",
-      blurb: "Premium-Website für Autovermietung – Platz 1 bei Google, 5,0 Sterne.",
+      blurb: "Eine Mietwagen-Website, die bei Google auf Platz 1 steht und Buchungen bringt.",
       summary:
         "Die Website einer Autovermietung im Kosovo: die Flotte präsentiert wie eine Premium-Marke, die Buchungsanfrage in wenigen Schritten – und Platz 1 bei Google.",
+      forYou:
+        "Sie brauchen eine Website, die Kunden bringt? Diese steht bei Google auf Platz 1, macht aus Besuchern Buchungsanfragen auf WhatsApp – und der Inhaber pflegt Autos und Preise selbst.",
       role: "Design und Entwicklung für den Kunden",
       overview: [
         "RRON Rent a Car ist eine Autovermietung im Kosovo. Ich habe ihre Website gestaltet und gebaut: eine dunkle, hochwertige Präsentation der Flotte mit einem Buchungsablauf, der dort endet, wo das Unternehmen ohnehin mit seinen Kunden spricht – auf WhatsApp.",
@@ -464,19 +471,21 @@ export const de: Dict = {
       },
       results: [
         { value: "#1", label: "bei Google" },
-        { value: "5,0", label: "Google-Bewertung aus 21 Rezensionen" },
-        { value: "16", label: "Fahrzeuge online" },
-        { value: "3", label: "Abholstandorte" },
+        { value: "24/7", label: "Buchungsanfragen, direkt auf WhatsApp" },
+        { value: "2", label: "Sprachen für Einheimische und Gäste" },
+        { value: "0", label: "Entwickler nötig, um Autos und Preise zu pflegen" },
       ],
       resultsNote:
-        "Seit dem Launch steht die Website bei Google auf Platz 1, und das Unternehmen hat deutlich mehr Kunden. Bewertung und Anzahl der Rezensionen von Google, wie auf rentacarron.com im Oktober 2026 gezeigt.",
+        "Seit dem Launch steht die Website bei Google auf Platz 1, und das Unternehmen hat deutlich mehr Kunden.",
     },
     subtoapi: {
       tag: "Developer SaaS",
       category: "Entwickler-Tools / SaaS",
-      blurb: "Die Schaltzentrale zwischen Claude und den eigenen Apps.",
+      blurb: "Ein komplettes SaaS: Abos, Team-Konten, Dashboard und API.",
       summary:
         "Eine Entwicklerplattform, die unterstützten Claude-Zugang über eine API mit Anwendungen verbindet – Schlüssel, Playground, Nutzungsübersicht und Team-Plätze in einem Dashboard.",
+      forYou:
+        "Sie planen ein eigenes Softwareprodukt? Abos, Team-Konten, ein Dashboard, eine öffentliche API und die Dokumentation: alles, was ein bezahltes SaaS braucht – gebaut und im Betrieb.",
       role: "Konzept, Design und Entwicklung",
       overview: [
         "SubToAPI ist eine Entwicklerplattform, die unterstützten Claude-Zugang über eine API-Schnittstelle mit Anwendungen verbindet. Entwickler verbinden einmal, erstellen API-Schlüssel für ihre Anwendungen, senden Anfragen aus einem Playground und sehen Nutzungsdaten zu jeder Antwort.",
@@ -528,13 +537,13 @@ export const de: Dict = {
         "home-mobile": "Landingpage mobil",
       },
       results: [
-        { value: "3", label: "Tarife, ab 9 € im Monat" },
-        { value: "200", label: "Plätze im größten Tarif" },
-        { value: "1.000", label: "Anfragen pro Minute in der Spitze" },
-        { value: "4", label: "API-Anleitungen in der Doku" },
+        { value: "4×100", label: "Lighthouse-Werte am Desktop" },
+        { value: "3", label: "Abo-Tarife mit Online-Zahlung" },
+        { value: "Teams", label: "Konten, Rollen und Plätze eingebaut" },
+        { value: "API", label: "öffentliche Schnittstelle mit Dokumentation" },
       ],
       resultsNote:
-        "Tarifdetails laut subtoapi.app, Stand Oktober 2026. Nutzungszahlen sind nicht öffentlich.",
+        "Lighthouse auf der Live-Seite gemessen, Oktober 2026: am Desktop 100 bei Performance, Barrierefreiheit, Best Practices und SEO.",
       missing:
         "Das Dashboard nach dem Login, die Schlüsselverwaltung, der Playground und die Nutzungsansichten erfordern ein Konto und werden nicht als Screenshots gezeigt. Das oben sichtbare Dashboard ist die produkteigene Vorschau auf der Landingpage.",
     },

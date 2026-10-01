@@ -29,7 +29,7 @@ function Showcase({ project, flip }: { project: Project; flip: boolean }) {
           <TypeBadge type={project.type} />
           <span className="text-[13px] text-muted">{copy.category}</span>
         </div>
-        <p className="mt-5 max-w-[420px] text-[16.5px] leading-[1.55] text-muted">{copy.summary}</p>
+        <p className="mt-5 max-w-[420px] text-[16.5px] leading-[1.55] text-muted">{copy.forYou}</p>
         <ul className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-ink/[0.08] pt-6">
           {copy.results.map((r) => (
             <li key={r.label}>

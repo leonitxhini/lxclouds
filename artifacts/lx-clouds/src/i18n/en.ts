@@ -6,6 +6,8 @@ export type ProjectCopy = {
   blurb: string;
   /** One or two sentences, used on showcases and as meta description. */
   summary: string;
+  /** What the project shows a prospective client – written to them, not about the product. */
+  forYou: string;
   role: string;
   overview: string[];
   problem: string;
@@ -187,12 +189,12 @@ export const en = {
     title: "Proof, not promises.",
     sub: "What the work has led to so far.",
     items: [
-      { value: "Top 10", label: "apps in Kosovo", note: "ZgjedhPlus — the app for iPhone." },
+      { value: "Top 10", label: "apps in Kosovo", note: "ZgjedhPlus — website and iPhone app from one hand." },
       { value: "#1", label: "on Google", note: "RRON Rent a Car — with considerably more customers since." },
       { value: "200", label: "visitors a day", note: "FrameNotion, from its own analytics." },
-      { value: "1.3M+", label: "products compared", note: "From 229 shops in Kosovo and Albania." },
-      { value: "5.0", label: "Google rating", note: "RRON Rent a Car, from 21 reviews." },
-      { value: "5.2M+", label: "price checks", note: "Run across the ZgjedhPlus catalogue." },
+      { value: "100", label: "SEO score in Lighthouse", note: "On ZgjedhPlus, FrameNotion and SubToAPI — so the product gets found." },
+      { value: "4/4", label: "projects live in production", note: "Everything shown here is online and in use, not a mock-up." },
+      { value: "1", label: "contact person", note: "Concept, design, development and launch — no handovers in between." },
     ],
   },
 
@@ -282,6 +284,7 @@ export const en = {
     resultsTitle: "In numbers.",
     resultsTitleNone: "Live and in use.",
     visit: (domain: string) => `Visit ${domain}`,
+    forYou: "What this means for your project",
     next: "Next project",
   },
 
@@ -295,9 +298,11 @@ export const en = {
     zgjedhplus: {
       tag: "Marketplace / Price Comparison",
       category: "Marketplace / Price Comparison",
-      blurb: "The price comparison for Kosovo & Albania — 1.3M+ products from 229 shops.",
+      blurb: "A marketplace with its own iPhone app — from an idea to the Top 10 in Kosovo.",
       summary:
         "The price comparison platform for Kosovo and Albania: more than 1.3 million products from 229 shops in one search — with price history, price alerts and its own iPhone app.",
+      forYou:
+        "Need a platform, a marketplace or an app? This is how far one person can take an idea: website, backend and iPhone app from a single hand — all the way into the Top 10 apps of a country.",
       role: "Concept, design, development and operations",
       overview: [
         "ZgjedhPlus is a price comparison platform for Kosovo and Albania. It brings the offers of local online shops into one searchable catalogue, so shoppers can see who sells a product, what it costs at each shop and how that price has moved.",
@@ -352,19 +357,21 @@ export const en = {
       },
       results: [
         { value: "Top 10", label: "apps in Kosovo" },
-        { value: "1.3M+", label: "products listed" },
-        { value: "229", label: "shops compared" },
-        { value: "5.2M+", label: "price checks" },
+        { value: "2", label: "platforms: website and iPhone app" },
+        { value: "100", label: "SEO score in Lighthouse" },
+        { value: "1", label: "person, from concept to operations" },
       ],
       resultsNote:
-        "Catalogue figures as published on zgjedhplus.com, October 2026.",
+        "App ranking as reported by me. Lighthouse measured on the live site in October 2026, mobile and desktop.",
     },
     framenotion: {
       tag: "AI / Creative SaaS",
       category: "AI / Creative Automation",
-      blurb: "Paste a product link, get a finished 30-second video ad.",
+      blurb: "An AI product that turns a link into a finished video ad.",
       summary:
         "An AI platform that turns any product link into a finished 30-second video ad — written, voiced, scored and rendered in minutes instead of days.",
+      forYou:
+        "Want AI inside your product? Here it does real work: it reads a page, writes the ad and renders the video — with accounts and online payment built around it.",
       role: "Concept, design and development",
       overview: [
         "FrameNotion turns a product link into a short vertical ad video. You paste a URL; the platform reads the page, writes a custom motion ad for it and renders a finished video with voiceover and music.",
@@ -418,21 +425,23 @@ export const en = {
       },
       results: [
         { value: "200", label: "visitors a day" },
-        { value: "30 s", label: "ads, rendered with sound" },
-        { value: "4", label: "formats from one ad" },
-        { value: "10", label: "showcase ads, shown untouched" },
+        { value: "100", label: "SEO score in Lighthouse" },
+        { value: "3", label: "subscription plans with online payment" },
+        { value: "AI", label: "writes, voices and renders the ad itself" },
       ],
       resultsNote:
-        "Visitor figure from the product's own analytics; everything else as published on framenotion.com, October 2026.",
+        "Visitor figure from the product's own analytics. Lighthouse measured on the live site in October 2026, mobile and desktop.",
       missing:
         "The editor and account dashboard sit behind the login and are not shown here. All screens above are from the public site.",
     },
     "rron-rent-a-car": {
       tag: "Client Project",
       category: "Automotive / Website Development",
-      blurb: "Premium rental website — first place on Google, 5.0 stars.",
+      blurb: "A rental website that ranks #1 on Google and brings in bookings.",
       summary:
         "The website of a car rental company in Kosovo: the fleet presented like a premium brand, a booking request in a few taps — and first place on Google.",
+      forYou:
+        "Need a website that brings customers? This one ranks first on Google, turns visitors into booking requests on WhatsApp — and the owner keeps cars and prices up to date himself.",
       role: "Design and development for the client",
       overview: [
         "RRON Rent a Car is a vehicle rental company in Kosovo. I designed and built their website: a dark, premium presentation of the fleet with a booking flow that ends where the business already talks to its customers — on WhatsApp.",
@@ -485,19 +494,21 @@ export const en = {
       },
       results: [
         { value: "#1", label: "on Google" },
-        { value: "5.0", label: "Google rating from 21 reviews" },
-        { value: "16", label: "vehicles online" },
-        { value: "3", label: "pick-up locations" },
+        { value: "24/7", label: "booking requests, straight to WhatsApp" },
+        { value: "2", label: "languages for locals and visitors" },
+        { value: "0", label: "developers needed to update cars and prices" },
       ],
       resultsNote:
-        "Since launch the website ranks first on Google, and the business has seen considerably more customers. Rating and review count from Google, as shown on rentacarron.com in October 2026.",
+        "Since launch the website ranks first on Google, and the business has seen considerably more customers.",
     },
     subtoapi: {
       tag: "Developer SaaS",
       category: "Developer Tools / SaaS",
-      blurb: "One control panel between Claude and your apps.",
+      blurb: "A complete SaaS: subscriptions, team accounts, dashboard and API.",
       summary:
         "A developer platform that connects supported Claude access to applications through an API — keys, playground, usage monitoring and team seats in one dashboard.",
+      forYou:
+        "Planning a software product of your own? Subscriptions, team accounts, a dashboard, a public API and the documentation: every part a paid SaaS needs, built and running.",
       role: "Concept, design and development",
       overview: [
         "SubToAPI is a developer platform that connects supported Claude access to applications through an API interface. Developers connect once, create application API keys, send requests from a playground and see usage metadata for every response.",
@@ -549,13 +560,13 @@ export const en = {
         "home-mobile": "Landing page on mobile",
       },
       results: [
-        { value: "3", label: "plans, from €9 a month" },
-        { value: "200", label: "seats on the largest plan" },
-        { value: "1,000", label: "requests a minute at the top" },
-        { value: "4", label: "API guides in the docs" },
+        { value: "4×100", label: "Lighthouse scores on desktop" },
+        { value: "3", label: "subscription plans with online payment" },
+        { value: "Teams", label: "accounts, roles and seats built in" },
+        { value: "API", label: "public interface with full documentation" },
       ],
       resultsNote:
-        "Plan details as published on subtoapi.app, October 2026. Usage figures are not public.",
+        "Lighthouse measured on the live site in October 2026: 100 in performance, accessibility, best practices and SEO on desktop.",
       missing:
         "The signed-in dashboard, API key management, playground and usage views require an account and are not shown as screenshots. The dashboard visible above is the product's own preview on its landing page.",
     },
