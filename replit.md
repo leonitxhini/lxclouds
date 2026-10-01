@@ -52,13 +52,17 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 
 ### `artifacts/lx-clouds` (`@workspace/lx-clouds`)
 
-LX CLOUDS portfolio/agency website. A single-page React + Vite app with dark elegant green theme.
+Personal portfolio of Leonit Xhini (lxclouds.com). React + Vite + Tailwind v4, client-side routing with wouter.
 
-- Brand colors: deep green-black backgrounds (#0A0F0A), emerald accent (#00C46A), neon glow (#00FF7F)
-- Fonts: Cormorant Garamond (headings), DM Sans (body), JetBrains Mono (labels/tags)
-- Sections: Hero with floating orbs, About, Services, Portfolio with filter, Why LX CLOUDS, Contact form, Footer
-- All data is static/hardcoded (no backend required)
-- Key packages: framer-motion, lucide-react, react-hook-form, zod, @hookform/resolvers
+- **Deploy:** Cloudflare Pages project `lxclouds`, connected to this repo. A push to `main` builds (`pnpm --filter @workspace/lx-clouds run build`, output `artifacts/lx-clouds/dist`) and goes live on lxclouds.com.
+- **Routes:** `/` (home), `/work`, `/work/:slug` (case studies) – each also under `/de` and `/sq`. `public/_redirects` provides the SPA fallback.
+- **Languages:** English (root), German, Albanian. All copy lives in `src/i18n/{en,de,sq}.ts`; `en.ts` defines the shape, the others must match it. `LocaleProvider` (`src/i18n/index.tsx`) reads the language from the first path segment.
+- **Projects:** language-independent facts (URLs, brand colours, screenshot files, stack) in `src/data/projects.ts`; texts and results in the i18n files under `projects`.
+- **Screenshots and logos** in `public/work/<slug>/` are captured from the live sites – replace them with new captures, never with mock-ups.
+- **Hero glass:** `src/components/home/HeroGlass.tsx` is a three.js scene (physically based transmission material), lazy-loaded on screens ≥ 1280px. Phones and tablets use the still `public/glass-sphere.webp`, rendered from the same scene.
+- **Design tokens** in `src/index.css` (`@theme`): paper `#F8F7F4`, ink `#11121B`, accent `#6865FF`. Font: Outfit, self-hosted in `public/fonts`.
+- **Contact dialog** posts to web3forms (`src/components/ContactDialog.tsx`); no backend required.
+- Name, email and social links: `src/data/site.ts`.
 
 ## Packages
 

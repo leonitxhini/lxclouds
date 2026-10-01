@@ -1,0 +1,21 @@
+# Leonit Xhini
+
+> Independent developer and digital product builder. Websites, mobile apps, AI and automation, custom software and SaaS for small businesses and companies digitising their systems. Works in English, German and Albanian.
+
+## Selected work
+
+- [ZgjedhPlus](https://lxclouds.com/work/zgjedhplus): Price comparison platform for Kosovo and Albania. Independent product.
+- [FrameNotion](https://lxclouds.com/work/framenotion): Turns product links into short ad videos. Independent product.
+- [RRON Rent a Car](https://lxclouds.com/work/rron-rent-a-car): Website for a vehicle rental company. Client project.
+- [SubToAPI](https://lxclouds.com/work/subtoapi): Developer platform that connects supported Claude access to applications through an API. Independent product.
+
+## Languages
+
+- [English](https://lxclouds.com/)
+- [Deutsch](https://lxclouds.com/de)
+- [Shqip](https://lxclouds.com/sq)
+
+## Contact
+
+- Email: info@lxclouds.com
+- [All work](https://lxclouds.com/work)

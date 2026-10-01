@@ -1,33 +1,65 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { lazy, Suspense } from "react";
+import { Route, Router as WouterRouter, Switch, useLocation } from "wouter";
+import { ContactProvider } from "@/components/ContactDialog";
+import { Footer } from "@/components/Footer";
+import { Nav } from "@/components/Nav";
+import { LocaleProvider, useLocale } from "@/i18n";
 import Home from "@/pages/Home";
-import NotFound from "@/pages/not-found";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    },
-  },
-});
+// everything but the home page loads when it is first visited
+const Work = lazy(() => import("@/pages/Work"));
+const CaseStudy = lazy(() => import("@/pages/CaseStudy"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
-function App() {
+function Pages() {
+  const [location] = useLocation();
+  const { locale, t } = useLocale();
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
-          <Switch>
-            <Route path="/" component={Home} />
-            <Route component={NotFound} />
-          </Switch>
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-white"
+      >
+        {t.common.skip}
+      </a>
+      <Nav />
+      <AnimatePresence mode="wait" initial={false}>
+        {/* keyed by language too, so switching it replays the transition with the new copy */}
+        <motion.main
+          key={`${locale}${location}`}
+          id="main"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* the location is pinned so the outgoing page keeps rendering while it fades */}
+          <Suspense fallback={<div className="min-h-screen" />}>
+            <Switch location={location}>
+              <Route path="/" component={Home} />
+              <Route path="/work" component={Work} />
+              <Route path="/work/:slug">{(params) => <CaseStudy slug={params.slug} />}</Route>
+              <Route component={NotFound} />
+            </Switch>
+          </Suspense>
+        </motion.main>
+      </AnimatePresence>
+      <Footer />
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <MotionConfig reducedMotion="user">
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <LocaleProvider>
+          <ContactProvider>
+            <Pages />
+          </ContactProvider>
+        </LocaleProvider>
+      </WouterRouter>
+    </MotionConfig>
+  );
+}
