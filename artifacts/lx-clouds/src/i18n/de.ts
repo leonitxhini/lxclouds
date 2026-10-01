@@ -170,7 +170,7 @@ export const de: Dict = {
       { value: "#1", label: "bei Google", note: "RRON Rent a Car – seitdem deutlich mehr Kunden." },
       { value: "200", label: "Besucher pro Tag", note: "FrameNotion, laut eigener Statistik." },
       { value: "100", label: "SEO-Wert in Lighthouse", note: "Bei ZgjedhPlus, FrameNotion und SubToAPI – damit das Produkt gefunden wird." },
-      { value: "4/4", label: "Projekte live im Einsatz", note: "Alles hier Gezeigte ist online und in Benutzung, kein Entwurf." },
+      { value: "8.000+", label: "Besucher im Monat", note: "ZgjedhPlus – 2,5-mal so viele wie im Monat davor." },
       { value: "1", label: "Ansprechpartner", note: "Konzept, Design, Entwicklung und Launch – ohne Übergaben dazwischen." },
     ],
   },
@@ -334,12 +334,12 @@ export const de: Dict = {
       },
       results: [
         { value: "Top 10", label: "der Apps im Kosovo" },
+        { value: "8.000+", label: "Besucher im Monat" },
+        { value: "2,5×", label: "mehr Besucher innerhalb eines Monats" },
         { value: "2", label: "Plattformen: Website und iPhone-App" },
-        { value: "100", label: "SEO-Wert in Lighthouse" },
-        { value: "1", label: "Person, vom Konzept bis zum Betrieb" },
       ],
       resultsNote:
-        "App-Platzierung nach eigener Angabe. Lighthouse auf der Live-Seite gemessen, Oktober 2026, mobil und Desktop.",
+        "Besucherzahlen aus der eigenen Statistik der Plattform, ohne Bots: 8.240 Besucher in den 30 Tagen bis zum 1. Oktober 2026; der September hatte 2,5-mal so viele wie der August. App-Platzierung nach eigener Angabe.",
     },
     framenotion: {
       tag: "KI / Creative SaaS",
@@ -537,13 +537,13 @@ export const de: Dict = {
         "home-mobile": "Landingpage mobil",
       },
       results: [
+        { value: "5 Min.", label: "bis zum ersten API-Aufruf" },
         { value: "4×100", label: "Lighthouse-Werte am Desktop" },
         { value: "3", label: "Abo-Tarife mit Online-Zahlung" },
         { value: "Teams", label: "Konten, Rollen und Plätze eingebaut" },
-        { value: "API", label: "öffentliche Schnittstelle mit Dokumentation" },
       ],
       resultsNote:
-        "Lighthouse auf der Live-Seite gemessen, Oktober 2026: am Desktop 100 bei Performance, Barrierefreiheit, Best Practices und SEO.",
+        "Der Quickstart ist darauf ausgelegt, die erste Anfrage in fünf Minuten zum Laufen zu bringen. Lighthouse auf der Live-Seite gemessen, Oktober 2026: am Desktop 100 bei Performance, Barrierefreiheit, Best Practices und SEO.",
       missing:
         "Das Dashboard nach dem Login, die Schlüsselverwaltung, der Playground und die Nutzungsansichten erfordern ein Konto und werden nicht als Screenshots gezeigt. Das oben sichtbare Dashboard ist die produkteigene Vorschau auf der Landingpage.",
     },

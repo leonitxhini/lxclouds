@@ -193,7 +193,7 @@ export const en = {
       { value: "#1", label: "on Google", note: "RRON Rent a Car — with considerably more customers since." },
       { value: "200", label: "visitors a day", note: "FrameNotion, from its own analytics." },
       { value: "100", label: "SEO score in Lighthouse", note: "On ZgjedhPlus, FrameNotion and SubToAPI — so the product gets found." },
-      { value: "4/4", label: "projects live in production", note: "Everything shown here is online and in use, not a mock-up." },
+      { value: "8,000+", label: "visitors a month", note: "ZgjedhPlus — 2.5 times as many as the month before." },
       { value: "1", label: "contact person", note: "Concept, design, development and launch — no handovers in between." },
     ],
   },
@@ -357,12 +357,12 @@ export const en = {
       },
       results: [
         { value: "Top 10", label: "apps in Kosovo" },
+        { value: "8,000+", label: "visitors a month" },
+        { value: "2.5×", label: "more visitors within one month" },
         { value: "2", label: "platforms: website and iPhone app" },
-        { value: "100", label: "SEO score in Lighthouse" },
-        { value: "1", label: "person, from concept to operations" },
       ],
       resultsNote:
-        "App ranking as reported by me. Lighthouse measured on the live site in October 2026, mobile and desktop.",
+        "Visitor figures from the platform's own analytics, bots excluded: 8,240 visitors in the 30 days to 1 October 2026, and September had 2.5 times as many as August. App ranking as reported by me.",
     },
     framenotion: {
       tag: "AI / Creative SaaS",
@@ -560,13 +560,13 @@ export const en = {
         "home-mobile": "Landing page on mobile",
       },
       results: [
+        { value: "5 min", label: "to the first API call" },
         { value: "4×100", label: "Lighthouse scores on desktop" },
         { value: "3", label: "subscription plans with online payment" },
         { value: "Teams", label: "accounts, roles and seats built in" },
-        { value: "API", label: "public interface with full documentation" },
       ],
       resultsNote:
-        "Lighthouse measured on the live site in October 2026: 100 in performance, accessibility, best practices and SEO on desktop.",
+        "The quickstart is built to get a first request working in five minutes. Lighthouse measured on the live site in October 2026: 100 in performance, accessibility, best practices and SEO on desktop.",
       missing:
         "The signed-in dashboard, API key management, playground and usage views require an account and are not shown as screenshots. The dashboard visible above is the product's own preview on its landing page.",
     },

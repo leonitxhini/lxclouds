@@ -170,7 +170,7 @@ export const sq: Dict = {
       { value: "#1", label: "në Google", note: "RRON Rent a Car — që atëherë dukshëm më shumë klientë." },
       { value: "200", label: "vizitorë në ditë", note: "FrameNotion, sipas statistikave të veta." },
       { value: "100", label: "pikë SEO në Lighthouse", note: "Te ZgjedhPlus, FrameNotion dhe SubToAPI — që produkti të gjendet." },
-      { value: "4/4", label: "projekte live në përdorim", note: "Gjithçka që shfaqet këtu është online dhe në përdorim, jo skicë." },
+      { value: "8.000+", label: "vizitorë në muaj", note: "ZgjedhPlus — 2,5 herë më shumë se muajin e kaluar." },
       { value: "1", label: "person kontakti", note: "Koncept, dizajn, zhvillim dhe lansim — pa dorëzime ndërmjet." },
     ],
   },
@@ -334,12 +334,12 @@ export const sq: Dict = {
       },
       results: [
         { value: "Top 10", label: "aplikacionet në Kosovë" },
+        { value: "8.000+", label: "vizitorë në muaj" },
+        { value: "2,5×", label: "më shumë vizitorë brenda një muaji" },
         { value: "2", label: "platforma: ueb-faqe dhe aplikacion për iPhone" },
-        { value: "100", label: "pikë SEO në Lighthouse" },
-        { value: "1", label: "person, nga koncepti deri te operimi" },
       ],
       resultsNote:
-        "Renditja e aplikacionit sipas të dhënave të mia. Lighthouse i matur në faqen live, tetor 2026, në telefon dhe desktop.",
+        "Shifrat e vizitorëve nga statistikat e vetë platformës, pa bote: 8.240 vizitorë në 30 ditët deri më 1 tetor 2026; shtatori pati 2,5 herë më shumë se gushti. Renditja e aplikacionit sipas të dhënave të mia.",
     },
     framenotion: {
       tag: "AI / SaaS kreativ",
@@ -537,13 +537,13 @@ export const sq: Dict = {
         "home-mobile": "Landing page në telefon",
       },
       results: [
+        { value: "5 min", label: "deri te thirrja e parë e API-së" },
         { value: "4×100", label: "pikë Lighthouse në desktop" },
         { value: "3", label: "plane abonimi me pagesë online" },
         { value: "Ekipe", label: "llogari, role dhe vende të integruara" },
-        { value: "API", label: "ndërfaqe publike me dokumentim të plotë" },
       ],
       resultsNote:
-        "Lighthouse i matur në faqen live, tetor 2026: në desktop 100 në performancë, qasshmëri, praktikat më të mira dhe SEO.",
+        "Fillimi i shpejtë është ndërtuar që kërkesa e parë të funksionojë për pesë minuta. Lighthouse i matur në faqen live, tetor 2026: në desktop 100 në performancë, qasshmëri, praktikat më të mira dhe SEO.",
       missing:
         "Paneli pas hyrjes, menaxhimi i çelësave API, playground-i dhe pamjet e përdorimit kërkojnë llogari dhe nuk shfaqen si pamje ekrani. Paneli që shihet më lart është parapamja e vetë produktit në landing page.",
     },

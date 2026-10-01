@@ -63,7 +63,8 @@ export const projects: Project[] = [
     cover: d("home"),
     coverMobile: m("home-mobile"),
     gallery: [d("home"), d("workflow"), d("examples"), d("features"), m("home-mobile"), m("examples-mobile")],
-    stack: ["Next.js", "React", "TypeScript", "Remotion", "Claude API", "Stripe"],
+    // no vendor names for the AI and the renderer: FrameNotion keeps its technology to itself
+    stack: ["Next.js", "React", "TypeScript", "AI pipeline", "Server-side video rendering", "Stripe"],
   },
   {
     slug: "rron-rent-a-car",

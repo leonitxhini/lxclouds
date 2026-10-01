@@ -8,7 +8,7 @@ import { useT } from "@/i18n";
 import { asset, cn } from "@/lib/utils";
 
 /** The project each figure belongs to – same order as the copy; null for figures about the work as a whole. */
-const sources = ["zgjedhplus", "rron-rent-a-car", "framenotion", "subtoapi", null, null];
+const sources = ["zgjedhplus", "rron-rent-a-car", "framenotion", "subtoapi", "zgjedhplus", null];
 
 /** Splits a figure like "Top 10", "#1", "1.3M+", "1,3 Mio.+" or "1.000" into prefix, number and suffix. */
 function parseFigure(value: string) {
