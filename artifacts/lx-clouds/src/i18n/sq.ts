@@ -66,7 +66,7 @@ export const sq: Dict = {
       {
         title: "Ndikim real",
         body: "Produkte që njerëzit i përdorin vërtet.",
-        more: ["Top 10 aplikacionet në Kosovë", "Vendi 1 në Google për një klient", "200 vizitorë në ditë"],
+        more: ["Top 10 aplikacionet në Kosovë", "Vendi 1 në Google për një klient", "60.000 vizitorë në muaj"],
       },
     ],
     pillars: [
@@ -168,9 +168,9 @@ export const sq: Dict = {
     items: [
       { value: "Top 10", label: "aplikacionet në Kosovë", note: "ZgjedhPlus — ueb-faqe dhe aplikacion për iPhone nga një dorë." },
       { value: "#1", label: "në Google", note: "RRON Rent a Car — që atëherë dukshëm më shumë klientë." },
-      { value: "200", label: "vizitorë në ditë", note: "FrameNotion, sipas statistikave të veta." },
+      { value: "200", label: "abonentë aktivë", note: "FrameNotion, sipas faturimit të vet." },
       { value: "100", label: "pikë SEO në Lighthouse", note: "Te ZgjedhPlus, FrameNotion dhe SubToAPI — që produkti të gjendet." },
-      { value: "8.000+", label: "vizitorë në muaj", note: "ZgjedhPlus — 2,5 herë më shumë se muajin e kaluar." },
+      { value: "60.000", label: "vizitorë në muaj", note: "ZgjedhPlus, sipas statistikave të veta live." },
       { value: "1", label: "person kontakti", note: "Koncept, dizajn, zhvillim dhe lansim — pa dorëzime ndërmjet." },
     ],
   },
@@ -334,12 +334,12 @@ export const sq: Dict = {
       },
       results: [
         { value: "Top 10", label: "aplikacionet në Kosovë" },
-        { value: "8.000+", label: "vizitorë në muaj" },
+        { value: "60.000", label: "vizitorë në muaj" },
         { value: "2,5×", label: "më shumë vizitorë brenda një muaji" },
         { value: "2", label: "platforma: ueb-faqe dhe aplikacion për iPhone" },
       ],
       resultsNote:
-        "Shifrat e vizitorëve nga statistikat e vetë platformës, pa bote: 8.240 vizitorë në 30 ditët deri më 1 tetor 2026; shtatori pati 2,5 herë më shumë se gushti. Renditja e aplikacionit sipas të dhënave të mia.",
+        "Vizitorët mujorë dhe renditja e aplikacionit sipas të dhënave të mia nga statistikat live. Rritja nga gushti në shtator sipas gjurmuesit të platformës.",
     },
     framenotion: {
       tag: "AI / SaaS kreativ",
@@ -401,13 +401,13 @@ export const sq: Dict = {
         "examples-mobile": "Shembujt në telefon",
       },
       results: [
-        { value: "200", label: "vizitorë në ditë" },
+        { value: "200", label: "abonentë aktivë" },
         { value: "100", label: "pikë SEO në Lighthouse" },
         { value: "3", label: "plane abonimi me pagesë online" },
         { value: "AI", label: "e shkruan, e zëron dhe e renderon vetë reklamën" },
       ],
       resultsNote:
-        "Shifra e vizitave nga statistikat e vetë produktit. Lighthouse i matur në faqen live, tetor 2026, në telefon dhe desktop.",
+        "Numri i abonentëve sipas të dhënave të mia nga faturimi. Lighthouse i matur në faqen live, tetor 2026, në telefon dhe desktop.",
       missing:
         "Editori dhe paneli i llogarisë janë pas hyrjes me llogari dhe nuk shfaqen këtu. Të gjitha pamjet më lart janë nga faqja publike.",
     },

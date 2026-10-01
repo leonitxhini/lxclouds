@@ -89,7 +89,7 @@ export const en = {
       {
         title: "Real impact",
         body: "Products people actually use.",
-        more: ["Top 10 apps in Kosovo", "#1 on Google for a client", "200 visitors a day"],
+        more: ["Top 10 apps in Kosovo", "#1 on Google for a client", "60,000 visitors a month"],
       },
     ],
     pillars: [
@@ -191,9 +191,9 @@ export const en = {
     items: [
       { value: "Top 10", label: "apps in Kosovo", note: "ZgjedhPlus — website and iPhone app from one hand." },
       { value: "#1", label: "on Google", note: "RRON Rent a Car — with considerably more customers since." },
-      { value: "200", label: "visitors a day", note: "FrameNotion, from its own analytics." },
+      { value: "200", label: "active subscribers", note: "FrameNotion, as reported from its billing." },
       { value: "100", label: "SEO score in Lighthouse", note: "On ZgjedhPlus, FrameNotion and SubToAPI — so the product gets found." },
-      { value: "8,000+", label: "visitors a month", note: "ZgjedhPlus — 2.5 times as many as the month before." },
+      { value: "60,000", label: "visitors a month", note: "ZgjedhPlus, as reported from its live analytics." },
       { value: "1", label: "contact person", note: "Concept, design, development and launch — no handovers in between." },
     ],
   },
@@ -357,12 +357,12 @@ export const en = {
       },
       results: [
         { value: "Top 10", label: "apps in Kosovo" },
-        { value: "8,000+", label: "visitors a month" },
+        { value: "60,000", label: "visitors a month" },
         { value: "2.5×", label: "more visitors within one month" },
         { value: "2", label: "platforms: website and iPhone app" },
       ],
       resultsNote:
-        "Visitor figures from the platform's own analytics, bots excluded: 8,240 visitors in the 30 days to 1 October 2026, and September had 2.5 times as many as August. App ranking as reported by me.",
+        "Monthly visitors and app ranking as reported by me from the live analytics. Growth from August to September from the platform's own tracker.",
     },
     framenotion: {
       tag: "AI / Creative SaaS",
@@ -424,13 +424,13 @@ export const en = {
         "examples-mobile": "Examples on mobile",
       },
       results: [
-        { value: "200", label: "visitors a day" },
+        { value: "200", label: "active subscribers" },
         { value: "100", label: "SEO score in Lighthouse" },
         { value: "3", label: "subscription plans with online payment" },
         { value: "AI", label: "writes, voices and renders the ad itself" },
       ],
       resultsNote:
-        "Visitor figure from the product's own analytics. Lighthouse measured on the live site in October 2026, mobile and desktop.",
+        "Subscriber figure as reported by me from the billing data. Lighthouse measured on the live site in October 2026, mobile and desktop.",
       missing:
         "The editor and account dashboard sit behind the login and are not shown here. All screens above are from the public site.",
     },

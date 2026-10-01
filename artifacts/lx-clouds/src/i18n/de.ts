@@ -66,7 +66,7 @@ export const de: Dict = {
       {
         title: "Echte Wirkung",
         body: "Produkte, die wirklich genutzt werden.",
-        more: ["Top 10 der Apps im Kosovo", "Platz 1 bei Google für einen Kunden", "200 Besucher pro Tag"],
+        more: ["Top 10 der Apps im Kosovo", "Platz 1 bei Google für einen Kunden", "60.000 Besucher im Monat"],
       },
     ],
     pillars: [
@@ -168,9 +168,9 @@ export const de: Dict = {
     items: [
       { value: "Top 10", label: "der Apps im Kosovo", note: "ZgjedhPlus – Website und iPhone-App aus einer Hand." },
       { value: "#1", label: "bei Google", note: "RRON Rent a Car – seitdem deutlich mehr Kunden." },
-      { value: "200", label: "Besucher pro Tag", note: "FrameNotion, laut eigener Statistik." },
+      { value: "200", label: "aktive Abonnenten", note: "FrameNotion, laut eigener Abrechnung." },
       { value: "100", label: "SEO-Wert in Lighthouse", note: "Bei ZgjedhPlus, FrameNotion und SubToAPI – damit das Produkt gefunden wird." },
-      { value: "8.000+", label: "Besucher im Monat", note: "ZgjedhPlus – 2,5-mal so viele wie im Monat davor." },
+      { value: "60.000", label: "Besucher im Monat", note: "ZgjedhPlus, laut eigener Live-Statistik." },
       { value: "1", label: "Ansprechpartner", note: "Konzept, Design, Entwicklung und Launch – ohne Übergaben dazwischen." },
     ],
   },
@@ -334,12 +334,12 @@ export const de: Dict = {
       },
       results: [
         { value: "Top 10", label: "der Apps im Kosovo" },
-        { value: "8.000+", label: "Besucher im Monat" },
+        { value: "60.000", label: "Besucher im Monat" },
         { value: "2,5×", label: "mehr Besucher innerhalb eines Monats" },
         { value: "2", label: "Plattformen: Website und iPhone-App" },
       ],
       resultsNote:
-        "Besucherzahlen aus der eigenen Statistik der Plattform, ohne Bots: 8.240 Besucher in den 30 Tagen bis zum 1. Oktober 2026; der September hatte 2,5-mal so viele wie der August. App-Platzierung nach eigener Angabe.",
+        "Monatliche Besucher und App-Platzierung nach eigener Angabe aus der Live-Statistik. Wachstum von August auf September laut Tracker der Plattform.",
     },
     framenotion: {
       tag: "KI / Creative SaaS",
@@ -401,13 +401,13 @@ export const de: Dict = {
         "examples-mobile": "Beispiele mobil",
       },
       results: [
-        { value: "200", label: "Besucher pro Tag" },
+        { value: "200", label: "aktive Abonnenten" },
         { value: "100", label: "SEO-Wert in Lighthouse" },
         { value: "3", label: "Abo-Tarife mit Online-Zahlung" },
         { value: "KI", label: "schreibt, vertont und rendert die Ad selbst" },
       ],
       resultsNote:
-        "Besucherzahl aus der eigenen Statistik des Produkts. Lighthouse auf der Live-Seite gemessen, Oktober 2026, mobil und Desktop.",
+        "Abonnentenzahl nach eigener Angabe aus der Abrechnung. Lighthouse auf der Live-Seite gemessen, Oktober 2026, mobil und Desktop.",
       missing:
         "Editor und Konto-Dashboard liegen hinter dem Login und werden hier nicht gezeigt. Alle Screenshots oben stammen von der öffentlichen Seite.",
     },
