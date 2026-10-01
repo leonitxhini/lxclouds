@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Link } from "wouter";
 import { BrowserFrame, PhoneFrame } from "@/components/Frames";
 import { Cta } from "@/components/home/Cta";
+import { CountUp } from "@/components/home/Results";
 import { ProjectStage, TypeBadge } from "@/components/ProjectStage";
 import { Reveal } from "@/components/Reveal";
 import { getProject, projects, shotSrc } from "@/data/projects";
@@ -109,6 +110,21 @@ export default function CaseStudy({ slug }: { slug: string }) {
           <Reveal y={36} delay={0.12} className="mt-10 sm:mt-12">
             <ProjectStage project={project} eager />
           </Reveal>
+
+          {copy.results.length > 0 && (
+            <ul className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[22px] border border-ink/[0.07] bg-ink/[0.07] lg:grid-cols-4">
+              {copy.results.map((r, i) => (
+                <li key={r.label} className="bg-white">
+                  <Reveal delay={i * 0.06} className="h-full px-5 py-6 sm:px-7 sm:py-7">
+                    <p className="w-fit text-[34px] font-semibold leading-none tracking-[-0.04em] sm:text-[46px]" style={{ color: brand.color }}>
+                      <CountUp value={r.value} />
+                    </p>
+                    <p className="mt-2.5 text-[14px] leading-snug text-muted">{r.label}</p>
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </header>
 
@@ -240,12 +256,12 @@ export default function CaseStudy({ slug }: { slug: string }) {
 
         <Chapter label={c.resultsLabel} title={copy.results.length ? c.resultsTitle : c.resultsTitleNone}>
           {copy.results.length > 0 && (
-            <ul className="mb-6 grid gap-4 sm:grid-cols-3">
+            <ul className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {copy.results.map((r, i) => (
                 <li key={r.label}>
                   <Reveal delay={i * 0.07}>
                     <p className="rounded-[22px] border border-ink/[0.07] bg-white p-7">
-                      <span className="block text-[52px] font-semibold leading-none tracking-[-0.04em]" style={{ color: brand.color }}>
+                      <span className="block text-[44px] font-semibold leading-none tracking-[-0.04em]" style={{ color: brand.color }}>
                         {r.value}
                       </span>
                       <span className="mt-3 block text-[15px] text-muted">{r.label}</span>

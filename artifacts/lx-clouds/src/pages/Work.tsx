@@ -1,6 +1,7 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "wouter";
 import { Cta } from "@/components/home/Cta";
+import { CountUp } from "@/components/home/Results";
 import { ProjectStage, TypeBadge } from "@/components/ProjectStage";
 import { Reveal } from "@/components/Reveal";
 import { projects, type Project } from "@/data/projects";
@@ -11,7 +12,6 @@ import { cn } from "@/lib/utils";
 function Showcase({ project, flip }: { project: Project; flip: boolean }) {
   const t = useT();
   const copy = t.projects[project.slug];
-  const headline = copy.results[0];
   return (
     <article className="grid items-center gap-7 lg:grid-cols-12 lg:gap-12">
       <Reveal className={cn("lg:col-span-8", flip && "lg:order-2")}>
@@ -30,12 +30,16 @@ function Showcase({ project, flip }: { project: Project; flip: boolean }) {
           <span className="text-[13px] text-muted">{copy.category}</span>
         </div>
         <p className="mt-5 max-w-[420px] text-[16.5px] leading-[1.55] text-muted">{copy.summary}</p>
-        {headline && (
-          <p className="mt-5 flex items-baseline gap-2.5">
-            <span className="text-gradient text-[30px] font-semibold leading-none tracking-[-0.03em]">{headline.value}</span>
-            <span className="text-[14.5px] text-ink/80">{headline.label}</span>
-          </p>
-        )}
+        <ul className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-ink/[0.08] pt-6">
+          {copy.results.map((r) => (
+            <li key={r.label}>
+              <p className="text-gradient w-fit text-[30px] font-semibold leading-none tracking-[-0.035em]">
+                <CountUp value={r.value} />
+              </p>
+              <p className="mt-1.5 text-[13.5px] leading-snug text-muted">{r.label}</p>
+            </li>
+          ))}
+        </ul>
         <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
           <Link
             href={`/work/${project.slug}`}

@@ -122,6 +122,7 @@ export const de: Dict = {
     note: ["Echte Produkte.", "Echte Ergebnisse."],
     statLabel: "live",
     statBody: (shops: string) => `Produkte aus ${shops} Shops`,
+    statValue: "1,3 Mio.+",
     hint: "Weiterscrollen",
     step: (n: number, total: number) => `Schritt ${n} von ${total}`,
   },
@@ -168,7 +169,9 @@ export const de: Dict = {
       { value: "Top 10", label: "der Apps im Kosovo", note: "ZgjedhPlus – die App fürs iPhone." },
       { value: "#1", label: "bei Google", note: "RRON Rent a Car – seitdem deutlich mehr Kunden." },
       { value: "200", label: "Besucher pro Tag", note: "FrameNotion, laut eigener Statistik." },
-      { value: "1.25M+", label: "verglichene Produkte", note: "Aus 229 Shops auf ZgjedhPlus." },
+      { value: "1,3 Mio.+", label: "verglichene Produkte", note: "Aus 229 Shops im Kosovo und in Albanien." },
+      { value: "5,0", label: "Google-Bewertung", note: "RRON Rent a Car, aus 21 Rezensionen." },
+      { value: "5,2 Mio.+", label: "Preisprüfungen", note: "Über den gesamten ZgjedhPlus-Katalog." },
     ],
   },
 
@@ -271,9 +274,9 @@ export const de: Dict = {
     zgjedhplus: {
       tag: "Marktplatz / Preisvergleich",
       category: "Marktplatz / Preisvergleich",
-      blurb: "Preisvergleich für Kosovo & Albanien.",
+      blurb: "Der Preisvergleich für Kosovo & Albanien – 1,3 Mio.+ Produkte aus 229 Shops.",
       summary:
-        "Eine Preisvergleichsplattform für Kosovo und Albanien, die die Angebote lokaler Onlineshops in einem durchsuchbaren Katalog bündelt.",
+        "Die Preisvergleichsplattform für Kosovo und Albanien: mehr als 1,3 Millionen Produkte aus 229 Shops in einer Suche – mit Preisverlauf, Preisalarm und eigener iPhone-App.",
       role: "Konzept, Design, Entwicklung und Betrieb",
       overview: [
         "ZgjedhPlus ist eine Preisvergleichsplattform für Kosovo und Albanien. Sie bündelt die Angebote lokaler Onlineshops in einem durchsuchbaren Katalog: Käufer sehen, wer ein Produkt verkauft, was es in jedem Shop kostet und wie sich der Preis entwickelt hat.",
@@ -328,17 +331,19 @@ export const de: Dict = {
       },
       results: [
         { value: "Top 10", label: "der Apps im Kosovo" },
-        { value: "1.25M+", label: "gelistete Produkte" },
+        { value: "1,3 Mio.+", label: "gelistete Produkte" },
         { value: "229", label: "verglichene Shops" },
+        { value: "5,2 Mio.+", label: "Preisprüfungen" },
       ],
-      resultsNote: "Katalogzahlen laut zgjedhplus.com, Stand Oktober 2026.",
+      resultsNote:
+        "Katalogzahlen laut zgjedhplus.com, Stand Oktober 2026.",
     },
     framenotion: {
       tag: "KI / Creative SaaS",
       category: "KI / kreative Automatisierung",
-      blurb: "Macht aus Produktlinks Werbevideos.",
+      blurb: "Produktlink einfügen, fertige 30-Sekunden-Video-Ad bekommen.",
       summary:
-        "Eine KI-Plattform, die aus einem Produktlink ein kurzes Werbevideo mit Sprecherstimme und Musik macht.",
+        "Eine KI-Plattform, die aus jedem Produktlink eine fertige 30-Sekunden-Video-Ad macht – geschrieben, vertont, mit Musik unterlegt und in Minuten statt Tagen gerendert.",
       role: "Konzept, Design und Entwicklung",
       overview: [
         "FrameNotion macht aus einem Produktlink ein kurzes Werbevideo im Hochformat. Man fügt eine URL ein; die Plattform liest die Seite, schreibt dafür eine individuelle Motion-Ad und rendert ein fertiges Video mit Sprecherstimme und Musik.",
@@ -390,17 +395,23 @@ export const de: Dict = {
         "home-mobile": "Landingpage mobil",
         "examples-mobile": "Beispiele mobil",
       },
-      results: [{ value: "200", label: "Besucher pro Tag" }],
-      resultsNote: "Besucherzahl aus der eigenen Statistik des Produkts. Live und offen für Anmeldungen auf framenotion.com.",
+      results: [
+        { value: "200", label: "Besucher pro Tag" },
+        { value: "30 s", label: "Ads, gerendert mit Ton" },
+        { value: "4", label: "Formate aus einer Ad" },
+        { value: "10", label: "Beispiel-Ads, unverändert gezeigt" },
+      ],
+      resultsNote:
+        "Besucherzahl aus der eigenen Statistik des Produkts; alles Weitere laut framenotion.com, Stand Oktober 2026.",
       missing:
         "Editor und Konto-Dashboard liegen hinter dem Login und werden hier nicht gezeigt. Alle Screenshots oben stammen von der öffentlichen Seite.",
     },
     "rron-rent-a-car": {
       tag: "Kundenprojekt",
       category: "Automotive / Website-Entwicklung",
-      blurb: "Premium-Website für Autovermietung mit Buchungs-UX.",
+      blurb: "Premium-Website für Autovermietung – Platz 1 bei Google, 5,0 Sterne.",
       summary:
-        "Eine Website für eine Autovermietung im Kosovo: eine hochwertige Präsentation der Flotte mit kurzem Weg zur Buchungsanfrage.",
+        "Die Website einer Autovermietung im Kosovo: die Flotte präsentiert wie eine Premium-Marke, die Buchungsanfrage in wenigen Schritten – und Platz 1 bei Google.",
       role: "Design und Entwicklung für den Kunden",
       overview: [
         "RRON Rent a Car ist eine Autovermietung im Kosovo. Ich habe ihre Website gestaltet und gebaut: eine dunkle, hochwertige Präsentation der Flotte mit einem Buchungsablauf, der dort endet, wo das Unternehmen ohnehin mit seinen Kunden spricht – auf WhatsApp.",
@@ -451,15 +462,21 @@ export const de: Dict = {
         "home-mobile": "Startseite mobil",
         "fleet-mobile": "Flotte mobil",
       },
-      results: [{ value: "#1", label: "bei Google" }],
-      resultsNote: "Seit dem Launch steht die Website bei Google auf Platz 1, und das Unternehmen hat deutlich mehr Kunden.",
+      results: [
+        { value: "#1", label: "bei Google" },
+        { value: "5,0", label: "Google-Bewertung aus 21 Rezensionen" },
+        { value: "16", label: "Fahrzeuge online" },
+        { value: "3", label: "Abholstandorte" },
+      ],
+      resultsNote:
+        "Seit dem Launch steht die Website bei Google auf Platz 1, und das Unternehmen hat deutlich mehr Kunden. Bewertung und Anzahl der Rezensionen von Google, wie auf rentacarron.com im Oktober 2026 gezeigt.",
     },
     subtoapi: {
       tag: "Developer SaaS",
       category: "Entwickler-Tools / SaaS",
-      blurb: "Macht Claude-Zugang als API nutzbar.",
+      blurb: "Die Schaltzentrale zwischen Claude und den eigenen Apps.",
       summary:
-        "Eine Entwicklerplattform, die unterstützten Claude-Zugang über eine API-Schnittstelle mit Anwendungen verbindet.",
+        "Eine Entwicklerplattform, die unterstützten Claude-Zugang über eine API mit Anwendungen verbindet – Schlüssel, Playground, Nutzungsübersicht und Team-Plätze in einem Dashboard.",
       role: "Konzept, Design und Entwicklung",
       overview: [
         "SubToAPI ist eine Entwicklerplattform, die unterstützten Claude-Zugang über eine API-Schnittstelle mit Anwendungen verbindet. Entwickler verbinden einmal, erstellen API-Schlüssel für ihre Anwendungen, senden Anfragen aus einem Playground und sehen Nutzungsdaten zu jeder Antwort.",
@@ -510,8 +527,14 @@ export const de: Dict = {
         pricing: "Preise",
         "home-mobile": "Landingpage mobil",
       },
-      results: [],
-      resultsNote: "Für dieses Produkt werden keine öffentlichen Kennzahlen genannt. Es ist live auf subtoapi.app.",
+      results: [
+        { value: "3", label: "Tarife, ab 9 € im Monat" },
+        { value: "200", label: "Plätze im größten Tarif" },
+        { value: "1.000", label: "Anfragen pro Minute in der Spitze" },
+        { value: "4", label: "API-Anleitungen in der Doku" },
+      ],
+      resultsNote:
+        "Tarifdetails laut subtoapi.app, Stand Oktober 2026. Nutzungszahlen sind nicht öffentlich.",
       missing:
         "Das Dashboard nach dem Login, die Schlüsselverwaltung, der Playground und die Nutzungsansichten erfordern ein Konto und werden nicht als Screenshots gezeigt. Das oben sichtbare Dashboard ist die produkteigene Vorschau auf der Landingpage.",
     },

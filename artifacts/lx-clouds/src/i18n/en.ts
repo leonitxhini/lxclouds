@@ -143,6 +143,7 @@ export const en = {
     note: ["Real products.", "Real results."],
     statLabel: "live",
     statBody: (shops: string) => `products across ${shops} shops`,
+    statValue: "1.3M+",
     hint: "Keep scrolling",
     step: (n: number, total: number) => `Step ${n} of ${total}`,
   },
@@ -189,7 +190,9 @@ export const en = {
       { value: "Top 10", label: "apps in Kosovo", note: "ZgjedhPlus — the app for iPhone." },
       { value: "#1", label: "on Google", note: "RRON Rent a Car — with considerably more customers since." },
       { value: "200", label: "visitors a day", note: "FrameNotion, from its own analytics." },
-      { value: "1.25M+", label: "products compared", note: "Across 229 shops on ZgjedhPlus." },
+      { value: "1.3M+", label: "products compared", note: "From 229 shops in Kosovo and Albania." },
+      { value: "5.0", label: "Google rating", note: "RRON Rent a Car, from 21 reviews." },
+      { value: "5.2M+", label: "price checks", note: "Run across the ZgjedhPlus catalogue." },
     ],
   },
 
@@ -292,9 +295,9 @@ export const en = {
     zgjedhplus: {
       tag: "Marketplace / Price Comparison",
       category: "Marketplace / Price Comparison",
-      blurb: "Price comparison platform for Kosovo & Albania.",
+      blurb: "The price comparison for Kosovo & Albania — 1.3M+ products from 229 shops.",
       summary:
-        "A price comparison platform for Kosovo and Albania that brings the offers of local online shops into one searchable catalogue.",
+        "The price comparison platform for Kosovo and Albania: more than 1.3 million products from 229 shops in one search — with price history, price alerts and its own iPhone app.",
       role: "Concept, design, development and operations",
       overview: [
         "ZgjedhPlus is a price comparison platform for Kosovo and Albania. It brings the offers of local online shops into one searchable catalogue, so shoppers can see who sells a product, what it costs at each shop and how that price has moved.",
@@ -349,17 +352,19 @@ export const en = {
       },
       results: [
         { value: "Top 10", label: "apps in Kosovo" },
-        { value: "1.25M+", label: "products listed" },
+        { value: "1.3M+", label: "products listed" },
         { value: "229", label: "shops compared" },
+        { value: "5.2M+", label: "price checks" },
       ],
-      resultsNote: "Catalogue figures as published on zgjedhplus.com in October 2026.",
+      resultsNote:
+        "Catalogue figures as published on zgjedhplus.com, October 2026.",
     },
     framenotion: {
       tag: "AI / Creative SaaS",
       category: "AI / Creative Automation",
-      blurb: "Turns product links into ad videos.",
+      blurb: "Paste a product link, get a finished 30-second video ad.",
       summary:
-        "An AI-powered platform that transforms a product link into a short advertising video with voiceover and music.",
+        "An AI platform that turns any product link into a finished 30-second video ad — written, voiced, scored and rendered in minutes instead of days.",
       role: "Concept, design and development",
       overview: [
         "FrameNotion turns a product link into a short vertical ad video. You paste a URL; the platform reads the page, writes a custom motion ad for it and renders a finished video with voiceover and music.",
@@ -411,17 +416,23 @@ export const en = {
         "home-mobile": "Landing page on mobile",
         "examples-mobile": "Examples on mobile",
       },
-      results: [{ value: "200", label: "visitors a day" }],
-      resultsNote: "Traffic figure from the product's own analytics. Live and open for sign-ups at framenotion.com.",
+      results: [
+        { value: "200", label: "visitors a day" },
+        { value: "30 s", label: "ads, rendered with sound" },
+        { value: "4", label: "formats from one ad" },
+        { value: "10", label: "showcase ads, shown untouched" },
+      ],
+      resultsNote:
+        "Visitor figure from the product's own analytics; everything else as published on framenotion.com, October 2026.",
       missing:
         "The editor and account dashboard sit behind the login and are not shown here. All screens above are from the public site.",
     },
     "rron-rent-a-car": {
       tag: "Client Project",
       category: "Automotive / Website Development",
-      blurb: "Premium rental website with booking UX.",
+      blurb: "Premium rental website — first place on Google, 5.0 stars.",
       summary:
-        "A website for a vehicle rental company in Kosovo: a premium presentation of the fleet with a short path to a booking request.",
+        "The website of a car rental company in Kosovo: the fleet presented like a premium brand, a booking request in a few taps — and first place on Google.",
       role: "Design and development for the client",
       overview: [
         "RRON Rent a Car is a vehicle rental company in Kosovo. I designed and built their website: a dark, premium presentation of the fleet with a booking flow that ends where the business already talks to its customers — on WhatsApp.",
@@ -472,16 +483,21 @@ export const en = {
         "home-mobile": "Home on mobile",
         "fleet-mobile": "Fleet on mobile",
       },
-      results: [{ value: "#1", label: "on Google" }],
+      results: [
+        { value: "#1", label: "on Google" },
+        { value: "5.0", label: "Google rating from 21 reviews" },
+        { value: "16", label: "vehicles online" },
+        { value: "3", label: "pick-up locations" },
+      ],
       resultsNote:
-        "Since launch the website ranks first on Google, and the business has seen considerably more customers.",
+        "Since launch the website ranks first on Google, and the business has seen considerably more customers. Rating and review count from Google, as shown on rentacarron.com in October 2026.",
     },
     subtoapi: {
       tag: "Developer SaaS",
       category: "Developer Tools / SaaS",
-      blurb: "Turns Claude access into a usable API.",
+      blurb: "One control panel between Claude and your apps.",
       summary:
-        "A developer platform that connects supported Claude access to applications through an API interface.",
+        "A developer platform that connects supported Claude access to applications through an API — keys, playground, usage monitoring and team seats in one dashboard.",
       role: "Concept, design and development",
       overview: [
         "SubToAPI is a developer platform that connects supported Claude access to applications through an API interface. Developers connect once, create application API keys, send requests from a playground and see usage metadata for every response.",
@@ -532,8 +548,14 @@ export const en = {
         pricing: "Pricing",
         "home-mobile": "Landing page on mobile",
       },
-      results: [],
-      resultsNote: "No public metrics are shared for this product. It is live at subtoapi.app.",
+      results: [
+        { value: "3", label: "plans, from €9 a month" },
+        { value: "200", label: "seats on the largest plan" },
+        { value: "1,000", label: "requests a minute at the top" },
+        { value: "4", label: "API guides in the docs" },
+      ],
+      resultsNote:
+        "Plan details as published on subtoapi.app, October 2026. Usage figures are not public.",
       missing:
         "The signed-in dashboard, API key management, playground and usage views require an account and are not shown as screenshots. The dashboard visible above is the product's own preview on its landing page.",
     },

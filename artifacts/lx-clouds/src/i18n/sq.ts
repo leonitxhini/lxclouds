@@ -122,6 +122,7 @@ export const sq: Dict = {
     note: ["Produkte reale.", "Rezultate reale."],
     statLabel: "live",
     statBody: (shops: string) => `produkte nga ${shops} dyqane`,
+    statValue: "1,3 mln+",
     hint: "Vazhdo të lëvizësh poshtë",
     step: (n: number, total: number) => `Hapi ${n} nga ${total}`,
   },
@@ -168,7 +169,9 @@ export const sq: Dict = {
       { value: "Top 10", label: "aplikacionet në Kosovë", note: "ZgjedhPlus — aplikacioni për iPhone." },
       { value: "#1", label: "në Google", note: "RRON Rent a Car — që atëherë dukshëm më shumë klientë." },
       { value: "200", label: "vizitorë në ditë", note: "FrameNotion, sipas statistikave të veta." },
-      { value: "1.25M+", label: "produkte të krahasuara", note: "Nga 229 dyqane në ZgjedhPlus." },
+      { value: "1,3 mln+", label: "produkte të krahasuara", note: "Nga 229 dyqane në Kosovë dhe Shqipëri." },
+      { value: "5,0", label: "vlerësim në Google", note: "RRON Rent a Car, nga 21 komente." },
+      { value: "5,2 mln+", label: "kontrolle çmimesh", note: "Në gjithë katalogun e ZgjedhPlus." },
     ],
   },
 
@@ -271,9 +274,9 @@ export const sq: Dict = {
     zgjedhplus: {
       tag: "Treg / Krahasim çmimesh",
       category: "Treg / Krahasim çmimesh",
-      blurb: "Platformë për krahasimin e çmimeve në Kosovë & Shqipëri.",
+      blurb: "Krahasimi i çmimeve për Kosovë & Shqipëri — 1,3 mln+ produkte nga 229 dyqane.",
       summary:
-        "Platformë për krahasimin e çmimeve në Kosovë dhe Shqipëri, që i mbledh ofertat e dyqaneve online vendore në një katalog të kërkueshëm.",
+        "Platforma e krahasimit të çmimeve për Kosovë dhe Shqipëri: më shumë se 1,3 milion produkte nga 229 dyqane në një kërkim — me historik çmimesh, njoftime për çmim dhe aplikacion për iPhone.",
       role: "Koncept, dizajn, zhvillim dhe operim",
       overview: [
         "ZgjedhPlus është platformë për krahasimin e çmimeve në Kosovë dhe Shqipëri. Ajo i mbledh ofertat e dyqaneve online vendore në një katalog të kërkueshëm, që blerësit të shohin kush e shet një produkt, sa kushton në secilin dyqan dhe si ka lëvizur çmimi.",
@@ -328,17 +331,19 @@ export const sq: Dict = {
       },
       results: [
         { value: "Top 10", label: "aplikacionet në Kosovë" },
-        { value: "1.25M+", label: "produkte të listuara" },
+        { value: "1,3 mln+", label: "produkte të listuara" },
         { value: "229", label: "dyqane të krahasuara" },
+        { value: "5,2 mln+", label: "kontrolle çmimesh" },
       ],
-      resultsNote: "Shifrat e katalogut sipas zgjedhplus.com, tetor 2026.",
+      resultsNote:
+        "Shifrat e katalogut sipas zgjedhplus.com, tetor 2026.",
     },
     framenotion: {
       tag: "AI / SaaS kreativ",
       category: "AI / Automatizim kreativ",
-      blurb: "Kthen lidhjet e produkteve në video reklamuese.",
+      blurb: "Ngjit lidhjen e produktit, merr një video-reklamë 30-sekondëshe të gatshme.",
       summary:
-        "Platformë me inteligjencë artificiale që e kthen lidhjen e një produkti në video të shkurtër reklamuese me zë dhe muzikë.",
+        "Platformë me AI që e kthen çdo lidhje produkti në video-reklamë 30-sekondëshe të gatshme — e shkruar, me zë, me muzikë dhe e renderuar për minuta, jo për ditë.",
       role: "Koncept, dizajn dhe zhvillim",
       overview: [
         "FrameNotion e kthen lidhjen e një produkti në video të shkurtër reklamuese vertikale. Ngjit një URL; platforma e lexon faqen, shkruan për të një reklamë të personalizuar me animacion dhe nxjerr videon e përfunduar me zë dhe muzikë.",
@@ -390,17 +395,23 @@ export const sq: Dict = {
         "home-mobile": "Landing page në telefon",
         "examples-mobile": "Shembujt në telefon",
       },
-      results: [{ value: "200", label: "vizitorë në ditë" }],
-      resultsNote: "Shifra e vizitave nga statistikat e vetë produktit. Live dhe e hapur për regjistrim në framenotion.com.",
+      results: [
+        { value: "200", label: "vizitorë në ditë" },
+        { value: "30 s", label: "reklama, të renderuara me zë" },
+        { value: "4", label: "formate nga një reklamë" },
+        { value: "10", label: "reklama shembull, të paprekura" },
+      ],
+      resultsNote:
+        "Shifra e vizitave nga statistikat e vetë produktit; të tjerat sipas framenotion.com, tetor 2026.",
       missing:
         "Editori dhe paneli i llogarisë janë pas hyrjes me llogari dhe nuk shfaqen këtu. Të gjitha pamjet më lart janë nga faqja publike.",
     },
     "rron-rent-a-car": {
       tag: "Projekt për klient",
       category: "Automobilistikë / Zhvillim ueb-faqeje",
-      blurb: "Ueb-faqe premium për vetura me qira, me rezervim të thjeshtë.",
+      blurb: "Ueb-faqe premium për vetura me qira — vendi i parë në Google, 5,0 yje.",
       summary:
-        "Ueb-faqe për një kompani veturash me qira në Kosovë: prezantim premium i flotës me rrugë të shkurtër deri te kërkesa për rezervim.",
+        "Ueb-faqja e një kompanie veturash me qira në Kosovë: flota e prezantuar si brend premium, kërkesa për rezervim me pak hapa — dhe vendi i parë në Google.",
       role: "Dizajn dhe zhvillim për klientin",
       overview: [
         "RRON Rent a Car është kompani veturash me qira në Kosovë. Unë e dizajnova dhe e ndërtova ueb-faqen e tyre: një prezantim i errët dhe premium i flotës, me rrjedhë rezervimi që përfundon aty ku biznesi tashmë flet me klientët — në WhatsApp.",
@@ -451,15 +462,21 @@ export const sq: Dict = {
         "home-mobile": "Ballina në telefon",
         "fleet-mobile": "Flota në telefon",
       },
-      results: [{ value: "#1", label: "në Google" }],
-      resultsNote: "Që nga lansimi, ueb-faqja renditet e para në Google dhe biznesi ka dukshëm më shumë klientë.",
+      results: [
+        { value: "#1", label: "në Google" },
+        { value: "5,0", label: "vlerësim në Google nga 21 komente" },
+        { value: "16", label: "vetura online" },
+        { value: "3", label: "lokacione marrjeje" },
+      ],
+      resultsNote:
+        "Që nga lansimi, ueb-faqja renditet e para në Google dhe biznesi ka dukshëm më shumë klientë. Vlerësimi dhe numri i komenteve nga Google, siç shfaqen në rentacarron.com në tetor 2026.",
     },
     subtoapi: {
       tag: "SaaS për zhvillues",
       category: "Mjete për zhvillues / SaaS",
-      blurb: "E bën qasjen në Claude të përdorshme si API.",
+      blurb: "Paneli i kontrollit mes Claude dhe aplikacioneve të tua.",
       summary:
-        "Platformë për zhvillues që e lidh qasjen e mbështetur në Claude me aplikacionet përmes një ndërfaqeje API.",
+        "Platformë për zhvillues që e lidh qasjen e mbështetur në Claude me aplikacionet përmes një API — çelësa, playground, monitorim i përdorimit dhe vende për ekip në një panel.",
       role: "Koncept, dizajn dhe zhvillim",
       overview: [
         "SubToAPI është platformë për zhvillues që e lidh qasjen e mbështetur në Claude me aplikacionet përmes një ndërfaqeje API. Zhvilluesit lidhen një herë, krijojnë çelësa API për aplikacionet, dërgojnë kërkesa nga një playground dhe shohin të dhënat e përdorimit për çdo përgjigje.",
@@ -510,8 +527,14 @@ export const sq: Dict = {
         pricing: "Çmimet",
         "home-mobile": "Landing page në telefon",
       },
-      results: [],
-      resultsNote: "Për këtë produkt nuk publikohen shifra. Është live në subtoapi.app.",
+      results: [
+        { value: "3", label: "plane, nga 9 € në muaj" },
+        { value: "200", label: "vende në planin më të madh" },
+        { value: "1.000", label: "kërkesa në minutë në maksimum" },
+        { value: "4", label: "udhëzues API në dokumentim" },
+      ],
+      resultsNote:
+        "Detajet e planeve sipas subtoapi.app, tetor 2026. Shifrat e përdorimit nuk janë publike.",
       missing:
         "Paneli pas hyrjes, menaxhimi i çelësave API, playground-i dhe pamjet e përdorimit kërkojnë llogari dhe nuk shfaqen si pamje ekrani. Paneli që shihet më lart është parapamja e vetë produktit në landing page.",
     },

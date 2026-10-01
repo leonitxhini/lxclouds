@@ -106,7 +106,15 @@ function ProjectCard({ project }: { project: Project }) {
               <ArrowRight className="size-[14px] transition-transform duration-300 group-hover:translate-x-px" strokeWidth={2} />
             </span>
           </div>
-          <p className="mt-3 text-[12.5px] leading-snug text-muted">{copy.blurb}</p>
+          <p className="mt-3 min-h-[2.75em] text-[12.5px] leading-snug text-muted">{copy.blurb}</p>
+          <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-ink/[0.06] pt-3">
+            {copy.results.slice(1, 3).map((r) => (
+              <div key={r.label} className="flex flex-col-reverse">
+                <dt className="mt-0.5 text-[10.5px] leading-tight text-muted">{r.label}</dt>
+                <dd className="text-[17px] font-semibold leading-none tracking-[-0.02em] text-ink">{r.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </Link>
     </motion.div>
