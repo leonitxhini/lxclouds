@@ -9,7 +9,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { ArrowRight, ChartNoAxesColumn, CodeXml, Monitor, Play, Plus, Rocket, Sparkles, Zap, type LucideIcon } from "lucide-react";
-import { lazy, Suspense, useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/Button";
 import { useContact } from "@/components/ContactDialog";
@@ -17,9 +17,6 @@ import { projects } from "@/data/projects";
 import { useSectionNav } from "@/hooks/use-page";
 import { useT } from "@/i18n";
 import { asset, cn } from "@/lib/utils";
-
-// three.js is only fetched on screens wide enough for the glass composition
-const HeroGlass = lazy(() => import("./HeroGlass"));
 
 function useWideScreen() {
   const [wide, setWide] = useState(false);
@@ -149,30 +146,60 @@ function Atmosphere() {
   );
 }
 
-/** Line work for when the 3D glass is not (yet) there; the WebGL scene draws its own so the glass can bend it. */
-function Orbits({ mx, my, scroll }: { mx: MotionValue<number>; my: MotionValue<number>; scroll: MotionValue<number> }) {
+/**
+ * The glass is a path-traced render (see replit.md): a 2400×1100 plate with ribbons, plates, orbit lines
+ * and the shadows of the spheres, plus the spheres themselves as separate cut-outs so they can float.
+ * Positions are stage px, matching the scene the render was made from.
+ */
+const spheres: { file: string; x: number; y: number; r: number; depth: number; speed: number; delay: number }[] = [
+  { file: "a", x: 202, y: 176, r: 23, depth: 34, speed: -70, delay: 0 },
+  { file: "b", x: 346, y: 436, r: 20, depth: 46, speed: -130, delay: 2 },
+  { file: "c", x: 1350, y: 238, r: 52, depth: 28, speed: -160, delay: 3.5 },
+  { file: "d", x: 1357, y: 11, r: 13, depth: 18, speed: -40, delay: 1.2 },
+];
+
+function GlassPlate({ mx, my, scroll }: { mx: MotionValue<number>; my: MotionValue<number>; scroll: MotionValue<number> }) {
+  const [loaded, setLoaded] = useState(false);
   return (
-    <div className="pointer-events-none absolute inset-0 hidden xl:block" aria-hidden="true">
-      <Drift mx={mx} my={my} scroll={scroll} depth={10} speed={60} className="left-1/2 top-[-40px] h-[760px] w-[1640px] -translate-x-1/2">
-        <svg viewBox="0 0 1640 760" fill="none" className="h-full w-full">
-          <path d="M-40 250C120 150 300 190 470 330 600 440 520 590 360 640" stroke="#FFFFFF" strokeOpacity="0.9" strokeWidth="1.5" />
-          <path d="M1680 220C1500 130 1330 190 1190 330 1090 430 1150 580 1300 640" stroke="#FFFFFF" strokeOpacity="0.9" strokeWidth="1.5" />
-          <g stroke="#8E86FF" strokeOpacity="0.42" strokeWidth="1.1">
-            <path d="M268 62C330 20 520 40 610 138" />
-            <path d="M214 148C150 260 320 330 492 292" />
-            <path d="M440 470C520 430 580 410 630 398" />
-            <path d="M1058 110C1110 40 1300 10 1372 50" />
-            <path d="M1142 288C1220 250 1290 236 1328 230" />
-            <path d="M1040 470C1180 420 1330 470 1262 560" />
-          </g>
-          <g fill="#F4F2FF" stroke="#7C79FF" strokeWidth="2.6">
-            <circle cx="426" cy="72" r="5" />
-            <circle cx="492" cy="292" r="5" />
-            <circle cx="1186" cy="72" r="5" />
-            <circle cx="1142" cy="288" r="5" />
-          </g>
-        </svg>
+    <div
+      className={cn(
+        "pointer-events-none absolute left-1/2 top-[-200px] z-0 h-[1100px] w-screen -translate-x-1/2 overflow-hidden transition-opacity duration-1000",
+        loaded ? "opacity-100" : "opacity-0",
+      )}
+      aria-hidden="true"
+    >
+      <Drift mx={mx} my={my} scroll={scroll} depth={12} speed={50} className="left-1/2 top-0 w-[2400px] -translate-x-1/2">
+        <img
+          src={asset("/hero/glass-plate.webp")}
+          alt=""
+          width={2400}
+          height={1100}
+          decoding="async"
+          fetchPriority="high"
+          onLoad={() => setLoaded(true)}
+          className="hero-plate-mask block h-[1100px] w-[2400px] max-w-none"
+        />
       </Drift>
+    </div>
+  );
+}
+
+function GlassSpheres({ mx, my, scroll }: { mx: MotionValue<number>; my: MotionValue<number>; scroll: MotionValue<number> }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[2]" aria-hidden="true">
+      {spheres.map((s) => (
+        <Drift key={s.file} mx={mx} my={my} scroll={scroll} depth={s.depth} speed={s.speed} className="left-1/2 top-0">
+          <img
+            src={asset(`/hero/sphere-${s.file}.webp`)}
+            alt=""
+            width={s.r * 2}
+            height={s.r * 2}
+            decoding="async"
+            className="max-w-none animate-drift"
+            style={{ marginLeft: s.x - 720 - s.r, marginTop: s.y - s.r, width: s.r * 2, height: s.r * 2, animationDelay: `-${s.delay}s` }}
+          />
+        </Drift>
+      ))}
     </div>
   );
 }
@@ -190,9 +217,7 @@ export function Hero() {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const [openCard, setOpenCard] = useState<number | null>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
   const wide = useWideScreen();
-  const [glassReady, setGlassReady] = useState(false);
 
   // pointer position, -0.5…0.5 from the centre of the hero
   const px = useMotionValue(0);
@@ -219,7 +244,7 @@ export function Hero() {
   return (
     <section
       ref={ref}
-      className="relative flex flex-col justify-center pt-[68px] xl:min-h-[max(100svh,760px)]"
+      className="relative flex flex-col justify-center overflow-clip pt-[68px] xl:min-h-[max(100svh,760px)]"
       onPointerMove={onPointerMove}
       onPointerLeave={() => {
         px.set(0);
@@ -227,13 +252,8 @@ export function Hero() {
       }}
     >
       <Atmosphere />
-      {wide && (
-        <Suspense fallback={null}>
-          <HeroGlass stageRef={stageRef} mx={mx} my={my} scroll={scroll} onReady={() => setGlassReady(true)} />
-        </Suspense>
-      )}
 
-      {/* phones and tablets get the same glass as rendered stills */}
+      {/* phones and tablets: the same rendered spheres, placed around the copy */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden xl:hidden" aria-hidden="true">
         {[
           "right-[-46px] top-[176px] w-[112px]",
@@ -242,20 +262,24 @@ export function Hero() {
         ].map((place) => (
           <img
             key={place}
-            src={asset("/glass-sphere.webp")}
+            src={asset("/hero/sphere-c.webp")}
             alt=""
-            width={360}
-            height={360}
+            width={104}
+            height={104}
             className={cn("absolute h-auto animate-drift drop-shadow-[0_14px_18px_rgba(88,78,200,0.28)]", place)}
           />
         ))}
       </div>
 
-      {/* the 1440px stage the reference composition is laid out on */}
-      <div ref={stageRef} className="relative mx-auto w-full max-w-[1440px]">
-        {!glassReady && <Orbits mx={mx} my={my} scroll={scroll} />}
+      {/* lets the render dissolve into the page colour wherever the hero ends; sits between plate and spheres */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] hidden h-[220px] bg-gradient-to-b from-paper/0 to-paper xl:block" aria-hidden="true" />
 
-        <div className="absolute inset-0 hidden xl:block" role="group" aria-label={t.cardsLabel}>
+      {/* the 1440px stage the reference composition is laid out on */}
+      <div className="relative mx-auto w-full max-w-[1440px]">
+        {wide && <GlassPlate mx={mx} my={my} scroll={scroll} />}
+        {wide && <GlassSpheres mx={mx} my={my} scroll={scroll} />}
+
+        <div className="absolute inset-0 z-[3] hidden xl:block" role="group" aria-label={t.cardsLabel}>
           {t.cards.map((copy, i) => {
             const layout = cardLayout[i];
             const open = openCard === i;
@@ -285,7 +309,7 @@ export function Hero() {
 
         <motion.div
           style={{ y: copyY, opacity: copyOpacity }}
-          className="relative px-5 pb-12 pt-10 text-center md:px-8 xl:pb-7 xl:pt-[66px]"
+          className="relative z-[3] px-5 pb-12 pt-10 text-center md:px-8 xl:pb-7 xl:pt-[66px]"
         >
           <motion.p
             {...rise(0)}

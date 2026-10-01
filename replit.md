@@ -59,7 +59,7 @@ Personal portfolio of Leonit Xhini (lxclouds.com). React + Vite + Tailwind v4, c
 - **Languages:** English (root), German, Albanian. All copy lives in `src/i18n/{en,de,sq}.ts`; `en.ts` defines the shape, the others must match it. `LocaleProvider` (`src/i18n/index.tsx`) reads the language from the first path segment.
 - **Projects:** language-independent facts (URLs, brand colours, screenshot files, stack) in `src/data/projects.ts`; texts and results in the i18n files under `projects`.
 - **Screenshots and logos** in `public/work/<slug>/` are captured from the live sites – replace them with new captures, never with mock-ups.
-- **Hero glass:** `src/components/home/HeroGlass.tsx` is a three.js scene (physically based transmission material), lazy-loaded on screens ≥ 1280px. Phones and tablets use the still `public/glass-sphere.webp`, rendered from the same scene.
+- **Hero glass:** a path-traced render, not CSS and not WebGL. `render/hero-glass.py` builds the scene in Blender (Cycles, `pip install bpy`, Python 3.11) – `python render/hero-glass.py plate out.png 1.5 320` renders the backdrop (ribbons, glass plates, orbit lines, sphere shadows), `sphere:a…d` the four spheres at 4×. Results live in `public/hero/` (`glass-plate.webp` 2400×1100 logical, spheres as cut-outs). `Hero.tsx` places them on the 1440px stage; the frame covers stage x −480…1920, y −200…900.
 - **Design tokens** in `src/index.css` (`@theme`): paper `#F8F7F4`, ink `#11121B`, accent `#6865FF`. Font: Outfit, self-hosted in `public/fonts`.
 - **Contact dialog** posts to web3forms (`src/components/ContactDialog.tsx`); no backend required.
 - Name, email and social links: `src/data/site.ts`.

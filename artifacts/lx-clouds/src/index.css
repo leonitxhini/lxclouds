@@ -165,6 +165,18 @@
     backdrop-filter: blur(16px) saturate(1.35);
   }
 
+  /* the rendered glass plate fades out towards all four edges */
+  .hero-plate-mask {
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0, #000 150px, #000 calc(100% - 210px), transparent 100%),
+      linear-gradient(to right, transparent 0, #000 180px, #000 calc(100% - 180px), transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to bottom, transparent 0, #000 150px, #000 calc(100% - 210px), transparent 100%),
+      linear-gradient(to right, transparent 0, #000 180px, #000 calc(100% - 180px), transparent 100%);
+    mask-composite: intersect;
+  }
+
   /* cursor-following highlight; --mx/--my are set from pointer events */
   .spotlight {
     position: relative;
