@@ -1,15 +1,15 @@
 /**
  * Picks the language of lxclouds.com by country (Cloudflare Pages Function).
  *
- *   Germany            → /de
- *   Kosovo, Albania    → /sq
- *   everywhere else    → English, at the root
+ *   Germany, Austria, Switzerland → /de
+ *   Kosovo, Albania               → /sq
+ *   everywhere else               → English, at the root
  *
  * Only addresses without a language prefix are redirected (see public/_routes.json for the list),
  * a language the visitor picked in the switcher wins (cookie lx-lang), and crawlers are left alone
  * so every language version stays indexable from anywhere.
  */
-const BY_COUNTRY = { DE: "de", XK: "sq", AL: "sq" };
+const BY_COUNTRY = { DE: "de", AT: "de", CH: "de", XK: "sq", AL: "sq" };
 const CRAWLER = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthouse|pagespeed/i;
 
 function pickLanguage({ country, cookie, userAgent }) {

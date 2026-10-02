@@ -54,7 +54,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const locale: Locale = segment === "de" || segment === "sq" ? segment : "en";
   const path = locale === "en" ? location : location.slice(3) || "/";
 
-  // The language is picked by country at the edge (functions/_middleware.js): Germany → German,
+  // The language is picked by country at the edge (functions/_middleware.js): Germany, Austria and Switzerland → German,
   // Kosovo and Albania → Albanian, everyone else English. This is only the fallback for a stored
   // choice when the page is served without that function, e.g. in local development.
   useEffect(() => {
