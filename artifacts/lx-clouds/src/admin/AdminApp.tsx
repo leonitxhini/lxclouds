@@ -1,10 +1,11 @@
-import { CheckSquare, FolderKanban, Inbox, LayoutDashboard, LayoutTemplate, LogOut, Menu, MonitorPlay, Settings, Users, X, type LucideIcon } from "lucide-react";
+import { CheckSquare, FolderKanban, Images, Inbox, LayoutDashboard, LayoutTemplate, LogOut, Menu, MonitorPlay, Settings, Users, X, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, Route, Router, Switch, useLocation } from "wouter";
 import { LogoMark } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 import { api, ApiError, type User } from "./api";
 import { DemoEditor } from "./editor/Editor";
+import { BoardDetail, Boards } from "./pages/Boards";
 import { Clients, ClientDetail } from "./pages/Clients";
 import { Dashboard } from "./pages/Dashboard";
 import { Demos } from "./pages/Demos";
@@ -16,6 +17,7 @@ const nav: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/", label: "Übersicht", icon: LayoutDashboard },
   { href: "/kunden", label: "Kunden", icon: Users },
   { href: "/demos", label: "Demos", icon: MonitorPlay },
+  { href: "/entwuerfe", label: "Entwürfe", icon: Images },
   { href: "/vorlagen", label: "Vorlagen", icon: LayoutTemplate },
   { href: "/projekte", label: "Projekte", icon: FolderKanban },
   { href: "/aufgaben", label: "Aufgaben", icon: CheckSquare },
@@ -161,6 +163,8 @@ function Shell({ user, onLogout }: { user: User; onLogout: () => void }) {
             <Route path="/kunden" component={Clients} />
             <Route path="/kunden/:id">{(params) => <ClientDetail key={params.id} id={Number(params.id)} />}</Route>
             <Route path="/demos" component={Demos} />
+            <Route path="/entwuerfe" component={Boards} />
+            <Route path="/entwuerfe/:id">{(params) => <BoardDetail key={params.id} id={Number(params.id)} />}</Route>
             <Route path="/vorlagen" component={Templates} />
             <Route path="/projekte" component={Projects} />
             <Route path="/aufgaben" component={Tasks} />

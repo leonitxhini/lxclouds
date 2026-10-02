@@ -221,15 +221,16 @@ async function createClient(request, env) {
 }
 
 async function getClient(env, id) {
-  const [client, activities, tasks, demos, projects] = await env.DB.batch([
+  const [client, activities, tasks, demos, projects, boards] = await env.DB.batch([
     env.DB.prepare("SELECT * FROM clients WHERE id = ?").bind(id),
     env.DB.prepare("SELECT * FROM activities WHERE client_id = ? ORDER BY created_at DESC, id DESC").bind(id),
     env.DB.prepare("SELECT * FROM tasks WHERE client_id = ? ORDER BY done, due IS NULL, due, id").bind(id),
     env.DB.prepare("SELECT id, slug, title, shared, updated_at, template FROM demos WHERE client_id = ? ORDER BY updated_at DESC").bind(id),
     env.DB.prepare("SELECT * FROM projects WHERE client_id = ? ORDER BY id").bind(id),
+    env.DB.prepare("SELECT b.id, b.title, b.updated_at, (SELECT count(*) FROM board_items i WHERE i.board_id = b.id) AS items FROM boards b WHERE b.client_id = ? ORDER BY b.updated_at DESC").bind(id),
   ]);
   if (!client.results[0]) throw new HttpError(404, "Diesen Kunden gibt es nicht.");
-  return json({ client: client.results[0], activities: activities.results, tasks: tasks.results, demos: demos.results, projects: projects.results });
+  return json({ client: client.results[0], activities: activities.results, tasks: tasks.results, demos: demos.results, projects: projects.results, boards: boards.results });
 }
 
 async function updateClient(request, env, id) {
@@ -336,6 +337,92 @@ async function upload(request, env) {
   return json({ url: `/media/${key}` }, 201);
 }
 
+// ---------- design boards ----------
+const BOARD_FIELDS = { title: (v) => str(v, 160) ?? "Entwürfe", client_id: int, notes: (v) => String(v ?? "").slice(0, 20000), link: (v) => str(v, 300) };
+
+function parsePins(value) {
+  if (!Array.isArray(value)) return "[]";
+  const clamp = (n) => Math.min(100, Math.max(0, Math.round(Number(n) * 10) / 10 || 0));
+  return JSON.stringify(
+    value.slice(0, 80).map((pin) => ({ id: str(pin?.id, 24) ?? randomHex(4), x: clamp(pin?.x), y: clamp(pin?.y), text: String(pin?.text ?? "").slice(0, 1500), done: !!pin?.done })),
+  );
+}
+
+const ITEM_FIELDS = {
+  title: (v) => str(v, 160) ?? "Entwurf",
+  group_name: (v) => str(v, 80),
+  image: (v) => {
+    const url = str(v, 400);
+    if (!url || !/^(\/media\/|\/|https:\/\/)/.test(url)) throw new HttpError(400, "Bild fehlt.");
+    return url;
+  },
+  width: int,
+  height: int,
+  status: (v) => (["favorite", "maybe", "out"].includes(v) ? v : ""),
+  notes: (v) => String(v ?? "").slice(0, 20000),
+  pins: parsePins,
+  position: (v) => int(v) ?? 0,
+};
+
+const boardItem = (row) => ({ ...row, pins: JSON.parse(row.pins || "[]") });
+
+async function listBoards(env) {
+  const { results } = await env.DB.prepare(
+    `SELECT b.id, b.title, b.client_id, b.updated_at, c.name AS client_name,
+            (SELECT count(*) FROM board_items i WHERE i.board_id = b.id) AS items,
+            (SELECT count(*) FROM board_items i WHERE i.board_id = b.id AND i.status = 'favorite') AS favorites,
+            (SELECT image FROM board_items i WHERE i.board_id = b.id ORDER BY (i.status = 'favorite') DESC, i.position, i.id LIMIT 1) AS cover
+     FROM boards b LEFT JOIN clients c ON c.id = b.client_id ORDER BY b.updated_at DESC`,
+  ).all();
+  return json({ boards: results });
+}
+
+async function getBoard(env, id) {
+  const [board, items] = await env.DB.batch([
+    env.DB.prepare("SELECT b.*, c.name AS client_name FROM boards b LEFT JOIN clients c ON c.id = b.client_id WHERE b.id = ?").bind(id),
+    env.DB.prepare("SELECT * FROM board_items WHERE board_id = ? ORDER BY position, id").bind(id),
+  ]);
+  if (!board.results[0]) throw new HttpError(404, "Diese Entwürfe gibt es nicht.");
+  return json({ board: board.results[0], items: items.results.map(boardItem) });
+}
+
+async function createBoard(request, env) {
+  const body = await readJson(request);
+  const clientId = int(body.client_id);
+  const title = BOARD_FIELDS.title(body.title);
+  const result = await env.DB.prepare("INSERT INTO boards (title, client_id, link) VALUES (?, ?, ?)").bind(title, clientId, BOARD_FIELDS.link(body.link)).run();
+  if (clientId) await env.DB.prepare("INSERT INTO activities (client_id, kind, text) VALUES (?, 'system', ?)").bind(clientId, `Entwürfe angelegt: ${title}`).run();
+  return json({ id: result.meta.last_row_id }, 201);
+}
+
+async function updateBoard(request, env, id) {
+  const { sets, values } = patch(await readJson(request), BOARD_FIELDS);
+  if (sets.length) await env.DB.prepare(`UPDATE boards SET ${sets.join(", ")}, updated_at = datetime('now') WHERE id = ?`).bind(...values, id).run();
+  return json({ ok: true });
+}
+
+async function createBoardItem(request, env, boardId) {
+  const body = await readJson(request);
+  const board = await env.DB.prepare("SELECT id FROM boards WHERE id = ?").bind(boardId).first();
+  if (!board) throw new HttpError(404, "Diese Entwürfe gibt es nicht.");
+  const last = await env.DB.prepare("SELECT coalesce(max(position), 0) AS p FROM board_items WHERE board_id = ?").bind(boardId).first();
+  const result = await env.DB.prepare("INSERT INTO board_items (board_id, position, title, group_name, image, width, height) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    .bind(boardId, last.p + 1, ITEM_FIELDS.title(body.title), ITEM_FIELDS.group_name(body.group_name), ITEM_FIELDS.image(body.image), int(body.width), int(body.height))
+    .run();
+  await env.DB.prepare("UPDATE boards SET updated_at = datetime('now') WHERE id = ?").bind(boardId).run();
+  return json({ id: result.meta.last_row_id }, 201);
+}
+
+async function updateBoardItem(request, env, id) {
+  const { sets, values } = patch(await readJson(request), ITEM_FIELDS);
+  if (!sets.length) return json({ ok: true });
+  await env.DB.batch([
+    env.DB.prepare(`UPDATE board_items SET ${sets.join(", ")}, updated_at = datetime('now') WHERE id = ?`).bind(...values, id),
+    env.DB.prepare("UPDATE boards SET updated_at = datetime('now') WHERE id = (SELECT board_id FROM board_items WHERE id = ?)").bind(id),
+  ]);
+  return json({ ok: true });
+}
+
 // ---------- public ----------
 async function publicDemo(env, slug) {
   const demo = await env.DB.prepare("SELECT title, doc FROM demos WHERE slug = ? AND shared = 1").bind(slug).first();
@@ -425,7 +512,7 @@ async function tableRoute(method, table, id, request, env) {
 }
 
 async function exportAll(env) {
-  const names = ["clients", "activities", "tasks", "demos", "demo_versions", "templates", "projects", "inquiries", "media"];
+  const names = ["clients", "activities", "tasks", "demos", "demo_versions", "templates", "projects", "inquiries", "media", "boards", "board_items"];
   const results = await env.DB.batch(names.map((n) => env.DB.prepare(`SELECT * FROM ${n}`)));
   return json(Object.fromEntries(names.map((n, i) => [n, results[i].results])), 200, {
     "Content-Disposition": `attachment; filename="lx-studio-${new Date().toISOString().slice(0, 10)}.json"`,
@@ -495,6 +582,27 @@ async function route(request, env) {
     if (id && method === "GET") return getVersion(env, id);
     if (id && method === "DELETE") {
       await env.DB.prepare("DELETE FROM demo_versions WHERE id = ?").bind(id).run();
+      return json({ ok: true });
+    }
+  }
+
+  if (a === "boards") {
+    const id = int(b);
+    if (!b && method === "GET") return listBoards(env);
+    if (!b && method === "POST") return createBoard(request, env);
+    if (id && !c && method === "GET") return getBoard(env, id);
+    if (id && !c && method === "PATCH") return updateBoard(request, env, id);
+    if (id && !c && method === "DELETE") {
+      await env.DB.prepare("DELETE FROM boards WHERE id = ?").bind(id).run();
+      return json({ ok: true });
+    }
+    if (id && c === "items" && method === "POST") return createBoardItem(request, env, id);
+  }
+  if (a === "board-items") {
+    const id = int(b);
+    if (id && method === "PATCH") return updateBoardItem(request, env, id);
+    if (id && method === "DELETE") {
+      await env.DB.prepare("DELETE FROM board_items WHERE id = ?").bind(id).run();
       return json({ ok: true });
     }
   }

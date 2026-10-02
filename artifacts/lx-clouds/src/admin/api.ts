@@ -110,6 +110,26 @@ export type Version = { id: number; label: string; created_at: string };
 export type OwnTemplate = { id: number; name: string; industry: string | null; doc: DemoDoc; created_at: string; updated_at: string };
 export type Project = { id: number; name: string; client_id: number | null; client_name?: string | null; url: string | null; repo: string | null; hosting: string | null; status: "idea" | "building" | "live" | "paused"; notes: string };
 export type Inquiry = { id: number; name: string | null; email: string | null; message: string; lang: string | null; page: string | null; status: "new" | "read" | "done"; created_at: string };
+/** A mark on a design image; x and y in percent of the image. */
+export type Pin = { id: string; x: number; y: number; text: string; done: boolean };
+export type ItemStatus = "" | "favorite" | "maybe" | "out";
+export type BoardSummary = { id: number; title: string; client_id: number | null; client_name: string | null; updated_at: string; items: number; favorites: number; cover: string | null };
+export type Board = { id: number; title: string; client_id: number | null; client_name: string | null; notes: string; link: string | null; created_at: string; updated_at: string };
+export type BoardItem = {
+  id: number;
+  board_id: number;
+  position: number;
+  title: string;
+  group_name: string | null;
+  image: string;
+  width: number | null;
+  height: number | null;
+  status: ItemStatus;
+  notes: string;
+  pins: Pin[];
+};
+export const itemStatusLabels: Record<Exclude<ItemStatus, "">, string> = { favorite: "Favorit", maybe: "Vielleicht", out: "Raus" };
+
 export type Overview = {
   counts: { clients: number; open_leads: number; customers: number; demos: number; open_tasks: number; new_inquiries: number; pipeline_value: number };
   pipeline: { status: ClientStatus; n: number; value: number }[];
