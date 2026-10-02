@@ -337,17 +337,18 @@ function Workspace({ demo, initialVersions }: { demo: Demo; initialVersions: Ver
               type="button"
               onClick={() => setEditing(!editing)}
               aria-pressed={editing}
+              aria-label="Bearbeiten in der Vorschau"
               className={cn("flex h-9 items-center gap-2 rounded-[9px] px-3 text-[13.5px] font-medium", editing ? "bg-accent-soft text-accent-ink" : "text-ink/70 hover:bg-ink/[0.07]")}
               title="Texte und Bilder direkt in der Vorschau ändern"
             >
               {editing ? <Pencil className="size-4" /> : <Eye className="size-4" />}
               <span className="hidden md:inline">{editing ? "Bearbeiten" : "Ansehen"}</span>
             </button>
-            <Btn variant="outline" size="sm" className="h-9" onClick={() => setShareOpen(true)}>
+            <Btn variant="outline" size="sm" className="h-9" onClick={() => setShareOpen(true)} aria-label="Teilen">
               <Share2 className="size-4" />
               <span className="hidden md:inline">Teilen</span>
             </Btn>
-            <Btn variant="primary" size="sm" className="h-9" onClick={() => present(true)}>
+            <Btn variant="primary" size="sm" className="h-9" onClick={() => present(true)} aria-label="Präsentieren">
               <Maximize className="size-4" />
               <span className="hidden md:inline">Präsentieren</span>
             </Btn>
@@ -553,7 +554,7 @@ function Workspace({ demo, initialVersions }: { demo: Demo; initialVersions: Ver
 
       {/* ---------- presenting: a small bar that stays out of the way ---------- */}
       {presenting && (
-        <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-[#14151c]/90 p-1.5 text-white opacity-40 shadow-2xl backdrop-blur transition-opacity duration-300 focus-within:opacity-100 hover:opacity-100">
+        <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-[#14151c]/90 p-1.5 text-white opacity-50 shadow-2xl backdrop-blur transition-opacity duration-300 focus-within:opacity-100 hover:opacity-100 [@media(hover:none)]:opacity-100">
           <button type="button" onClick={() => setEditing(!editing)} aria-pressed={editing} className={cn("flex h-9 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium", editing ? "bg-accent text-white" : "hover:bg-white/10")}>
             <Pencil className="size-4" />
             {editing ? "Bearbeiten an" : "Bearbeiten"}
