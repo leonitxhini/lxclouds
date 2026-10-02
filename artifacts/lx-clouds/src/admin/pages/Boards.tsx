@@ -1,8 +1,10 @@
-import { ArrowLeft, ClipboardList, CircleHelp, Copy, ExternalLink, ImagePlus, MapPin, Play, Plus, Star, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, ClipboardList, CircleHelp, ExternalLink, ImagePlus, MapPin, Play, Plus, Star, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation } from "wouter";
 import { asset, cn } from "@/lib/utils";
 import { api, ApiError, formatDate, itemStatusLabels, uploadImage, useLoad, type Board, type BoardItem, type BoardSummary, type Client, type ItemStatus } from "../api";
+import { Briefing } from "../boards/Briefing";
+import { pickKeys, pickLabels } from "../boards/model";
 import { Presenter } from "../boards/Presenter";
 import { Badge, Btn, Card, Empty, Field, Input, Loading, Modal, PageHeader, Select, Spinner, Textarea, useToast } from "../ui";
 
@@ -119,24 +121,6 @@ async function imageSize(file: File): Promise<{ width: number; height: number } 
   }
 }
 
-/** Everything that was decided, as plain text for the client file or a message. */
-function summary(board: Board, items: BoardItem[]) {
-  const name = (i: BoardItem) => (i.group_name ? `${i.group_name} · ${i.title}` : i.title);
-  const lines = [`Entwürfe „${board.title}" – Stand ${new Date().toLocaleDateString("de-DE")}`];
-  for (const status of ["favorite", "maybe", "out"] as const) {
-    const list = items.filter((i) => i.status === status);
-    if (list.length) lines.push(`${itemStatusLabels[status]}: ${list.map(name).join(", ")}`);
-  }
-  if (board.notes.trim()) lines.push("", "Allgemein:", board.notes.trim());
-  for (const item of items) {
-    if (!item.notes.trim() && item.pins.length === 0) continue;
-    lines.push("", `${name(item)}${item.status ? ` [${itemStatusLabels[item.status]}]` : ""}`);
-    if (item.notes.trim()) lines.push(item.notes.trim());
-    item.pins.forEach((pin, n) => lines.push(`  ${n + 1}. ${pin.text.trim() || "(ohne Text)"}${pin.done ? " – erledigt" : ""}`));
-  }
-  return lines.join("\n");
-}
-
 export function BoardDetail({ id }: { id: number }) {
   const { data, error, reload } = useLoad<{ board: Board; items: BoardItem[] }>(`/boards/${id}`);
   const [, navigate] = useLocation();
@@ -144,7 +128,7 @@ export function BoardDetail({ id }: { id: number }) {
   const [board, setBoard] = useState<Board | null>(null);
   const [items, setItems] = useState<BoardItem[]>([]);
   const [showing, setShowing] = useState<number | null>(null);
-  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [briefing, setBriefing] = useState(false);
   const [uploading, setUploading] = useState(0);
   const [group, setGroup] = useState("");
   const [unsaved, setUnsaved] = useState(0);
@@ -184,6 +168,32 @@ export function BoardDetail({ id }: { id: number }) {
     },
     [send],
   );
+  // The collection itself (aspect picks, offer, sign-off) is saved the same way.
+  const boardPending = useRef<{ timer: number; patch: Partial<Board> }>({ timer: 0, patch: {} });
+  const changeBoard = useCallback(
+    (patch: Partial<Board>, now = false) => {
+      setBoard((b) => (b ? { ...b, ...patch } : b));
+      const entry = boardPending.current;
+      window.clearTimeout(entry.timer);
+      entry.patch = { ...entry.patch, ...patch };
+      setUnsaved((n) => Math.max(n, 1));
+      entry.timer = window.setTimeout(
+        async () => {
+          const body = entry.patch;
+          entry.patch = {};
+          try {
+            await api(`/boards/${id}`, { method: "PATCH", body });
+          } catch (err) {
+            toast(`Nicht gespeichert: ${(err as ApiError).message}`, "error");
+          }
+          setUnsaved(pending.current.size);
+        },
+        now ? 0 : 500,
+      );
+    },
+    [id, toast],
+  );
+
   // leaving the page: write what is still waiting
   useEffect(() => {
     const waiting = pending.current;
@@ -193,13 +203,19 @@ export function BoardDetail({ id }: { id: number }) {
         void fetch(`/api/board-items/${itemId}`, { method: "PATCH", keepalive: true, headers: { "Content-Type": "application/json", "X-Studio": "1" }, body: JSON.stringify(entry.patch) });
       }
       waiting.clear();
+      const entry = boardPending.current;
+      if (Object.keys(entry.patch).length) {
+        window.clearTimeout(entry.timer);
+        void fetch(`/api/boards/${id}`, { method: "PATCH", keepalive: true, headers: { "Content-Type": "application/json", "X-Studio": "1" }, body: JSON.stringify(entry.patch) });
+        entry.patch = {};
+      }
     };
     window.addEventListener("pagehide", flush);
     return () => {
       window.removeEventListener("pagehide", flush);
       flush();
     };
-  }, []);
+  }, [id]);
 
   const groups = useMemo(() => {
     const map = new Map<string, BoardItem[]>();
@@ -252,7 +268,6 @@ export function BoardDetail({ id }: { id: number }) {
     navigate("/entwuerfe");
   }
 
-  const text = summary(board, items);
   const favourites = items.filter((i) => i.status === "favorite").length;
   const marks = items.reduce((n, i) => n + i.pins.length, 0);
 
@@ -263,9 +278,10 @@ export function BoardDetail({ id }: { id: number }) {
         Alle Entwürfe
       </Link>
       <PageHeader title={board.title} sub={`${board.client_name ?? "Ohne Kunde"} · ${items.length} Entwürfe${favourites ? ` · ${favourites} Favorit${favourites > 1 ? "en" : ""}` : ""}${marks ? ` · ${marks} Markierungen` : ""}`}>
-        <Btn variant="outline" onClick={() => setSummaryOpen(true)}>
+        <Btn variant="outline" onClick={() => setBriefing(true)}>
           <ClipboardList className="size-4" aria-hidden="true" />
-          Änderungen
+          Auftrag
+          {board.signoff && <Check className="size-4 text-emerald-600" aria-label="freigegeben" />}
         </Btn>
         <Btn variant="accent" disabled={!items.length} onClick={() => setShowing(0)}>
           <Play className="size-4" aria-hidden="true" />
@@ -311,6 +327,17 @@ export function BoardDetail({ id }: { id: number }) {
                         aria-label="Name des Entwurfs"
                       />
                       {item.notes.trim() && <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-muted">{item.notes}</p>}
+                      {pickKeys.some((key) => board.picks[key] === item.id) && (
+                        <p className="mt-1.5 flex flex-wrap gap-1">
+                          {pickKeys
+                            .filter((key) => board.picks[key] === item.id)
+                            .map((key) => (
+                              <Badge key={key} tone="green">
+                                <Check className="size-3" strokeWidth={3} /> {pickLabels[key]}
+                              </Badge>
+                            ))}
+                        </p>
+                      )}
                       <div className="mt-2.5 flex items-center gap-1">
                         {(["favorite", "maybe", "out"] as const).map((status) => {
                           const Icon = statusIcon[status];
@@ -389,39 +416,8 @@ export function BoardDetail({ id }: { id: number }) {
         </Card>
       </div>
 
-      <Modal open={summaryOpen} onClose={() => setSummaryOpen(false)} title="Änderungen und Entscheidungen" wide>
-        <pre className="max-h-[56dvh] overflow-auto whitespace-pre-wrap rounded-[12px] bg-paper p-4 font-sans text-[14px] leading-[1.55]">{text}</pre>
-        <div className="mt-4 flex flex-wrap justify-end gap-2">
-          <Btn
-            variant="outline"
-            onClick={async () => {
-              await navigator.clipboard.writeText(text).catch(() => {});
-              toast("Text kopiert");
-            }}
-          >
-            <Copy className="size-4" aria-hidden="true" />
-            Text kopieren
-          </Btn>
-          {board.client_id && (
-            <Btn
-              variant="accent"
-              onClick={async () => {
-                try {
-                  await api("/activities", { method: "POST", body: { client_id: board.client_id, kind: "meeting", text } });
-                  toast("In der Kundenakte gespeichert");
-                  setSummaryOpen(false);
-                } catch (err) {
-                  toast((err as ApiError).message, "error");
-                }
-              }}
-            >
-              In Kundenakte speichern
-            </Btn>
-          )}
-        </div>
-      </Modal>
-
-      {showing !== null && <Presenter items={items} index={Math.min(showing, items.length - 1)} onIndex={setShowing} onClose={() => setShowing(null)} onChange={change} saved={unsaved === 0} />}
+      {showing !== null && <Presenter board={board} items={items} index={Math.min(showing, items.length - 1)} onIndex={setShowing} onClose={() => setShowing(null)} onChange={change} onBoard={changeBoard} saved={unsaved === 0} />}
+      {briefing && <Briefing board={board} items={items} onBoard={changeBoard} onClose={() => setBriefing(false)} />}
     </>
   );
 }

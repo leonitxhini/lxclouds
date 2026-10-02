@@ -285,6 +285,17 @@
     opacity: 0.4;
   }
 
+  /* ---- Studio: the order sheet of a design meeting prints as a document, without the app around it ---- */
+  @media print {
+    body.briefing-open {
+      overflow: visible !important;
+      background: #fff;
+    }
+    body.briefing-open #root {
+      display: none;
+    }
+  }
+
   /* ---- home page, "what we build": a captured page travels through its window and back ---- */
   .shot-travel {
     animation: shot-travel var(--travel, 26s) cubic-bezier(0.45, 0, 0.55, 1) 1.4s infinite alternate;

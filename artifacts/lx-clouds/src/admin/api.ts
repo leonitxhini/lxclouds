@@ -111,10 +111,26 @@ export type OwnTemplate = { id: number; name: string; industry: string | null; d
 export type Project = { id: number; name: string; client_id: number | null; client_name?: string | null; url: string | null; repo: string | null; hosting: string | null; status: "idea" | "building" | "live" | "paused"; notes: string };
 export type Inquiry = { id: number; name: string | null; email: string | null; message: string; lang: string | null; page: string | null; status: "new" | "read" | "done"; created_at: string };
 /** A mark on a design image; x and y in percent of the image. */
-export type Pin = { id: string; x: number; y: number; text: string; done: boolean };
+export type PinKind = "keep" | "colour" | "smaller" | "bigger" | "image" | "text" | "remove" | "other";
+export type Pin = { id: string; x: number; y: number; text: string; done: boolean; kind?: PinKind; /** wanted colour, #rrggbb */ colour?: string; /** uploaded reference picture */ image?: string };
+export type OfferLine = { id: string; title: string; text: string; price: number; unit: "once" | "month" };
+export type Signoff = { name: string; date: string; signature: string };
 export type ItemStatus = "" | "favorite" | "maybe" | "out";
 export type BoardSummary = { id: number; title: string; client_id: number | null; client_name: string | null; updated_at: string; items: number; favorites: number; cover: string | null };
-export type Board = { id: number; title: string; client_id: number | null; client_name: string | null; notes: string; link: string | null; created_at: string; updated_at: string };
+export type Board = {
+  id: number;
+  title: string;
+  client_id: number | null;
+  client_name: string | null;
+  notes: string;
+  link: string | null;
+  /** which design wins per aspect: { logo: itemId, colours: itemId, … } */
+  picks: Record<string, number>;
+  offer: OfferLine[];
+  signoff: Signoff | null;
+  created_at: string;
+  updated_at: string;
+};
 export type BoardItem = {
   id: number;
   board_id: number;

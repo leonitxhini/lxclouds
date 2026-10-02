@@ -338,13 +338,62 @@ async function upload(request, env) {
 }
 
 // ---------- design boards ----------
-const BOARD_FIELDS = { title: (v) => str(v, 160) ?? "Entwürfe", client_id: int, notes: (v) => String(v ?? "").slice(0, 20000), link: (v) => str(v, 300) };
+const PICK_KEYS = ["logo", "colours", "type", "images", "layout", "name"];
+const PIN_KINDS = ["keep", "colour", "smaller", "bigger", "image", "text", "remove", "other"];
+const hexColour = (v) => (/^#[0-9a-f]{6}$/i.test(String(v ?? "")) ? String(v).toLowerCase() : undefined);
+const mediaUrl = (v) => (/^\/media\/[a-z0-9.]+$/i.test(String(v ?? "")) ? String(v) : undefined);
+
+function parsePicks(value) {
+  const picks = {};
+  for (const key of PICK_KEYS) if (value && int(value[key])) picks[key] = int(value[key]);
+  return JSON.stringify(picks);
+}
+
+function parseOffer(value) {
+  if (!Array.isArray(value)) return "[]";
+  return JSON.stringify(
+    value.slice(0, 40).map((line) => ({
+      id: str(line?.id, 24) ?? randomHex(4),
+      title: String(line?.title ?? "").slice(0, 200),
+      text: String(line?.text ?? "").slice(0, 600),
+      price: Math.max(0, Math.round(Number(line?.price) * 100) / 100 || 0),
+      unit: line?.unit === "month" ? "month" : "once",
+    })),
+  );
+}
+
+function parseSignoff(value) {
+  if (!value || typeof value !== "object") return null;
+  const signature = String(value.signature ?? "");
+  if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(signature) || signature.length > 400_000) throw new HttpError(400, "Die Unterschrift fehlt.");
+  return JSON.stringify({ name: str(value.name, 160) ?? "", date: now(), signature });
+}
+
+const BOARD_FIELDS = {
+  title: (v) => str(v, 160) ?? "Entwürfe",
+  client_id: int,
+  notes: (v) => String(v ?? "").slice(0, 20000),
+  link: (v) => str(v, 300),
+  picks: parsePicks,
+  offer: parseOffer,
+  signoff: parseSignoff,
+};
+const boardRow = (row) => ({ ...row, picks: JSON.parse(row.picks || "{}"), offer: JSON.parse(row.offer || "[]"), signoff: row.signoff ? JSON.parse(row.signoff) : null });
 
 function parsePins(value) {
   if (!Array.isArray(value)) return "[]";
   const clamp = (n) => Math.min(100, Math.max(0, Math.round(Number(n) * 10) / 10 || 0));
   return JSON.stringify(
-    value.slice(0, 80).map((pin) => ({ id: str(pin?.id, 24) ?? randomHex(4), x: clamp(pin?.x), y: clamp(pin?.y), text: String(pin?.text ?? "").slice(0, 1500), done: !!pin?.done })),
+    value.slice(0, 80).map((pin) => ({
+      id: str(pin?.id, 24) ?? randomHex(4),
+      x: clamp(pin?.x),
+      y: clamp(pin?.y),
+      text: String(pin?.text ?? "").slice(0, 1500),
+      done: !!pin?.done,
+      kind: PIN_KINDS.includes(pin?.kind) ? pin.kind : "other",
+      colour: hexColour(pin?.colour),
+      image: mediaUrl(pin?.image),
+    })),
   );
 }
 
@@ -383,7 +432,7 @@ async function getBoard(env, id) {
     env.DB.prepare("SELECT * FROM board_items WHERE board_id = ? ORDER BY position, id").bind(id),
   ]);
   if (!board.results[0]) throw new HttpError(404, "Diese Entwürfe gibt es nicht.");
-  return json({ board: board.results[0], items: items.results.map(boardItem) });
+  return json({ board: boardRow(board.results[0]), items: items.results.map(boardItem) });
 }
 
 async function createBoard(request, env) {
