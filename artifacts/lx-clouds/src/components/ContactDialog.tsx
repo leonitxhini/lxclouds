@@ -3,7 +3,7 @@ import { Check, Mail, X } from "lucide-react";
 import { createContext, useCallback, useContext, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { Button } from "@/components/Button";
 import { mailto, site } from "@/data/site";
-import { useT } from "@/i18n";
+import { useLocale, useT } from "@/i18n";
 
 const ContactContext = createContext<() => void>(() => {});
 
@@ -16,7 +16,7 @@ const field =
   "w-full rounded-xl border border-ink/10 bg-white px-3.5 py-2.5 text-[15px] text-ink placeholder:text-faint/80 transition-[border-color,box-shadow] duration-200 focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15";
 
 function ContactForm({ onDone }: { onDone: () => void }) {
-  const t = useT();
+  const { t, locale } = useLocale();
   const c = t.contact;
   const [status, setStatus] = useState<Status>("idle");
 
@@ -25,24 +25,27 @@ function ContactForm({ onDone }: { onDone: () => void }) {
     const data = new FormData(e.currentTarget);
     if (data.get("botcheck")) return; // honeypot
     setStatus("sending");
-    try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+    const message = { name: data.get("name"), email: data.get("email"), message: data.get("message") };
+    // the message goes to the inbox (e-mail) and into the Studio's enquiry list; one of the two is enough
+    const [mail, studio] = await Promise.allSettled([
+      fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           access_key: "ff0f38d4-cdc5-49b5-a0e8-00c4c585ce19",
-          subject: `New enquiry from ${data.get("name")} — ${site.domain}`,
+          subject: `New enquiry from ${message.name} — ${site.domain}`,
           from_name: `${site.domain} portfolio`,
-          name: data.get("name"),
-          email: data.get("email"),
-          message: data.get("message"),
+          ...message,
         }),
-      });
-      const json = (await res.json()) as { success?: boolean };
-      setStatus(json.success ? "sent" : "error");
-    } catch {
-      setStatus("error");
-    }
+      }).then(async (res) => ((await res.json()) as { success?: boolean }).success === true),
+      fetch("/api/public/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Studio": "1" },
+        body: JSON.stringify({ ...message, lang: locale, page: window.location.pathname }),
+      }).then((res) => res.ok),
+    ]);
+    const delivered = (mail.status === "fulfilled" && mail.value) || (studio.status === "fulfilled" && studio.value);
+    setStatus(delivered ? "sent" : "error");
   }
 
   if (status === "sent") {

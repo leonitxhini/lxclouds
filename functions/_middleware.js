@@ -20,6 +20,9 @@ function pickLanguage({ country, cookie, userAgent }) {
 }
 
 export async function onRequest({ request, next }) {
+  const { pathname } = new URL(request.url);
+  // the API and uploaded images share this middleware; only pages get a language
+  if (pathname.startsWith("/api/") || pathname.startsWith("/media/")) return next();
   if (request.method !== "GET" && request.method !== "HEAD") return next();
   const language = pickLanguage({
     country: request.cf?.country,

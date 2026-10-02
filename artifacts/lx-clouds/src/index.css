@@ -27,6 +27,29 @@
   src: url("/fonts/caveat-latin.woff2") format("woff2");
 }
 
+/* fonts offered in the demo builder; each file is only fetched when a demo uses it */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/inter-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/playfair-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/grotesk-latin.woff2") format("woff2");
+}
+
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-hand: "Caveat", "Bradley Hand", cursive;
@@ -175,6 +198,27 @@
       linear-gradient(to bottom, transparent 0, #000 150px, #000 calc(100% - 210px), transparent 100%),
       linear-gradient(to right, transparent 0, #000 180px, #000 calc(100% - 180px), transparent 100%);
     mask-composite: intersect;
+  }
+
+  /* ---- demo builder: text that can be typed over in the preview ---- */
+  .demo-editable {
+    min-width: 1ch;
+    cursor: text;
+    border-radius: 4px;
+    outline: 1.5px dashed transparent;
+    outline-offset: 3px;
+    transition: outline-color 0.15s;
+  }
+  .demo-editable:hover {
+    outline-color: color-mix(in srgb, var(--p) 65%, transparent);
+  }
+  .demo-editable:focus {
+    outline: 2px solid var(--p);
+    background: color-mix(in srgb, var(--p) 9%, transparent);
+  }
+  .demo-editable:empty::before {
+    content: attr(data-placeholder);
+    opacity: 0.4;
   }
 
   /* cursor-following highlight; --mx/--my are set from pointer events */

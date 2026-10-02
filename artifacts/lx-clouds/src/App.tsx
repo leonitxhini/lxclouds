@@ -11,10 +11,30 @@ import Home from "@/pages/Home";
 const Work = lazy(() => import("@/pages/Work"));
 const CaseStudy = lazy(() => import("@/pages/CaseStudy"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const AdminApp = lazy(() => import("@/admin/AdminApp"));
+const DemoPublic = lazy(() => import("@/pages/DemoPublic"));
 
 function Pages() {
   const [location] = useLocation();
   const { locale, t } = useLocale();
+
+  // the Studio and shared demos are their own screens: no site header, footer or page transitions
+  if (location === "/admin" || location.startsWith("/admin/")) {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-paper" />}>
+        <AdminApp />
+      </Suspense>
+    );
+  }
+  const demoSlug = /^\/d\/([a-z0-9-]+)\/?$/.exec(location)?.[1];
+  if (demoSlug) {
+    return (
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <DemoPublic slug={demoSlug} />
+      </Suspense>
+    );
+  }
+
   return (
     <>
       <a

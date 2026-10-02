@@ -1,0 +1,17 @@
+# Cloudflare Pages configuration for lxclouds.com.
+# With pages_build_output_dir set, Pages takes its bindings from this file.
+name = "lxclouds"
+pages_build_output_dir = "artifacts/lx-clouds/dist"
+compatibility_date = "2026-03-24"
+
+# Admin area ("Studio"): clients, demos, templates, tasks, enquiries
+[[d1_databases]]
+binding = "DB"
+database_name = "lxclouds"
+database_id = "a9d7abd8-3703-4d86-a42a-c16506f89fb3"
+migrations_dir = "migrations"
+
+# Images uploaded into demos
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "lxclouds-media"

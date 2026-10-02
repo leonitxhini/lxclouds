@@ -1,5 +1,5 @@
 {
   "version": 1,
-  "include": ["/", "/work", "/work/zgjedhplus", "/work/framenotion", "/work/rron-rent-a-car", "/work/subtoapi"],
+  "include": ["/", "/work", "/work/zgjedhplus", "/work/framenotion", "/work/rron-rent-a-car", "/work/subtoapi", "/api/*", "/media/*"],
   "exclude": []
 }

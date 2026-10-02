@@ -55,14 +55,27 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 Personal portfolio of Leonit Xhini (lxclouds.com). React + Vite + Tailwind v4, client-side routing with wouter.
 
 - **Deploy:** Cloudflare Pages project `lxclouds`, connected to this repo. A push to `main` builds (`pnpm --filter @workspace/lx-clouds run build`, output `artifacts/lx-clouds/dist`) and goes live on lxclouds.com.
-- **Routes:** `/` (home), `/work`, `/work/:slug` (case studies) – each also under `/de` and `/sq`. `public/_redirects` provides the SPA fallback.
+- **Routes:** `/` (home), `/work`, `/work/:slug` (case studies) – each also under `/de` and `/sq`; `/admin` (Studio) and `/d/:slug` (shared demo) without a language prefix. `public/_redirects` provides the SPA fallback.
 - **Languages:** English (root), German, Albanian. All copy lives in `src/i18n/{en,de,sq}.ts`; `en.ts` defines the shape, the others must match it. `LocaleProvider` (`src/i18n/index.tsx`) reads the language from the first path segment.
 - **Language by country:** `functions/_middleware.js` (Cloudflare Pages Function, repo root) redirects addresses without a language prefix: Germany, Austria and Switzerland → `/de`, Kosovo and Albania → `/sq`, everyone else stays on English. A language picked in the switcher is stored in the cookie `lx-lang` and always wins; crawlers are not redirected. The function only runs for the paths listed in `artifacts/lx-clouds/public/_routes.json` – add new case-study paths there.
 - **Projects:** language-independent facts (URLs, brand colours, screenshot files, stack) in `src/data/projects.ts`; texts and results in the i18n files under `projects`.
 - **Screenshots and logos** in `public/work/<slug>/` are captured from the live sites – replace them with new captures, never with mock-ups.
 - **Hero glass:** a path-traced render, not CSS and not WebGL. `render/hero-glass.py` builds the scene in Blender (Cycles, `pip install bpy`, Python 3.11) – `python render/hero-glass.py plate out.png 1.5 320` renders the backdrop (ribbons, glass plates, orbit lines, sphere shadows), `sphere:a…d` the four spheres at 4×. Results live in `public/hero/` (`glass-plate.webp` 2400×1100 logical, spheres as cut-outs). `Hero.tsx` places them on the 1440px stage; the frame covers stage x −480…1920, y −200…900.
 - **Design tokens** in `src/index.css` (`@theme`): paper `#F8F7F4`, ink `#11121B`, accent `#6865FF`. Font: Outfit, self-hosted in `public/fonts`.
-- **Contact dialog** posts to web3forms (`src/components/ContactDialog.tsx`); no backend required.
+- **Contact dialog** (`src/components/ContactDialog.tsx`) sends each message twice: by e-mail through web3forms and into the Studio's enquiry list (`/api/public/inquiries`). One of the two succeeding counts as sent.
+
+#### LX Studio (`/admin`) – the back office
+
+German-language admin area for the owner only: overview, clients (pipeline, notes, history), demo websites, templates, own projects, tasks, enquiries, settings. Lives in the same app, loaded lazily, outside the public header/footer (`App.tsx`).
+
+- **Backend:** Cloudflare Pages Functions in `functions/api/[[path]].js` (one file, small router) with D1 (`DB`, database `lxclouds`) and R2 (`MEDIA`, bucket `lxclouds-media`, uploaded demo images, served by `functions/media/[[key]].js`). Bindings come from `wrangler.toml` in the repo root.
+- **Schema:** `migrations/0001_studio.sql`. Apply changes with `npx wrangler d1 migrations apply lxclouds --remote` – run wrangler from the repo, never from the home directory.
+- **Login:** e-mail + password (PBKDF2-SHA256, 100,000 rounds), session cookie `lx_studio` (HttpOnly, Secure, SameSite=Strict, 30 days; only its hash is stored). Every writing request needs the header `X-Studio: 1` and a matching Origin. Logins are limited to 8 attempts per 15 minutes and IP. Create or reset a user: `node scripts-studio/hash-password.mjs <email> <name> <password>` prints the SQL for `wrangler d1 execute lxclouds --remote --command "…"`.
+- **Demo websites:** a demo is one JSON document (`src/demo/types.ts`: company data, theme, list of blocks). `src/demo/blocks.tsx` renders the blocks, `src/demo/templates.ts` holds the eight industry templates and the empty blocks, photos are in `public/demo-assets/<industry>/` (Unsplash licence, sources in `SOURCES.txt`). Demos size themselves with container queries, so the phone preview in the editor is the real phone layout.
+- **Editor** (`src/admin/editor/Editor.tsx`): texts and images are changed directly in the preview (`src/demo/edit.tsx`), with undo/redo, autosave, device preview, colour/font/corner settings, notes, named snapshots ("Stände"), presentation mode (full screen with a small floating bar) and sharing.
+- **Sharing:** a demo with the public link switched on is readable at `/d/<slug>` (`src/pages/DemoPublic.tsx`, noindex). Switched off, the address answers "not available".
+- **Local test:** `pnpm --filter @workspace/lx-clouds run build`, `npx wrangler d1 migrations apply lxclouds --local`, then `npx wrangler pages dev artifacts/lx-clouds/dist --port 8788`.
+- `/admin`, `/d/` and `/api/` are excluded in `robots.txt`; the language redirect skips `/api/` and `/media/`.
 - Name, email and social links: `src/data/site.ts`.
 
 ## Packages
