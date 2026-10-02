@@ -5,6 +5,8 @@
  * Data lives in D1 (binding DB, schema in /migrations), uploaded images in R2 (binding MEDIA).
  */
 
+import { auditSite, checkDomain } from "../../lib/sitecheck.mjs";
+
 const COOKIE = "lx_studio";
 const SESSION_DAYS = 30;
 const MAX_BODY = 900_000; // a demo document with all its text is far below this
@@ -221,16 +223,17 @@ async function createClient(request, env) {
 }
 
 async function getClient(env, id) {
-  const [client, activities, tasks, demos, projects, boards] = await env.DB.batch([
+  const [client, activities, tasks, demos, projects, boards, folios] = await env.DB.batch([
     env.DB.prepare("SELECT * FROM clients WHERE id = ?").bind(id),
     env.DB.prepare("SELECT * FROM activities WHERE client_id = ? ORDER BY created_at DESC, id DESC").bind(id),
     env.DB.prepare("SELECT * FROM tasks WHERE client_id = ? ORDER BY done, due IS NULL, due, id").bind(id),
     env.DB.prepare("SELECT id, slug, title, shared, updated_at, template FROM demos WHERE client_id = ? ORDER BY updated_at DESC").bind(id),
     env.DB.prepare("SELECT * FROM projects WHERE client_id = ? ORDER BY id").bind(id),
     env.DB.prepare("SELECT b.id, b.title, b.updated_at, (SELECT count(*) FROM board_items i WHERE i.board_id = b.id) AS items FROM boards b WHERE b.client_id = ? ORDER BY b.updated_at DESC").bind(id),
+    env.DB.prepare("SELECT id, title, updated_at, shared FROM folios WHERE client_id = ? ORDER BY updated_at DESC").bind(id),
   ]);
   if (!client.results[0]) throw new HttpError(404, "Diesen Kunden gibt es nicht.");
-  return json({ client: client.results[0], activities: activities.results, tasks: tasks.results, demos: demos.results, projects: projects.results, boards: boards.results });
+  return json({ client: client.results[0], activities: activities.results, tasks: tasks.results, demos: demos.results, projects: projects.results, boards: boards.results, folios: folios.results });
 }
 
 async function updateClient(request, env, id) {
@@ -472,6 +475,66 @@ async function updateBoardItem(request, env, id) {
   return json({ ok: true });
 }
 
+// ---------- project folios ----------
+function parseFolio(value) {
+  if (!value || typeof value !== "object" || !Array.isArray(value.chapters)) throw new HttpError(400, "Die Mappe ist beschädigt.");
+  const text = JSON.stringify(value);
+  if (text.length > 900_000) throw new HttpError(413, "Die Mappe ist zu groß.");
+  return text;
+}
+const FOLIO_FIELDS = { title: (v) => str(v, 160) ?? "Projektmappe", client_id: int, doc: parseFolio, shared: (v) => (v ? 1 : 0) };
+
+async function listFolios(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT f.id, f.slug, f.title, f.client_id, f.shared, f.updated_at, c.name AS client_name, json_extract(f.doc, '$.meta.industry') AS industry FROM folios f LEFT JOIN clients c ON c.id = f.client_id ORDER BY f.updated_at DESC",
+  ).all();
+  return json({ folios: results });
+}
+
+async function getFolio(env, id) {
+  const row = await env.DB.prepare("SELECT f.*, c.name AS client_name FROM folios f LEFT JOIN clients c ON c.id = f.client_id WHERE f.id = ?").bind(id).first();
+  if (!row) throw new HttpError(404, "Diese Mappe gibt es nicht.");
+  return json({ folio: { ...row, doc: JSON.parse(row.doc) } });
+}
+
+async function createFolio(request, env) {
+  const body = await readJson(request);
+  const title = FOLIO_FIELDS.title(body.title);
+  const clientId = int(body.client_id);
+  const slug = `${slugify(title)}-${randomHex(3)}`;
+  const result = await env.DB.prepare("INSERT INTO folios (client_id, slug, title, doc) VALUES (?, ?, ?, ?)").bind(clientId, slug, title, parseFolio(body.doc)).run();
+  if (clientId) await env.DB.prepare("INSERT INTO activities (client_id, kind, text) VALUES (?, 'system', ?)").bind(clientId, `Projektmappe angelegt: ${title}`).run();
+  return json({ id: result.meta.last_row_id, slug }, 201);
+}
+
+async function updateFolio(request, env, id) {
+  const { sets, values } = patch(await readJson(request), FOLIO_FIELDS);
+  if (sets.length) await env.DB.prepare(`UPDATE folios SET ${sets.join(", ")}, updated_at = datetime('now') WHERE id = ?`).bind(...values, id).run();
+  return json({ ok: true });
+}
+
+async function checkDomains(request) {
+  const body = await readJson(request);
+  const list = (Array.isArray(body.domains) ? body.domains : []).slice(0, 40);
+  const results = [];
+  // a few at a time, so the registries are not hammered
+  for (let i = 0; i < list.length; i += 5) results.push(...(await Promise.all(list.slice(i, i + 5).map(checkDomain))));
+  return json({ results });
+}
+
+async function auditPage(request) {
+  const body = await readJson(request);
+  const url = str(body.url, 400);
+  if (!url) throw new HttpError(400, "Adresse fehlt.");
+  return json({ result: await auditSite(url) });
+}
+
+async function publicFolio(env, slug) {
+  const row = await env.DB.prepare("SELECT title, doc FROM folios WHERE slug = ? AND shared = 1").bind(slug).first();
+  if (!row) throw new HttpError(404, "Diese Mappe ist nicht freigegeben.");
+  return json({ title: row.title, doc: JSON.parse(row.doc) });
+}
+
 // ---------- public ----------
 async function publicDemo(env, slug) {
   const demo = await env.DB.prepare("SELECT title, doc FROM demos WHERE slug = ? AND shared = 1").bind(slug).first();
@@ -561,7 +624,7 @@ async function tableRoute(method, table, id, request, env) {
 }
 
 async function exportAll(env) {
-  const names = ["clients", "activities", "tasks", "demos", "demo_versions", "templates", "projects", "inquiries", "media", "boards", "board_items"];
+  const names = ["clients", "activities", "tasks", "demos", "demo_versions", "templates", "projects", "inquiries", "media", "boards", "board_items", "folios"];
   const results = await env.DB.batch(names.map((n) => env.DB.prepare(`SELECT * FROM ${n}`)));
   return json(Object.fromEntries(names.map((n, i) => [n, results[i].results])), 200, {
     "Content-Disposition": `attachment; filename="lx-studio-${new Date().toISOString().slice(0, 10)}.json"`,
@@ -584,6 +647,7 @@ async function route(request, env) {
 
   if (a === "public") {
     if (method === "GET" && b === "demos" && c) return publicDemo(env, c);
+    if (method === "GET" && b === "folios" && c) return publicFolio(env, c);
     if (method === "POST" && b === "inquiries") return publicInquiry(request, env);
     throw new HttpError(404, "Not found.");
   }
@@ -633,6 +697,22 @@ async function route(request, env) {
       await env.DB.prepare("DELETE FROM demo_versions WHERE id = ?").bind(id).run();
       return json({ ok: true });
     }
+  }
+
+  if (a === "folios") {
+    const id = int(b);
+    if (!b && method === "GET") return listFolios(env);
+    if (!b && method === "POST") return createFolio(request, env);
+    if (id && method === "GET") return getFolio(env, id);
+    if (id && method === "PATCH") return updateFolio(request, env, id);
+    if (id && method === "DELETE") {
+      await env.DB.prepare("DELETE FROM folios WHERE id = ?").bind(id).run();
+      return json({ ok: true });
+    }
+  }
+  if (a === "tools" && method === "POST") {
+    if (b === "domains") return checkDomains(request);
+    if (b === "audit") return auditPage(request);
   }
 
   if (a === "boards") {

@@ -13,6 +13,7 @@ const CaseStudy = lazy(() => import("@/pages/CaseStudy"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const AdminApp = lazy(() => import("@/admin/AdminApp"));
 const DemoPublic = lazy(() => import("@/pages/DemoPublic"));
+const FolioPublic = lazy(() => import("@/pages/FolioPublic"));
 
 function Pages() {
   const [location] = useLocation();
@@ -23,6 +24,14 @@ function Pages() {
     return (
       <Suspense fallback={<div className="min-h-screen bg-paper" />}>
         <AdminApp />
+      </Suspense>
+    );
+  }
+  const folioSlug = /^\/m\/([a-z0-9-]+)\/?$/.exec(location)?.[1];
+  if (folioSlug) {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-paper" />}>
+        <FolioPublic slug={folioSlug} />
       </Suspense>
     );
   }

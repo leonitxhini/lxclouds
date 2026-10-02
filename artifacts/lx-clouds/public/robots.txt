@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /d/
+Disallow: /m/
 Disallow: /api/
 
 Sitemap: https://lxclouds.com/sitemap.xml

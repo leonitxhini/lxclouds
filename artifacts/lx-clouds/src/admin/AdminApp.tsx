@@ -1,4 +1,4 @@
-import { CheckSquare, FolderKanban, Images, Inbox, LayoutDashboard, LayoutTemplate, LogOut, Menu, MonitorPlay, Settings, Users, X, type LucideIcon } from "lucide-react";
+import { CheckSquare, FileText, FolderKanban, Images, Inbox, LayoutDashboard, LayoutTemplate, LogOut, Menu, MonitorPlay, Settings, Users, X, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, Route, Router, Switch, useLocation } from "wouter";
 import { LogoMark } from "@/components/Logo";
@@ -9,6 +9,7 @@ import { BoardDetail, Boards } from "./pages/Boards";
 import { Clients, ClientDetail } from "./pages/Clients";
 import { Dashboard } from "./pages/Dashboard";
 import { Demos } from "./pages/Demos";
+import { FolioEditor, Folios } from "./pages/Folios";
 import { Inquiries, Projects, SettingsPage, Tasks } from "./pages/More";
 import { Templates } from "./pages/Templates";
 import { Btn, Field, Input, Loading, ToastProvider } from "./ui";
@@ -16,6 +17,7 @@ import { Btn, Field, Input, Loading, ToastProvider } from "./ui";
 const nav: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/", label: "Übersicht", icon: LayoutDashboard },
   { href: "/kunden", label: "Kunden", icon: Users },
+  { href: "/mappen", label: "Projektmappen", icon: FileText },
   { href: "/demos", label: "Demos", icon: MonitorPlay },
   { href: "/entwuerfe", label: "Entwürfe", icon: Images },
   { href: "/vorlagen", label: "Vorlagen", icon: LayoutTemplate },
@@ -137,12 +139,12 @@ function Shell({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [location] = useLocation();
   const [menu, setMenu] = useState(false);
 
-  // the demo editor takes the whole screen
-  const editor = /^\/demos\/\d+/.exec(location);
-  if (editor) {
+  // the demo editor and the folio editor take the whole screen
+  if (/^\/(demos|mappen)\/\d+/.test(location)) {
     return (
       <Switch>
         <Route path="/demos/:id">{(params) => <DemoEditor key={params.id} id={Number(params.id)} />}</Route>
+        <Route path="/mappen/:id">{(params) => <FolioEditor key={params.id} id={Number(params.id)} />}</Route>
       </Switch>
     );
   }
@@ -162,6 +164,7 @@ function Shell({ user, onLogout }: { user: User; onLogout: () => void }) {
             <Route path="/" component={Dashboard} />
             <Route path="/kunden" component={Clients} />
             <Route path="/kunden/:id">{(params) => <ClientDetail key={params.id} id={Number(params.id)} />}</Route>
+            <Route path="/mappen" component={Folios} />
             <Route path="/demos" component={Demos} />
             <Route path="/entwuerfe" component={Boards} />
             <Route path="/entwuerfe/:id">{(params) => <BoardDetail key={params.id} id={Number(params.id)} />}</Route>

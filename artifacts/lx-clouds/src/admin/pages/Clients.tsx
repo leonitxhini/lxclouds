@@ -154,7 +154,7 @@ export function Clients() {
   );
 }
 
-type Detail = { client: Client; activities: Activity[]; tasks: Task[]; demos: DemoSummary[]; boards: { id: number; title: string; updated_at: string; items: number }[] };
+type Detail = { client: Client; activities: Activity[]; tasks: Task[]; demos: DemoSummary[]; boards: { id: number; title: string; updated_at: string; items: number }[]; folios: { id: number; title: string; updated_at: string; shared: number }[] };
 const kinds = { note: "Notiz", call: "Anruf", meeting: "Termin", email: "E-Mail", system: "System" } as Record<string, string>;
 
 export function ClientDetail({ id }: { id: number }) {
@@ -300,6 +300,25 @@ export function ClientDetail({ id }: { id: number }) {
               </ul>
             )}
           </Card>
+
+          {data.folios.length > 0 && (
+            <Card className="p-5">
+              <h2 className="text-[15px] font-semibold">Projektmappen</h2>
+              <ul className="mt-3 divide-y divide-ink/[0.06]">
+                {data.folios.map((f) => (
+                  <li key={f.id}>
+                    <Link href={`/mappen/${f.id}`} className="group flex items-center justify-between gap-3 py-2.5">
+                      <span className="min-w-0">
+                        <span className="block truncate text-[14.5px] font-medium group-hover:text-accent-ink">{f.title}</span>
+                        <span className="block text-[12.5px] text-faint">Geändert {formatDate(f.updated_at, true)}</span>
+                      </span>
+                      {f.shared ? <Badge tone="green">Freigegeben</Badge> : <Badge>Privat</Badge>}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           {data.boards.length > 0 && (
             <Card className="p-5">
