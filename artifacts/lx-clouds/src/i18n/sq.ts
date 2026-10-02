@@ -25,6 +25,7 @@ export const sq: Dict = {
   nav: {
     main: "Navigimi kryesor",
     work: "Projektet",
+    designs: "Dizajne",
     services: "Shërbimet",
     about: "Rreth meje",
     contact: "Kontakti",
@@ -91,6 +92,28 @@ export const sq: Dict = {
     pageTitle2: "Të ndërtuara nga A-ja te Zh-ja.",
     pageSub:
       "Tri produkte të mia dhe një ueb-faqe për klient — secila e dizajnuar, e zhvilluar dhe e lansuar nga unë. Çdo pamje në këto faqe është marrë nga faqja reale.",
+  },
+
+  designs: {
+    eyebrow: "Çfarë ndërtojmë",
+    title: "Dizajni i duhur për çdo biznes.",
+    text: "Tetë faqe shembull tregojnë drejtimin – nga makinat me qira te ordinanca dentare. Secila është një faqe që funksionon, me pamjen e vet, jo një foto. Tekstet, fotot dhe ngjyrat përshtaten më pas për biznesin tuaj.",
+    open: "Hape demon live",
+    request: "Kërko një dizajn të tillë",
+    note: "Dizajne shembull, jo projekte klientësh. Përmbajtja e demove është në gjermanisht.",
+    pick: "Zgjidh fushën",
+    desktop: "Pamja në kompjuter",
+    phone: "Pamja në telefon",
+    items: {
+      rental: { name: "Makina me qira", style: "E errët dhe e fortë, me rezervim dhe flotë." },
+      restaurant: { name: "Restorant", style: "E ngrohtë dhe elegante, me meny dhe rezervim." },
+      craft: { name: "Zejtari & renovim", style: "E fuqishme dhe e qartë, me para-pas dhe formular oferte." },
+      beauty: { name: "Flokë & bukuri", style: "E butë dhe luksoze, me çmimore dhe termine." },
+      clinic: { name: "Ordinancë", style: "E ndritshme dhe e qetë, me zgjedhje termini online." },
+      realestate: { name: "Patundshmëri", style: "Arkitektonike, me kërkim objektesh dhe vlerësim." },
+      shop: { name: "Dyqan", style: "Plot ngjyra dhe lojcake, me produkte dhe shportë." },
+      service: { name: "Këshillim & shërbime", style: "E çelët dhe e tejdukshme, me pako dhe proces." },
+    },
   },
 
   process: {

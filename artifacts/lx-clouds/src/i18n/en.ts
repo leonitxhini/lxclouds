@@ -48,6 +48,7 @@ export const en = {
   nav: {
     main: "Main",
     work: "Work",
+    designs: "Designs",
     services: "Services",
     about: "About",
     contact: "Contact",
@@ -114,6 +115,28 @@ export const en = {
     pageTitle2: "Built end to end.",
     pageSub:
       "Three products of my own and one website for a client — each designed, developed and shipped by me. Every screen on these pages is taken from the live site.",
+  },
+
+  designs: {
+    eyebrow: "What we build",
+    title: "The right design for every industry.",
+    text: "Eight example websites show the direction – from car rental to dental practice. Each one is a working page with its own look, not a picture. Texts, photos and colours are then tailored to your business.",
+    open: "Open live demo",
+    request: "Request a design like this",
+    note: "Example designs, not client projects. Demo content is in German.",
+    pick: "Choose an industry",
+    desktop: "Desktop view",
+    phone: "Phone view",
+    items: {
+      rental: { name: "Car rental", style: "Dark and bold, with a booking bar and fleet." },
+      restaurant: { name: "Restaurant", style: "Warm and editorial, with menu and reservation." },
+      craft: { name: "Trades & renovation", style: "Strong and clear, with before/after and quote form." },
+      beauty: { name: "Hair & beauty", style: "Soft and luxurious, with price list and booking." },
+      clinic: { name: "Medical practice", style: "Bright and calm, with online appointment picker." },
+      realestate: { name: "Real estate", style: "Architectural, with property search and valuation." },
+      shop: { name: "Shop", style: "Colourful and playful, with products and cart." },
+      service: { name: "Consulting & services", style: "Light and glassy, with packages and process." },
+    },
   },
 
   process: {

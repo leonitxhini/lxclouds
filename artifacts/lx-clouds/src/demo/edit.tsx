@@ -23,7 +23,8 @@ export const useEdit = () => useContext(EditContext);
 export const imageUrl = (src: string) => (src.startsWith("/") ? asset(src) : src);
 
 type TextProps = {
-  value: string;
+  /** Optional fields of a block may be missing; they then behave like an empty text. */
+  value: string | undefined;
   /** Position inside the current block's props … */
   path?: Path;
   /** … or a field of the company data, shared by all blocks. */
@@ -36,7 +37,8 @@ type TextProps = {
 };
 
 /** Text that can be typed over directly in the preview while editing. */
-export function T({ value, path, meta, as = "span", className, multiline, placeholder = "Text" }: TextProps) {
+export function T({ value: given, path, meta, as = "span", className, multiline, placeholder = "Text" }: TextProps) {
+  const value = given ?? "";
   const edit = useEdit();
   const blockId = useContext(BlockContext);
   const ref = useRef<HTMLElement>(null);
@@ -85,31 +87,54 @@ export function T({ value, path, meta, as = "span", className, multiline, placeh
   });
 }
 
+type ImgProps = {
+  src: string | undefined;
+  path: Path;
+  alt: string;
+  className?: string;
+  /** Classes for the <img> itself, e.g. object-position. */
+  imgClassName?: string;
+  /** For images that sit behind text: only a small "change" button in this corner instead of making the whole image a button. */
+  chip?: "tl" | "tr" | "bl" | "br";
+  eager?: boolean;
+};
+
+const chipPosition = { tl: "left-3 top-3", tr: "right-3 top-3", bl: "bottom-3 left-3", br: "bottom-3 right-3" };
+const changeLabel = "inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold normal-case tracking-normal text-[#14151c] shadow-lg [font-family:Outfit,sans-serif]";
+
 /** An image that can be swapped by clicking it while editing. */
-export function Img({ src, path, alt, className }: { src: string; path: Path; alt: string; className?: string }) {
+export function Img({ src, path, alt, className, imgClassName, chip, eager }: ImgProps) {
   const edit = useEdit();
   const blockId = useContext(BlockContext);
   return (
     <div className={cn("group/img relative overflow-hidden bg-(--soft)", className)}>
       {src ? (
-        <img src={imageUrl(src)} alt={alt} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+        <img src={imageUrl(src)} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async" className={cn("h-full w-full object-cover", imgClassName)} />
       ) : (
         <div className="flex h-full w-full items-center justify-center text-(--p)/50">
           <ImagePlus className="size-8" strokeWidth={1.4} aria-hidden="true" />
         </div>
       )}
-      {edit && (
-        <button
-          type="button"
-          onClick={() => edit.pickImage(blockId, path)}
-          className="absolute inset-0 flex items-end justify-end bg-black/0 p-3 opacity-0 transition-[opacity,background-color] duration-200 hover:bg-black/25 focus-visible:opacity-100 group-hover/img:opacity-100"
-        >
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-[#14151c] shadow-lg [font-family:Outfit,sans-serif]">
-            <ImagePlus className="size-3.5" aria-hidden="true" />
-            Bild ändern
-          </span>
-        </button>
-      )}
+      {edit &&
+        (chip ? (
+          <button type="button" onClick={() => edit.pickImage(blockId, path)} className={cn("pointer-events-auto absolute z-10 opacity-0 transition-opacity duration-200 focus-visible:opacity-100 group-hover/block:opacity-100", chipPosition[chip])}>
+            <span className={changeLabel}>
+              <ImagePlus className="size-3.5" aria-hidden="true" />
+              Bild ändern
+            </span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => edit.pickImage(blockId, path)}
+            className="absolute inset-0 flex items-end justify-end bg-black/0 p-3 opacity-0 transition-[opacity,background-color] duration-200 hover:bg-black/25 focus-visible:opacity-100 group-hover/img:opacity-100"
+          >
+            <span className={changeLabel}>
+              <ImagePlus className="size-3.5" aria-hidden="true" />
+              Bild ändern
+            </span>
+          </button>
+        ))}
     </div>
   );
 }

@@ -62,3 +62,10 @@ service/g1.webp  https://unsplash.com/photos/1556761175-b413da4baf72  (photo-155
 service/g2.webp  https://unsplash.com/photos/1565347878137-a5d5613ee61a  (photo-1565347878137-a5d5613ee61a)
 service/g3.webp  https://unsplash.com/photos/1499750310107-5fef28a66643  (photo-1499750310107-5fef28a66643)
 service/g4.webp  https://unsplash.com/photos/1560264280-88b68371db39  (photo-1560264280-88b68371db39)
+
+Files named n-*.webp
+--------------------
+Generated on 2 October 2026 with ChatGPT image generation (owner's account) for these templates:
+design references and photos for the eight industry demos. They show no real people, places or
+businesses. Cars, where a real model is recognisable, illustrate the kind of vehicle a rental
+company would list.

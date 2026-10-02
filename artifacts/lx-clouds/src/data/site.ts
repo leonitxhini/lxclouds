@@ -8,6 +8,6 @@ export const site = {
 };
 
 /** Sections of the home page that the navigation points to. */
-export const navSections = ["work", "services", "about", "contact"] as const;
+export const navSections = ["work", "designs", "services", "about", "contact"] as const;
 
 export const mailto = (subject: string) => `mailto:${site.email}?subject=${encodeURIComponent(subject)}`;

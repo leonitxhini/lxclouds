@@ -28,8 +28,9 @@ import { DemoSite, type BlockTools } from "@/demo/DemoSite";
 import { imageUrl, type EditApi } from "@/demo/edit";
 import { getIn, setIn } from "@/demo/path";
 import { blankBlock, blockLabels, uid } from "@/demo/templates";
+import { skins } from "@/demo/skins/palettes";
 import { colourPresets, fonts } from "@/demo/theme";
-import type { Block, BlockType, DemoDoc, FontKey, Meta, Path, Theme } from "@/demo/types";
+import type { Block, BlockType, DemoDoc, FontKey, Meta, Path, SkinKey, Theme } from "@/demo/types";
 import { cn } from "@/lib/utils";
 import { api, ApiError, formatDate, useLoad, type Demo, type Version } from "../api";
 import { Btn, Field, Input, Loading, Modal, Select, Textarea, useToast } from "../ui";
@@ -40,7 +41,7 @@ type Panel = "blocks" | "design" | "notes" | "versions";
 type SaveState = "saved" | "dirty" | "saving" | "error";
 
 const deviceWidth: Record<Device, string> = { desktop: "100%", tablet: "834px", phone: "390px" };
-const addable: BlockType[] = ["hero", "stats", "services", "cards", "about", "prices", "gallery", "steps", "quotes", "faq", "cta", "contact"];
+const addable: BlockType[] = ["hero", "stats", "services", "cards", "about", "team", "prices", "gallery", "steps", "quotes", "faq", "cta", "contact"];
 const iconButton = "flex size-9 items-center justify-center rounded-[9px] text-ink/70 transition-colors hover:bg-ink/[0.07] hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent";
 
 type History = { doc: DemoDoc; past: DemoDoc[]; future: DemoDoc[] };
@@ -418,6 +419,16 @@ function Workspace({ demo, initialVersions }: { demo: Demo; initialVersions: Ver
 
               {panel === "design" && (
                 <div className="space-y-5">
+                  <Field label="Stil" hint="Wechselt das komplette Design – Inhalte bleiben erhalten.">
+                    <Select value={doc.theme.skin ?? ""} onChange={(e) => setTheme({ skin: (e.target.value || undefined) as SkinKey | undefined })}>
+                      <option value="">Standard – schlicht</option>
+                      {Object.entries(skins).map(([key, skin]) => (
+                        <option key={key} value={key}>
+                          {skin.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
                   <div>
                     <p className="mb-2 text-[12.5px] font-medium text-ink/70">Farbe</p>
                     <div className="flex flex-wrap gap-2">
@@ -450,7 +461,7 @@ function Workspace({ demo, initialVersions }: { demo: Demo; initialVersions: Ver
                   <Field label={`Ecken: ${doc.theme.radius} px`}>
                     <input type="range" min={0} max={28} step={2} value={doc.theme.radius} onChange={(e) => setTheme({ radius: Number(e.target.value) })} className="w-full accent-[#6865ff]" />
                   </Field>
-                  {hero && hero.type === "hero" && (
+                  {hero && hero.type === "hero" && !doc.theme.skin && (
                     <Field label="Hero-Variante">
                       <Select value={hero.props.variant} onChange={(e) => edit.set(hero.id, ["variant"], e.target.value)}>
                         <option value="split">Text links, Bild rechts</option>

@@ -25,6 +25,7 @@ export const de: Dict = {
   nav: {
     main: "Hauptnavigation",
     work: "Projekte",
+    designs: "Designs",
     services: "Leistungen",
     about: "Über mich",
     contact: "Kontakt",
@@ -91,6 +92,28 @@ export const de: Dict = {
     pageTitle2: "Komplett aus einer Hand.",
     pageSub:
       "Drei eigene Produkte und eine Website für einen Kunden – jedes von mir gestaltet, entwickelt und live gebracht. Jeder Screenshot auf diesen Seiten stammt von der Live-Seite.",
+  },
+
+  designs: {
+    eyebrow: "Das bauen wir",
+    title: "Für jede Branche das passende Design.",
+    text: "Acht Beispiel-Websites zeigen die Richtung – von der Autovermietung bis zur Zahnarztpraxis. Jede ist eine funktionierende Seite mit eigenem Auftritt, kein Bild. Texte, Fotos und Farben werden danach auf Ihr Unternehmen zugeschnitten.",
+    open: "Live-Demo öffnen",
+    request: "So ein Design anfragen",
+    note: "Beispiel-Designs, keine Kundenprojekte.",
+    pick: "Branche wählen",
+    desktop: "Desktop-Ansicht",
+    phone: "Handy-Ansicht",
+    items: {
+      rental: { name: "Autovermietung", style: "Dunkel und kantig, mit Buchungsleiste und Flotte." },
+      restaurant: { name: "Restaurant", style: "Warm und editorial, mit Speisekarte und Reservierung." },
+      craft: { name: "Handwerk", style: "Kräftig und klar, mit Vorher-Nachher und Angebotsformular." },
+      beauty: { name: "Friseur & Beauty", style: "Weich und luxuriös, mit Preisliste und Terminbuchung." },
+      clinic: { name: "Praxis", style: "Hell und ruhig, mit Online-Terminauswahl." },
+      realestate: { name: "Immobilien", style: "Architektonisch, mit Objektsuche und Wertermittlung." },
+      shop: { name: "Shop", style: "Farbig und verspielt, mit Produkten und Warenkorb." },
+      service: { name: "Beratung & Dienstleistung", style: "Hell und gläsern, mit Paketen und Ablauf." },
+    },
   },
 
   process: {

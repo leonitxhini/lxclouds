@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { designs } from "@/data/designs";
 import { DemoSite } from "@/demo/DemoSite";
-import type { DemoDoc } from "@/demo/types";
+import { getTemplate } from "@/demo/templates";
+import { skins } from "@/demo/skins/palettes";
+import type { DemoDoc, SkinKey } from "@/demo/types";
 import { site } from "@/data/site";
 
 type State = { status: "loading" } | { status: "missing" } | { status: "ready"; title: string; doc: DemoDoc };
@@ -14,6 +17,22 @@ export default function DemoPublic({ slug }: { slug: string }) {
     robots.name = "robots";
     robots.content = "noindex, nofollow";
     document.head.appendChild(robots);
+    // /d/vorlage-<id> shows a built-in template as it comes, without a saved demo behind it
+    const template = slug.startsWith("vorlage-") ? getTemplate(slug.slice(8)) : undefined;
+    if (template) {
+      // ?firma= sets the company name; ?modus=hell|dunkel, ?farbe=rrggbb and ?stil=<skin> try the template in another look
+      const query = new URLSearchParams(window.location.search);
+      const demoName = designs.find((d) => d.id === template.id)?.demoName;
+      const doc = template.build({ company: query.get("firma") || demoName || "Musterfirma" });
+      const mode = query.get("modus");
+      if (mode === "hell" || mode === "dunkel") doc.theme.mode = mode === "hell" ? "light" : "dark";
+      if (/^[0-9a-f]{6}$/i.test(query.get("farbe") ?? "")) doc.theme.primary = `#${query.get("farbe")}`;
+      const skin = query.get("stil");
+      if (skin && skin in skins) doc.theme.skin = skin as SkinKey;
+      document.title = `${doc.meta.company} – Demo-Design (${template.name})`;
+      setState({ status: "ready", title: template.name, doc });
+      return () => robots.remove();
+    }
     fetch(`/api/public/demos/${slug}`)
       .then(async (res) => {
         if (!res.ok) throw new Error("missing");

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { skins } from "./skins/palettes";
 import type { FontKey, Theme } from "./types";
 
 export const fonts: Record<FontKey, { label: string; heading: string; body: string }> = {
@@ -6,6 +7,12 @@ export const fonts: Record<FontKey, { label: string; heading: string; body: stri
   inter: { label: "Inter – sachlich", heading: '"Inter", sans-serif', body: '"Inter", sans-serif' },
   playfair: { label: "Playfair – elegant", heading: '"Playfair Display", serif', body: '"Inter", sans-serif' },
   grotesk: { label: "Grotesk – technisch", heading: '"Space Grotesk", sans-serif', body: '"Inter", sans-serif' },
+  anton: { label: "Anton – plakativ", heading: '"Anton", "Arial Narrow", sans-serif', body: '"Inter", sans-serif' },
+  fraunces: { label: "Fraunces – editorial", heading: '"Fraunces", serif', body: '"Inter", sans-serif' },
+  archivo: { label: "Archivo – kräftig", heading: '"Archivo", sans-serif', body: '"Inter", sans-serif' },
+  cormorant: { label: "Cormorant – fein", heading: '"Cormorant Garamond", serif', body: '"Inter", sans-serif' },
+  lexend: { label: "Lexend – freundlich", heading: '"Lexend", sans-serif', body: '"Lexend", sans-serif' },
+  bricolage: { label: "Bricolage – verspielt", heading: '"Bricolage Grotesque", sans-serif', body: '"Inter", sans-serif' },
 };
 
 export const colourPresets = ["#6865FF", "#2F6BFF", "#0EA5E9", "#0F9D7A", "#16A34A", "#EAB308", "#F4511E", "#E11D48", "#DB2777", "#7C3AED", "#111827", "#92400E"];
@@ -28,19 +35,33 @@ export function onColour(hex: string) {
 export function themeVars(theme: Theme): CSSProperties {
   const dark = theme.mode === "dark";
   const font = fonts[theme.font] ?? fonts.outfit;
+  const skin = theme.skin ? skins[theme.skin] : undefined;
+  const c = skin?.[theme.mode] ?? {
+    bg: dark ? "#0c0d12" : "#ffffff",
+    bg2: dark ? "#13151d" : `color-mix(in srgb, ${theme.primary} 5%, #ffffff)`,
+    card: dark ? "#171a24" : "#ffffff",
+    fg: dark ? "#f3f4f8" : "#14151c",
+    mut: dark ? "#a3a7b7" : "#5b5e6e",
+    line: dark ? "rgba(255,255,255,0.11)" : "rgba(20,21,28,0.1)",
+    dk: dark ? "#07080b" : "#14151c",
+    dkOn: "#f3f4f8",
+  };
   return {
     "--p": theme.primary,
     "--p-on": onColour(theme.primary),
-    "--bg": dark ? "#0c0d12" : "#ffffff",
-    "--bg2": dark ? "#13151d" : `color-mix(in srgb, ${theme.primary} 5%, #ffffff)`,
-    "--card": dark ? "#171a24" : "#ffffff",
-    "--fg": dark ? "#f3f4f8" : "#14151c",
-    "--mut": dark ? "#a3a7b7" : "#5b5e6e",
-    "--line": dark ? "rgba(255,255,255,0.11)" : "rgba(20,21,28,0.1)",
-    "--soft": `color-mix(in srgb, ${theme.primary} ${dark ? 22 : 11}%, ${dark ? "#0c0d12" : "#ffffff"})`,
+    "--bg": c.bg,
+    "--bg2": c.bg2,
+    "--card": c.card,
+    "--fg": c.fg,
+    "--mut": c.mut,
+    "--line": c.line,
+    "--dk": c.dk,
+    "--dk-on": c.dkOn,
+    "--soft": `color-mix(in srgb, ${theme.primary} ${dark ? 22 : 11}%, ${c.bg})`,
     "--r": `${theme.radius}px`,
     "--r-sm": `${Math.round(theme.radius * 0.6)}px`,
     "--fh": font.heading,
     "--fb": font.body,
+    ...skin?.extra,
   } as CSSProperties;
 }

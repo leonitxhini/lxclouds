@@ -90,7 +90,7 @@ export function Nav() {
         </Link>
 
         <nav aria-label={t.nav.main} className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center xl:gap-1">
             {navSections.map((id) => (
               <li key={id}>
                 <a
@@ -98,7 +98,7 @@ export function Nav() {
                   onClick={go(id)}
                   aria-current={active === id ? "true" : undefined}
                   className={cn(
-                    "relative block whitespace-nowrap rounded-full px-3.5 py-2 text-[14px] transition-colors duration-300",
+                    "relative block whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] transition-colors duration-300 xl:px-3.5 xl:text-[14px]",
                     active === id ? "text-ink" : "text-ink/70 hover:text-ink",
                   )}
                 >
@@ -116,11 +116,11 @@ export function Nav() {
           </ul>
         </nav>
 
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-3 lg:flex xl:gap-4">
           <LanguageSwitch />
           <a
             href={mailto(t.contact.subject)}
-            className="inline-flex items-center gap-2 text-[14px] text-ink/80 transition-colors duration-300 hover:text-accent-ink"
+            className="hidden items-center gap-2 text-[14px] text-ink/80 transition-colors duration-300 hover:text-accent-ink xl:inline-flex"
           >
             <Mail className="size-[17px]" strokeWidth={1.7} aria-hidden="true" />
             {t.nav.email}

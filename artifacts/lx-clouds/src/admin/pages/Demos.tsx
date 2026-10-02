@@ -10,11 +10,11 @@ import { Badge, Btn, Card, Empty, Loading, PageHeader, useToast } from "../ui";
 
 /** Card image of a demo: the photo of its template, tinted in the demo's own colour. */
 export function DemoThumb({ demo }: { demo: Pick<DemoSummary, "template" | "theme" | "meta" | "title"> }) {
-  const preview = demo.template ? getTemplate(demo.template)?.preview : undefined;
+  const preview = demo.template ? getTemplate(demo.template)?.photo : undefined;
   const colour = demo.theme?.primary ?? "#6865FF";
   return (
     <div className="relative aspect-[16/10] overflow-hidden" style={{ background: `linear-gradient(135deg, ${colour}, #14151c)` }}>
-      {preview && <img src={imageUrl(preview)} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-70 transition-transform duration-700 group-hover:scale-105" />}
+      {preview && <img src={imageUrl(preview)} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105" />}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
       <span className="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11.5px] font-semibold" style={{ background: colour, color: onColour(colour) }}>
         {demo.meta?.industry ?? "Demo"}

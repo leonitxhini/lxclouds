@@ -1,5 +1,5 @@
 import { ArrowRight, Check, ChevronDown, Clock, Mail, MapPin, Phone, Quote } from "lucide-react";
-import { useContext, type ReactNode } from "react";
+import { lazy, useContext, type ComponentType, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { AddItem, BlockContext, Img, ItemTools, T, imageUrl, useEdit } from "./edit";
 import { icons } from "./icons";
@@ -18,8 +18,10 @@ import type {
   PricesBlock,
   QuotesBlock,
   ServicesBlock,
+  SkinKey,
   StatsBlock,
   StepsBlock,
+  TeamBlock,
 } from "./types";
 
 // Layout reacts to the width of the demo itself (container queries), not of the browser window,
@@ -38,9 +40,10 @@ function Section({ id, children, tone, className }: { id: string; children: Reac
   );
 }
 
-function Heading({ title, text, center }: { title: string; text?: string; center?: boolean }) {
+function Heading({ eyebrow, title, text, center }: { eyebrow?: string; title: string; text?: string; center?: boolean }) {
   return (
     <div className={cn("max-w-[640px]", center && "mx-auto text-center")}>
+      <T path={["eyebrow"]} value={eyebrow} className="mb-3 block text-[12.5px] font-semibold uppercase tracking-[0.14em] text-(--p)" placeholder="Kurzzeile" />
       <T as="h2" path={["title"]} value={title} className={h2} placeholder="Überschrift" />
       {text !== undefined && <T as="p" path={["text"]} value={text} multiline className={cn(lead, "mt-3")} placeholder="Kurzer Einleitungstext" />}
     </div>
@@ -194,10 +197,10 @@ function Stats({ block }: { block: StatsBlock }) {
 function Services({ block }: { block: ServicesBlock }) {
   const edit = useEdit();
   const blockId = useContext(BlockContext);
-  const { title, text, items } = block.props;
+  const { eyebrow, title, text, items } = block.props;
   return (
     <Section id="services">
-      <Heading title={title} text={text} center />
+      <Heading eyebrow={eyebrow} title={title} text={text} center />
       <div className="mt-10 grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
         {items.map((item, i) => {
           const Icon = icons[item.icon] ?? icons.star;
@@ -228,10 +231,10 @@ function Services({ block }: { block: ServicesBlock }) {
 
 // ---------- cards (fleet, products, treatments, listings) ----------
 function Cards({ block }: { block: CardsBlock }) {
-  const { title, text, items } = block.props;
+  const { eyebrow, title, text, items } = block.props;
   return (
     <Section id="offers" tone="alt">
-      <Heading title={title} text={text} />
+      <Heading eyebrow={eyebrow} title={title} text={text} />
       <div className="mt-10 grid gap-5 @2xl:grid-cols-2 @5xl:grid-cols-3">
         {items.map((item, i) => (
           <article key={i} className={cn(card, "group/item relative overflow-hidden")}>
@@ -288,10 +291,10 @@ function About({ block }: { block: AboutBlock }) {
 
 // ---------- prices / menu ----------
 function Prices({ block }: { block: PricesBlock }) {
-  const { title, text, groups } = block.props;
+  const { eyebrow, title, text, groups } = block.props;
   return (
     <Section id="prices" tone="alt">
-      <Heading title={title} text={text} center />
+      <Heading eyebrow={eyebrow} title={title} text={text} center />
       <div className="mt-10 grid gap-5 @4xl:grid-cols-2">
         {groups.map((group, g) => (
           <div key={g} className={cn(card, "group/item relative p-6 @2xl:p-7")}>
@@ -322,10 +325,10 @@ function Prices({ block }: { block: PricesBlock }) {
 
 // ---------- gallery ----------
 function Gallery({ block }: { block: GalleryBlock }) {
-  const { title, images } = block.props;
+  const { eyebrow, title, images } = block.props;
   return (
     <Section id="gallery">
-      <Heading title={title} center />
+      <Heading eyebrow={eyebrow} title={title} center />
       <div className="mt-10 grid grid-cols-2 gap-3 @4xl:grid-cols-3 @4xl:gap-4">
         {images.map((image, i) => (
           <div key={i} className={cn("group/item relative", i % 5 === 0 && "@4xl:col-span-2")}>
@@ -343,10 +346,10 @@ function Gallery({ block }: { block: GalleryBlock }) {
 
 // ---------- steps ----------
 function Steps({ block }: { block: StepsBlock }) {
-  const { title, items } = block.props;
+  const { eyebrow, title, items } = block.props;
   return (
     <Section id="steps">
-      <Heading title={title} center />
+      <Heading eyebrow={eyebrow} title={title} center />
       <ol className="mt-10 grid gap-5 @2xl:grid-cols-2 @5xl:grid-cols-4">
         {items.map((item, i) => (
           <li key={i} className="group/item relative">
@@ -366,10 +369,10 @@ function Steps({ block }: { block: StepsBlock }) {
 
 // ---------- quotes ----------
 function Quotes({ block }: { block: QuotesBlock }) {
-  const { title, items } = block.props;
+  const { eyebrow, title, items } = block.props;
   return (
     <Section id="quotes" tone="alt">
-      <Heading title={title} center />
+      <Heading eyebrow={eyebrow} title={title} center />
       <div className="mt-10 grid gap-4 @4xl:grid-cols-3">
         {items.map((item, i) => (
           <figure key={i} className={cn(card, "group/item relative p-6")}>
@@ -393,10 +396,10 @@ function Quotes({ block }: { block: QuotesBlock }) {
 // ---------- faq ----------
 function Faq({ block }: { block: FaqBlock }) {
   const edit = useEdit();
-  const { title, items } = block.props;
+  const { eyebrow, title, items } = block.props;
   return (
     <Section id="faq">
-      <Heading title={title} center />
+      <Heading eyebrow={eyebrow} title={title} center />
       <div className="mx-auto mt-10 max-w-[760px] space-y-3">
         {items.map((item, i) => (
           <details key={i} open={!!edit || i === 0} className={cn(card, "group/item group/faq relative px-5 py-1")}>
@@ -411,6 +414,32 @@ function Faq({ block }: { block: FaqBlock }) {
       </div>
       <div className="mt-5 text-center empty:hidden">
         <AddItem path={["items"]} item={{ q: "Neue Frage?", a: "Antwort." }} label="Frage" />
+      </div>
+    </Section>
+  );
+}
+
+// ---------- team ----------
+function Team({ block }: { block: TeamBlock }) {
+  const { eyebrow, title, text, items } = block.props;
+  return (
+    <Section id="team">
+      <Heading eyebrow={eyebrow} title={title} text={text} center />
+      <div className="mt-10 grid gap-5 @2xl:grid-cols-2 @5xl:grid-cols-4">
+        {items.map((item, i) => (
+          <article key={i} className={cn(card, "group/item relative overflow-hidden")}>
+            <Img src={item.image} path={["items", i, "image"]} alt={item.name} className="aspect-[4/5] w-full" />
+            <div className="p-5">
+              <T as="h3" path={["items", i, "name"]} value={item.name} className="block text-[17.5px] font-semibold [font-family:var(--fh)]" placeholder="Name" />
+              <T path={["items", i, "role"]} value={item.role} className="mt-0.5 block text-[13.5px] text-(--p)" placeholder="Aufgabe" />
+              <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-2 text-[14.5px] leading-[1.5] text-(--mut)" placeholder="Ein Satz zur Person" />
+            </div>
+            <ItemTools path={["items"]} index={i} count={items.length} />
+          </article>
+        ))}
+      </div>
+      <div className="mt-5 text-center empty:hidden">
+        <AddItem path={["items"]} item={{ image: "", name: "Name", role: "Aufgabe", text: "" }} label="Person" />
       </div>
     </Section>
   );
@@ -435,7 +464,7 @@ function Cta({ block }: { block: CtaBlock }) {
 
 // ---------- contact ----------
 function Contact({ block, doc }: { block: ContactBlock; doc: DemoDoc }) {
-  const { title, text, hours, form } = block.props;
+  const { eyebrow, title, text, hours, form } = block.props;
   const { meta } = doc;
   const field = "h-12 w-full rounded-(--r-sm) border border-(--line) bg-(--bg) px-4 text-[15px] text-(--fg) placeholder:text-(--mut)";
   const row = "flex items-start gap-3.5";
@@ -444,7 +473,7 @@ function Contact({ block, doc }: { block: ContactBlock; doc: DemoDoc }) {
     <Section id="contact" tone="alt">
       <div className="grid gap-10 @4xl:grid-cols-2 @4xl:gap-14">
         <div>
-          <Heading title={title} text={text} />
+          <Heading eyebrow={eyebrow} title={title} text={text} />
           <ul className="mt-8 space-y-5 text-[15.5px]">
             <li className={row}>
               <span className={iconBox}>
@@ -525,7 +554,8 @@ function Footer({ block, doc }: { block: FooterBlock; doc: DemoDoc }) {
   );
 }
 
-export function renderBlock(block: Block, doc: DemoDoc) {
+/** The plain blocks, used when a demo has no design language and for block types a design language does not restyle. */
+export function renderBase(block: Block, doc: DemoDoc): ReactNode {
   switch (block.type) {
     case "nav":
       return <Nav block={block} doc={doc} />;
@@ -551,9 +581,30 @@ export function renderBlock(block: Block, doc: DemoDoc) {
       return <Faq block={block} />;
     case "cta":
       return <Cta block={block} />;
+    case "team":
+      return <Team block={block} />;
     case "contact":
       return <Contact block={block} doc={doc} />;
     case "footer":
       return <Footer block={block} doc={doc} />;
   }
+}
+
+export type SkinProps = { block: Block; doc: DemoDoc };
+
+// Each design language is its own chunk, so a demo only loads the one it uses.
+const skinBlocks: Record<SkinKey, ComponentType<SkinProps>> = {
+  noir: lazy(() => import("./skins/noir")),
+  osteria: lazy(() => import("./skins/osteria")),
+  werk: lazy(() => import("./skins/werk")),
+  aurelia: lazy(() => import("./skins/aurelia")),
+  park: lazy(() => import("./skins/park")),
+  linden: lazy(() => import("./skins/linden")),
+  maison: lazy(() => import("./skins/maison")),
+  klar: lazy(() => import("./skins/klar")),
+};
+
+export function renderBlock(block: Block, doc: DemoDoc): ReactNode {
+  const SkinBlock = doc.theme.skin ? skinBlocks[doc.theme.skin] : undefined;
+  return SkinBlock ? <SkinBlock block={block} doc={doc} /> : renderBase(block, doc);
 }
