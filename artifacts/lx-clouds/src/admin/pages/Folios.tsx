@@ -230,12 +230,17 @@ export function FolioEditor({ id }: { id: number }) {
   const [busy, setBusy] = useState<Set<string>>(new Set());
   const latest = useRef<FolioDoc | null>(null);
   const timer = useRef(0);
+  /** the version this window started from; a save from an older version is refused by the server */
+  const base = useRef<string | null>(null);
+  const queue = useRef<Promise<void>>(Promise.resolve());
+  const [stale, setStale] = useState(false);
   const autoChecked = useRef(false);
 
   useEffect(() => {
     if (!data) return;
     setDoc(data.folio.doc);
     latest.current = data.folio.doc;
+    base.current = data.folio.updated_at;
     setTitle(data.folio.title);
     setShared(!!data.folio.shared);
   }, [data]);
@@ -245,13 +250,19 @@ export function FolioEditor({ id }: { id: number }) {
       latest.current = next;
       setSaved(false);
       window.clearTimeout(timer.current);
-      timer.current = window.setTimeout(async () => {
-        try {
-          await api(`/folios/${id}`, { method: "PATCH", body: { doc: latest.current } });
-          setSaved(true);
-        } catch (err) {
-          toast(`Nicht gespeichert: ${(err as ApiError).message}`, "error");
-        }
+      timer.current = window.setTimeout(() => {
+        timer.current = 0;
+        // one save after the other, each from the version the previous one produced
+        queue.current = queue.current.then(async () => {
+          try {
+            const res = await api<{ updated_at: string | null }>(`/folios/${id}`, { method: "PATCH", body: { doc: latest.current, base: base.current } });
+            base.current = res.updated_at;
+            setSaved(true);
+          } catch (err) {
+            if ((err as ApiError).status === 409) setStale(true);
+            else toast(`Nicht gespeichert: ${(err as ApiError).message}`, "error");
+          }
+        });
       }, 700);
     },
     [id, toast],
@@ -273,7 +284,7 @@ export function FolioEditor({ id }: { id: number }) {
     const flush = () => {
       if (timer.current && latest.current) {
         window.clearTimeout(timer.current);
-        void fetch(`/api/folios/${id}`, { method: "PATCH", keepalive: true, headers: { "Content-Type": "application/json", "X-Studio": "1" }, body: JSON.stringify({ doc: latest.current }) });
+        void fetch(`/api/folios/${id}`, { method: "PATCH", keepalive: true, headers: { "Content-Type": "application/json", "X-Studio": "1" }, body: JSON.stringify({ doc: latest.current, base: base.current }) });
         timer.current = 0;
       }
     };
@@ -402,7 +413,8 @@ export function FolioEditor({ id }: { id: number }) {
 
   async function saveMeta(body: Record<string, unknown>) {
     try {
-      await api(`/folios/${id}`, { method: "PATCH", body });
+      const res = await api<{ updated_at: string | null }>(`/folios/${id}`, { method: "PATCH", body });
+      base.current = res.updated_at;
     } catch (err) {
       toast((err as ApiError).message, "error");
     }
@@ -410,6 +422,14 @@ export function FolioEditor({ id }: { id: number }) {
 
   return (
     <div className="min-h-dvh bg-paper">
+      {stale && (
+        <div className="sticky top-0 z-40 flex flex-wrap items-center justify-center gap-3 bg-amber-400 px-4 py-2.5 text-[14px] font-medium text-black print:hidden">
+          Diese Mappe wurde an anderer Stelle geändert. Deine letzte Änderung hier ist nicht gespeichert.
+          <button type="button" onClick={() => window.location.reload()} className="rounded-full bg-black px-4 py-1.5 text-[13px] font-semibold text-white">
+            Neu laden
+          </button>
+        </div>
+      )}
       <div className="sticky top-0 z-30 flex flex-wrap items-center gap-2 border-b border-ink/[0.08] bg-paper/95 px-3 py-2.5 backdrop-blur print:hidden sm:px-5">
         <Link href="/mappen" className="flex size-9 items-center justify-center rounded-[9px] hover:bg-ink/[0.06]" aria-label="Alle Mappen">
           <ArrowLeft className="size-[18px]" />

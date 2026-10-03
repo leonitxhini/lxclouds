@@ -508,9 +508,18 @@ async function createFolio(request, env) {
 }
 
 async function updateFolio(request, env, id) {
-  const { sets, values } = patch(await readJson(request), FOLIO_FIELDS);
+  const body = await readJson(request);
+  // a folio open in two windows must not silently overwrite the newer one: the editor sends the version it started from
+  // (an editor page from before this check sends no version – it is outdated and has to be reloaded)
+  if ("doc" in body) {
+    if (!body.base) throw new HttpError(409, "Diese Seite ist veraltet – bitte neu laden.");
+    const row = await env.DB.prepare("SELECT updated_at FROM folios WHERE id = ?").bind(id).first();
+    if (row && row.updated_at !== body.base) throw new HttpError(409, "Die Mappe wurde inzwischen an anderer Stelle geändert.");
+  }
+  const { sets, values } = patch(body, FOLIO_FIELDS);
   if (sets.length) await env.DB.prepare(`UPDATE folios SET ${sets.join(", ")}, updated_at = datetime('now') WHERE id = ?`).bind(...values, id).run();
-  return json({ ok: true });
+  const row = await env.DB.prepare("SELECT updated_at FROM folios WHERE id = ?").bind(id).first();
+  return json({ ok: true, updated_at: row?.updated_at ?? null });
 }
 
 async function checkDomains(request) {
