@@ -1,4 +1,4 @@
-import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, RefreshCw, Rocket, Search, Star, Users, X, type LucideIcon } from "lucide-react";
+import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, RefreshCw, Rocket, Search, Star, Store, Users, X, type LucideIcon } from "lucide-react";
 import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddItem, BlockContext, EditContext, ItemTools, T, imageUrl, type EditApi } from "@/demo/edit";
@@ -432,7 +432,7 @@ function Domains({ b }: { b: DomainsBlock }) {
 }
 
 // ---------------------------------------------------------------- new customers: the way to you, the channels
-const CHANNEL_ICONS: Record<string, LucideIcon> = { pin: MapPin, handshake: Handshake, star: Star, globe: Globe, book: BookOpen, rocket: Rocket, megaphone: Megaphone, users: Users, camera: Camera, search: Search, calendar: CalendarCheck, phone: Phone };
+const CHANNEL_ICONS: Record<string, LucideIcon> = { pin: MapPin, handshake: Handshake, star: Star, globe: Globe, book: BookOpen, rocket: Rocket, megaphone: Megaphone, users: Users, camera: Camera, search: Search, calendar: CalendarCheck, phone: Phone, store: Store };
 const iconFor = (key: string) => CHANNEL_ICONS[key] ?? Star;
 
 function Journey({ b }: { b: JourneyBlock }) {
@@ -499,7 +499,7 @@ function Channels({ b }: { b: ChannelsBlock }) {
               <ul className="space-y-2.5">
                 {items.map(({ item, index }) => {
                   const Icon = iconFor(item.icon);
-                  const free = /kostenlos|im paket/i.test(item.cost);
+                  const free = /kostenlos|im paket|klein/i.test(item.cost);
                   return (
                     <li key={index} className={cn(card, "group/item relative p-4")}>
                       <div className="flex items-start gap-3">

@@ -134,7 +134,7 @@ export function generateFolio(input: FolioInput): FolioDoc {
       },
     ]),
 
-    chapter("ads", "So finden Sie neue Kunden", `So kommt ein neuer ${book.customers === "Mandanten" ? "Mandant" : "Kunde"} zu Ihnen.`, book.short.channels, "Erst die Wege, die nichts kosten und sofort wirken. Werbung erst, wenn Website und Bewertungen stehen.", ["Kostet am Anfang fast nichts", "Wirkt schon in den ersten Wochen", "Jede Anfrage wird gezählt"], [
+    chapter("ads", "So finden Sie neue Kunden", `So kommt ein neuer ${book.customers === "Mandanten" ? "Mandant" : "Kunde"} zu Ihnen.`, book.short.channels, "Zuerst gefunden werden, wo Kunden in der Nähe suchen – auf der Google-Karte –, dann Empfehlungen und Nachbarschaft. Werbung erst, wenn alles steht.", ["Kostet am Anfang fast nichts", "Bringt Kunden aus der Umgebung", "Wirkt schon in den ersten Wochen"], [
       { id: fid(), type: "journey", title: "Der Weg zu Ihnen", items: book.journey.map((j) => ({ ...j, text: search(j.text).replace(/„([^“]+)“/, (_, q: string) => `„${q.replace(key, city.split(" ")[0])}“`) })), note: book.journeyNote },
       { id: fid(), type: "channels", title: "Ihre Wege zu neuen Kunden", items: book.channels.map((c) => ({ ...c, text: prose(c.text) })) },
       { id: fid(), type: "cards", title: "Wen wir ansprechen", items: book.audiences.slice(0, 3).map((a) => ({ title: a.title, text: firstSentence(prose(a.text)), tag: a.tag })), detail: true },

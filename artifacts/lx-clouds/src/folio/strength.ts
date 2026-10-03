@@ -77,8 +77,8 @@ export function domainStrength(domain: string, ctx: ReturnType<typeof domainCont
           ? { key: "phone", level: 1, text: "Der Bindestrich muss dazugesagt werden („ic Bindestrich …“)." }
           : { key: "phone", level: 0, text: "Mehrere Bindestriche – am Telefon umständlich." },
     hasCity
-      ? { key: "future", level: 1, text: "Mit Ort – klingt nach Suchwort statt nach Marke und bindet Sie an die Stadt." }
-      : { key: "future", level: 2, text: "Ohne Ort – passt auch, wenn Sie wachsen oder umziehen." },
+      ? { key: "future", level: 1, text: "Mit Ort – zeigt, wo Ihr Büro ist, klingt aber eher nach Suchwort als nach Marke." }
+      : { key: "future", level: 2, text: "Ohne Ort – bleibt Ihre Marke, auch mit einem zweiten Büro oder nach einem Umzug." },
   ];
   const weight = Object.fromEntries(criteria.map((c) => [c.key, c.weight]));
   const sum = list.reduce((n, c) => n + c.level * weight[c.key], 0);
