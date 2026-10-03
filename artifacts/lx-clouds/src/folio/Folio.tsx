@@ -1,5 +1,5 @@
-import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, RefreshCw, Rocket, Search, Star, Store, Users, X, type LucideIcon } from "lucide-react";
-import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, Plus, RefreshCw, Rocket, Search, Star, Store, Users, X, type LucideIcon } from "lucide-react";
+import { Fragment, createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddItem, BlockContext, EditContext, ItemTools, T, imageUrl, type EditApi } from "@/demo/edit";
 import { onColour } from "@/demo/theme";
@@ -890,13 +890,22 @@ function Packages({ b }: { b: PackagesBlock }) {
             <T path={["items", i, "price"]} value={item.price} className="mt-5 block text-[34px] font-semibold tracking-[-0.02em]" placeholder="Preis eintragen" />
             <T path={["items", i, "unit"]} value={item.unit} className="mt-0.5 block text-[13.5px] text-(--mut)" placeholder="einmalig · danach … im Monat" />
             <ul className="mt-5 flex-1 space-y-2 border-t border-(--line) pt-5">
-              {item.features.map((f, k) => (
-                <li key={k} className="group/item relative flex gap-2 text-[14.5px] leading-[1.45]">
-                  <Check className="mt-0.5 size-4 shrink-0 text-(--p)" strokeWidth={2.5} />
-                  <T path={["items", i, "features", k]} value={f} className="min-w-0 flex-1" placeholder="Leistung" />
-                  <ItemTools path={["items", i, "features"]} index={k} count={item.features.length} />
-                </li>
-              ))}
+              {item.features.map((f, k) => {
+                // "Alles aus Start" is not a feature of its own: show it as the base, and what this package adds below it
+                const base = k === 0 && /^alles aus/i.test(f);
+                const extra = i > 0 && /^alles aus/i.test(item.features[0] ?? "") && k > 0;
+                const more = i > 0 ? amount(item.price) - amount(b.items[i - 1].price) : 0;
+                return (
+                  <Fragment key={k}>
+                    <li className={cn("group/item relative flex gap-2 text-[14.5px] leading-[1.45]", base && "rounded-[10px] bg-(--fg)/[0.06] px-3 py-2 font-medium")}>
+                      {extra ? <Plus className="mt-0.5 size-4 shrink-0 text-(--p)" strokeWidth={3} /> : <Check className={cn("mt-0.5 size-4 shrink-0", base ? "text-(--mut)" : "text-(--p)")} strokeWidth={2.5} />}
+                      <T path={["items", i, "features", k]} value={f} className="min-w-0 flex-1" placeholder="Leistung" />
+                      <ItemTools path={["items", i, "features"]} index={k} count={item.features.length} />
+                    </li>
+                    {base && <li className="pt-2 text-[12.5px] font-semibold uppercase tracking-[0.1em] text-(--p)">{more > 0 ? `Dazu – für ${euro(more)} mehr` : "Dazu"}</li>}
+                  </Fragment>
+                );
+              })}
             </ul>
             <AddItem path={["items", i, "features"]} item="" label="Leistung" className="mt-3" />
             <ItemTools path={["items"]} index={i} count={b.items.length} />
@@ -935,6 +944,8 @@ function TextBlock({ b }: { b: Extract<FolioBlock, { type: "text" }> }) {
 }
 
 const euro = (n: number) => n.toLocaleString("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+/** "1.490 €" → 1490 */
+const amount = (price: string) => Number(price.replace(/[^\d]/g, "")) || 0;
 
 function Roi({ b }: { b: RoiBlock }) {
   const edit = useEditApi();
