@@ -1,10 +1,12 @@
-import { Check, CircleDashed, Gauge, Loader2, Minus, Plus, RefreshCw, Star, X } from "lucide-react";
-import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
-import { AddItem, BlockContext, EditContext, ItemTools, T, type EditApi } from "@/demo/edit";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Loader2, Maximize2, Minus, Plus, RefreshCw, Star, X } from "lucide-react";
+import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { AddItem, BlockContext, EditContext, ItemTools, T, imageUrl, type EditApi } from "@/demo/edit";
 import { onColour } from "@/demo/theme";
 import { cn } from "@/lib/utils";
-import { roleOrder, roles } from "./roles";
-import type { Audit, AuditBlock, Chapter, DomainsBlock, FolioBlock, FolioDoc, OptionsBlock, PackagesBlock, RoiBlock } from "./types";
+import { roles } from "./roles";
+import { domainContext, rankDomains } from "./strength";
+import type { Audit, AuditBlock, Chapter, DomainsBlock, FolioBlock, FolioDoc, OptionsBlock, PackagesBlock, RoiBlock, TableBlock } from "./types";
 
 /** Live checks the editor can run; absent in the read-only views. */
 export type FolioTools = {
@@ -15,13 +17,22 @@ export type FolioTools = {
   busy: Set<string>;
 };
 const ToolsContext = createContext<FolioTools | null>(null);
+/** Decisions that can be made in the meeting even where texts are not editable (presentation): favourites and choices. */
+const ChoiceContext = createContext<EditApi["set"] | null>(null);
+const DocContext = createContext<FolioDoc | null>(null);
 const useTools = () => useContext(ToolsContext);
 const useScope = () => useContext(BlockContext);
+const useEditApi = () => useContext(EditContext);
+function useChoose() {
+  const edit = useEditApi();
+  const choose = useContext(ChoiceContext);
+  return edit?.set ?? choose;
+}
 
-const h2 = "text-[28px] font-semibold leading-[1.1] tracking-[-0.025em] @3xl:text-[36px]";
+const h2 = "text-[30px] font-semibold leading-[1.08] tracking-[-0.03em] @3xl:text-[42px]";
 const h3 = "text-[13px] font-semibold uppercase tracking-[0.12em] text-(--mut)";
-const card = "rounded-[16px] border border-(--line) bg-(--card)";
-const chip = "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11.5px] font-semibold";
+const card = "rounded-[18px] border border-(--line) bg-(--card)";
+const chip = "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold";
 
 export function folioVars(doc: FolioDoc): CSSProperties {
   const p = doc.meta.accent || "#6865FF";
@@ -29,7 +40,7 @@ export function folioVars(doc: FolioDoc): CSSProperties {
     "--p": p,
     "--p-on": onColour(p),
     "--soft": `color-mix(in srgb, ${p} 10%, #ffffff)`,
-    "--bg": "#F7F6F2",
+    "--bg": "#F6F5F1",
     "--card": "#ffffff",
     "--fg": "#12131B",
     "--mut": "#5D6072",
@@ -37,75 +48,28 @@ export function folioVars(doc: FolioDoc): CSSProperties {
   } as CSSProperties;
 }
 
-function Edit() {
-  return useContext(EditContext);
-}
-
-// ---------------------------------------------------------------- blocks
-function Cards({ b }: { b: Extract<FolioBlock, { type: "cards" }> }) {
+function Stars({ value, scope, path }: { value: number; scope?: string; path?: (string | number)[] }) {
+  const choose = useChoose();
+  const active = !!(choose && scope !== undefined && path);
   return (
-    <div>
-      <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
-      <div className="grid gap-3 @2xl:grid-cols-2 @5xl:grid-cols-3">
-        {b.items.map((item, i) => (
-          <article key={i} className={cn(card, "group/item relative p-5")}>
-            <T path={["items", i, "tag"]} value={item.tag} className={cn(chip, "bg-(--soft) text-(--p)")} placeholder="Stichwort" />
-            <T as="h4" path={["items", i, "title"]} value={item.title} className="mt-3 block text-[17px] font-semibold leading-[1.25]" placeholder="Titel" />
-            <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-1.5 text-[14.5px] leading-[1.55] text-(--mut)" placeholder="Beschreibung" />
-            <ItemTools path={["items"]} index={i} count={b.items.length} />
-          </article>
-        ))}
-      </div>
-      <AddItem path={["items"]} item={{ title: "Neuer Punkt", text: "", tag: "" }} label="Karte" className="mt-3" />
-    </div>
-  );
-}
-
-function Score({ value, scope, index }: { value: number; scope: string; index: number }) {
-  const edit = Edit();
-  return (
-    <span className="inline-flex gap-1" aria-label={`Bewertung ${value} von 5`}>
+    <span className="inline-flex gap-0.5" aria-label={`${value} von 5 Sternen`}>
       {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          key={n}
-          type="button"
-          disabled={!edit}
-          onClick={() => edit?.set(scope, ["items", index, "score"], n)}
-          className={cn("size-2.5 rounded-full", n <= value ? "bg-(--p)" : "bg-(--fg)/12", edit && "cursor-pointer hover:scale-125")}
-          aria-label={edit ? `${n} von 5` : undefined}
-          tabIndex={edit ? 0 : -1}
-        />
+        <button key={n} type="button" disabled={!active} onClick={() => active && choose!(scope!, path!, n)} className={cn("disabled:cursor-default", active && "cursor-pointer hover:scale-110")} tabIndex={active ? 0 : -1} aria-label={active ? `${n} Sterne` : undefined}>
+          <Star className={cn("size-4", n <= value ? "fill-amber-400 text-amber-400" : "fill-(--fg)/10 text-transparent")} />
+        </button>
       ))}
     </span>
   );
 }
 
-function PickToggle({ on, path, label = "Empfehlung", exclusive, count }: { on: boolean; path: (string | number)[]; label?: string; exclusive?: boolean; count?: number }) {
-  const edit = Edit();
-  const scope = useScope();
-  if (!edit) return on ? <span className={cn(chip, "bg-(--p) text-(--p-on)")}><Star className="size-3 fill-current" /> {label}</span> : null;
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        if (exclusive && count !== undefined && !on) for (let i = 0; i < count; i++) edit.set(scope, ["items", i, "pick"], false);
-        edit.set(scope, path, !on);
-      }}
-      className={cn(chip, "cursor-pointer", on ? "bg-(--p) text-(--p-on)" : "border border-dashed border-(--fg)/25 text-(--mut) hover:border-(--p) hover:text-(--p)")}
-    >
-      <Star className={cn("size-3", on && "fill-current")} /> {label}
-    </button>
-  );
-}
-
-function List({ items, path, sign, tone, label }: { items: string[]; path: (string | number)[]; sign: "plus" | "minus" | "check" | "x"; tone: string; label: string }) {
-  const Icon = { plus: Plus, minus: Minus, check: Check, x: X }[sign];
+function ListEdit({ items, path, good, label }: { items: string[]; path: (string | number)[]; good: boolean; label: string }) {
+  const Icon = good ? Check : X;
   return (
     <>
       <ul className="space-y-1.5">
         {items.map((text, i) => (
-          <li key={i} className="group/item relative flex gap-2 text-[14px] leading-[1.45]">
-            <Icon className={cn("mt-0.5 size-4 shrink-0", tone)} strokeWidth={2.5} aria-hidden="true" />
+          <li key={i} className="group/item relative flex gap-2 text-[14.5px] leading-[1.45]">
+            <Icon className={cn("mt-0.5 size-4 shrink-0", good ? "text-emerald-600" : "text-rose-500")} strokeWidth={3} aria-hidden="true" />
             <T path={[...path, i]} value={text} className="min-w-0 flex-1" placeholder="Punkt" />
             <ItemTools path={path} index={i} count={items.length} />
           </li>
@@ -116,31 +80,149 @@ function List({ items, path, sign, tone, label }: { items: string[]; path: (stri
   );
 }
 
-function Options({ b }: { b: OptionsBlock }) {
+// ---------------------------------------------------------------- designs: look at them together
+function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return createPortal(
+    <div className="fixed inset-0 z-[95] overflow-auto bg-black/92" onClick={onClose} role="dialog" aria-label={alt}>
+      <button type="button" onClick={onClose} className="fixed right-4 top-4 z-10 flex size-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25" aria-label="Schließen">
+        <X className="size-5" />
+      </button>
+      <img src={src} alt={alt} className="mx-auto block min-h-full w-auto max-w-none object-contain p-4 lg:max-w-[min(1800px,96vw)]" />
+    </div>,
+    document.body,
+  );
+}
+
+function Gallery({ b }: { b: OptionsBlock }) {
   const scope = useScope();
+  const choose = useChoose();
+  const edit = useEditApi();
+  const [index, setIndex] = useState(() => Math.max(0, b.items.findIndex((i) => i.pick)));
+  const [zoom, setZoom] = useState(false);
+  const i = Math.min(index, b.items.length - 1);
+  const item = b.items[i];
+  if (!item) return null;
+  const go = (by: number) => setIndex((i + by + b.items.length) % b.items.length);
+  const favourites = b.items.filter((x) => x.pick).length;
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <T as="h3" path={["title"]} value={b.title} className={h3} placeholder="Überschrift" />
+        <span className="text-[13px] text-(--mut)">
+          {i + 1} von {b.items.length}
+          {favourites ? ` · ${favourites} ${favourites === 1 ? "Favorit" : "Favoriten"}` : ""}
+        </span>
+      </div>
+      <div className="grid gap-4 @5xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="relative overflow-hidden rounded-[18px] border border-(--line) bg-[#0e0f15]">
+          {item.image ? (
+            <button type="button" onClick={() => setZoom(true)} className="group block w-full cursor-zoom-in" aria-label={`${item.name} groß ansehen`}>
+              <img src={imageUrl(item.image)} alt={item.name} className="mx-auto block max-h-[72vh] w-full object-contain" />
+              <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[12px] font-medium text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">
+                <Maximize2 className="size-3.5" /> Groß ansehen
+              </span>
+            </button>
+          ) : (
+            <div className="flex aspect-[4/3] items-center justify-center text-white/40">Kein Bild</div>
+          )}
+          {b.items.length > 1 && (
+            <>
+              <button type="button" onClick={() => go(-1)} className="absolute left-3 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#12131B] shadow-lg hover:bg-white" aria-label="Vorheriger Entwurf">
+                <ChevronLeft className="size-6" />
+              </button>
+              <button type="button" onClick={() => go(1)} className="absolute right-3 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#12131B] shadow-lg hover:bg-white" aria-label="Nächster Entwurf">
+                <ChevronRight className="size-6" />
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className={cn(card, "flex flex-col p-5")}>
+          <T as="h4" path={["items", i, "name"]} value={item.name} className="block text-[22px] font-semibold leading-[1.2] tracking-[-0.02em]" placeholder="Name" />
+          <div className="mt-2">
+            <Stars value={item.score} scope={scope} path={["items", i, "score"]} />
+          </div>
+          <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-3 text-[15.5px] leading-[1.5]" placeholder="Unser Eindruck in einem Satz" />
+          {(item.pros.length > 0 || edit) && (
+            <div className="mt-4">
+              <p className="mb-1.5 text-[12.5px] font-semibold text-emerald-700">Stark</p>
+              <ListEdit items={item.pros} path={["items", i, "pros"]} good label="Stärke" />
+            </div>
+          )}
+          {(item.cons.length > 0 || edit) && (
+            <div className="mt-4">
+              <p className="mb-1.5 text-[12.5px] font-semibold text-rose-700">Schwächer</p>
+              <ListEdit items={item.cons} path={["items", i, "cons"]} good={false} label="Schwäche" />
+            </div>
+          )}
+          <div className="mt-auto pt-5">
+            {choose ? (
+              <button type="button" onClick={() => choose(scope, ["items", i, "pick"], !item.pick)} aria-pressed={item.pick} className={cn("flex h-12 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition-colors", item.pick ? "bg-amber-400 text-black" : "border-2 border-(--fg)/15 hover:border-amber-400")}>
+                <Star className={cn("size-5", item.pick && "fill-current")} />
+                {item.pick ? "Favorit" : "Als Favorit markieren"}
+              </button>
+            ) : (
+              item.pick && (
+                <span className="flex h-12 items-center justify-center gap-2 rounded-full bg-amber-400 text-[15px] font-semibold text-black">
+                  <Star className="size-5 fill-current" /> Unsere Empfehlung
+                </span>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+
+      {b.items.length > 1 && (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+          {b.items.map((x, k) => (
+            <button key={k} type="button" onClick={() => setIndex(k)} aria-current={k === i} title={x.name} className={cn("relative h-[74px] w-[100px] shrink-0 overflow-hidden rounded-[10px] border-2 bg-[#0e0f15] transition-[border-color,opacity]", k === i ? "border-(--p)" : "border-transparent opacity-60 hover:opacity-100")}>
+              {x.image && <img src={imageUrl(x.image)} alt="" loading="lazy" className="h-full w-full object-cover object-top" />}
+              {x.pick && <Star className="absolute right-1 top-1 size-4 fill-amber-400 text-amber-400 drop-shadow" />}
+            </button>
+          ))}
+        </div>
+      )}
+      {zoom && item.image && <Lightbox src={imageUrl(item.image)} alt={item.name} onClose={() => setZoom(false)} />}
+    </div>
+  );
+}
+
+/** Options without pictures – e.g. names – side by side. */
+function Compare({ b }: { b: OptionsBlock }) {
+  const scope = useScope();
+  const choose = useChoose();
   return (
     <div>
       <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
       <div className="grid gap-3 @3xl:grid-cols-2 @6xl:grid-cols-3">
         {b.items.map((item, i) => (
-          <article key={i} className={cn(card, "group/item relative flex flex-col p-5", item.pick && "border-(--p) shadow-[0_0_0_1px_var(--p)]")}>
+          <article key={i} className={cn(card, "group/item relative flex flex-col p-5", item.pick && "border-(--p) shadow-[0_0_0_1.5px_var(--p)]")}>
             <div className="flex items-start justify-between gap-3">
-              <T as="h4" path={["items", i, "name"]} value={item.name} className="block text-[19px] font-semibold leading-[1.2] tracking-[-0.01em]" placeholder="Name" />
-              <Score value={item.score} scope={scope} index={i} />
+              <T as="h4" path={["items", i, "name"]} value={item.name} className="block text-[21px] font-semibold leading-[1.2] tracking-[-0.015em]" placeholder="Name" />
+              <Stars value={item.score} scope={scope} path={["items", i, "score"]} />
             </div>
-            <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-2 text-[14.5px] leading-[1.55] text-(--mut)" placeholder="Kurze Einschätzung" />
-            <div className="mt-4 grid flex-1 gap-4 @2xl:grid-cols-2 @3xl:grid-cols-1 @5xl:grid-cols-2">
-              <div>
-                <p className="mb-1.5 text-[12px] font-semibold text-emerald-700">Spricht dafür</p>
-                <List items={item.pros} path={["items", i, "pros"]} sign="plus" tone="text-emerald-600" label="Pro" />
-              </div>
-              <div>
-                <p className="mb-1.5 text-[12px] font-semibold text-rose-700">Spricht dagegen</p>
-                <List items={item.cons} path={["items", i, "cons"]} sign="minus" tone="text-rose-500" label="Contra" />
-              </div>
+            <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-1.5 text-[14.5px] leading-[1.5] text-(--mut)" placeholder="Kurz gesagt" />
+            <div className="mt-4 space-y-3">
+              <ListEdit items={item.pros} path={["items", i, "pros"]} good label="Pro" />
+              <ListEdit items={item.cons} path={["items", i, "cons"]} good={false} label="Contra" />
             </div>
-            <div className="mt-4">
-              <PickToggle on={item.pick} path={["items", i, "pick"]} exclusive count={b.items.length} />
+            <div className="mt-auto pt-4">
+              {choose ? (
+                <button type="button" onClick={() => choose(scope, ["items", i, "pick"], !item.pick)} className={cn(chip, "cursor-pointer", item.pick ? "bg-(--p) text-(--p-on)" : "border border-dashed border-(--fg)/25 text-(--mut) hover:border-(--p)")}>
+                  <Star className={cn("size-3", item.pick && "fill-current")} /> {item.pick ? "Unsere Wahl" : "Wählen"}
+                </button>
+              ) : (
+                item.pick && (
+                  <span className={cn(chip, "bg-(--p) text-(--p-on)")}>
+                    <Star className="size-3 fill-current" /> Unsere Empfehlung
+                  </span>
+                )
+              )}
             </div>
             <ItemTools path={["items"]} index={i} count={b.items.length} />
           </article>
@@ -151,55 +233,133 @@ function Options({ b }: { b: OptionsBlock }) {
   );
 }
 
+// ---------------------------------------------------------------- web addresses: which is strong and why
 const statusChip = {
   free: ["frei", "bg-emerald-50 text-emerald-700", Check],
   taken: ["vergeben", "bg-rose-50 text-rose-700", X],
   unknown: ["ungeprüft", "bg-(--fg)/[0.06] text-(--mut)", CircleDashed],
 } as const;
 
+function StrengthBar({ score, muted }: { score: number; muted?: boolean }) {
+  const tone = muted ? "bg-(--fg)/20" : score >= 7 ? "bg-emerald-500" : score >= 5 ? "bg-amber-400" : "bg-rose-400";
+  return (
+    <span className="flex items-center gap-2">
+      <span className="flex gap-[3px]" aria-hidden="true">
+        {Array.from({ length: 10 }, (_, k) => (
+          <span key={k} className={cn("h-2.5 w-[7px] rounded-[2px]", k < score ? tone : "bg-(--fg)/10")} />
+        ))}
+      </span>
+      <span className="text-[13px] font-semibold tabular-nums">{score}/10</span>
+    </span>
+  );
+}
+
 function Domains({ b }: { b: DomainsBlock }) {
+  const doc = useContext(DocContext)!;
   const tools = useTools();
   const scope = useScope();
+  const choose = useChoose();
+  const edit = useEditApi();
+  const [all, setAll] = useState(false);
+  const ctx = domainContext(doc);
+  const ranked = rankDomains(b, ctx);
+  const top = ranked.find((d) => d.item.pick) ?? ranked.find((d) => d.item.status === "free") ?? ranked[0];
+  const rest = ranked.filter((d) => d !== top);
+  const shown = all ? rest : rest.slice(0, 7);
+  const checked = b.items.map((d) => d.checked).filter(Boolean).sort().at(-1);
   const busy = tools?.busy.has(scope);
-  const checked = b.items.filter((d) => d.checked).map((d) => d.checked).sort().at(-1);
-  const free = b.items.filter((d) => d.status === "free").length;
+
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <T as="h3" path={["title"]} value={b.title} className={h3} placeholder="Überschrift" />
-        <span className="text-[12.5px] text-(--mut)">
-          {checked ? `${free} von ${b.items.length} frei · geprüft am ${new Date(checked).toLocaleDateString("de-DE")} bei der Registry` : "Noch nicht geprüft"}
+        <span className="flex items-center gap-2 text-[12.5px] text-(--mut)">
+          {checked ? `Geprüft am ${new Date(checked).toLocaleDateString("de-DE")} direkt bei der Vergabestelle` : "Noch nicht geprüft"}
+          {tools && (
+            <button type="button" onClick={() => tools.checkDomains(scope)} disabled={busy} className={cn(chip, "h-8 cursor-pointer bg-(--fg) px-3.5 text-white disabled:opacity-60")}>
+              {busy ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />} Jetzt prüfen
+            </button>
+          )}
         </span>
       </div>
-      <div className={cn(card, "divide-y divide-(--line) overflow-hidden")}>
-        {b.items.map((item, i) => {
+
+      {top && (
+        <div className="rounded-[20px] border-2 border-(--p) bg-white p-6 @3xl:p-8">
+          <p className="flex items-center gap-2 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-(--p)">
+            <Star className="size-4 fill-amber-400 text-amber-400" /> {top.item.pick ? "Unsere Wahl" : "Die stärkste freie Adresse"}
+          </p>
+          <p className="mt-3 break-all font-mono text-[30px] font-semibold leading-[1.1] @3xl:text-[44px]">{top.item.domain}</p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <span className={cn(chip, top.item.status === "free" ? "bg-emerald-500 text-white" : top.item.status === "taken" ? "bg-rose-500 text-white" : "bg-(--fg)/10 text-(--mut)")}>
+              {top.item.status === "free" ? "✓ frei – jetzt sichern" : top.item.status === "taken" ? "vergeben" : "noch prüfen"}
+            </span>
+            <StrengthBar score={top.strength.score} />
+          </div>
+          <div className="mt-5 grid gap-x-8 gap-y-1.5 @3xl:grid-cols-2">
+            {top.strength.good.map((r) => (
+              <p key={r} className="flex gap-2 text-[15px]">
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" strokeWidth={3} /> {r}
+              </p>
+            ))}
+            {top.strength.bad.map((r) => (
+              <p key={r} className="flex gap-2 text-[15px] text-(--mut)">
+                <Minus className="mt-0.5 size-4 shrink-0 text-amber-500" strokeWidth={3} /> {r}
+              </p>
+            ))}
+          </div>
+          {top.item.note && <p className="mt-4 border-t border-(--line) pt-3 text-[14.5px] font-medium">{top.item.note}</p>}
+        </div>
+      )}
+
+      <ol className={cn(card, "mt-3 divide-y divide-(--line) overflow-hidden")}>
+        {shown.map(({ item, index, strength }, n) => {
           const [label, style, Icon] = statusChip[item.status] ?? statusChip.unknown;
+          const taken = item.status === "taken";
           return (
-            <div key={i} className={cn("group/item relative grid items-center gap-x-4 gap-y-1 px-4 py-3 @2xl:grid-cols-[minmax(0,1.1fr)_110px_minmax(0,1.4fr)_auto]", item.pick && "bg-(--soft)")}>
-              <T path={["items", i, "domain"]} value={item.domain} className="min-w-0 truncate font-mono text-[14.5px] font-medium" placeholder="domain.de" />
+            <li key={index} className={cn("grid items-center gap-x-4 gap-y-1.5 px-4 py-3 @3xl:grid-cols-[28px_minmax(0,1fr)_110px_150px_minmax(0,1.3fr)_auto]", taken && "bg-(--fg)/[0.025]")}>
+              <span className="hidden text-[13px] font-semibold tabular-nums text-(--mut) @3xl:block">{n + 2}</span>
+              <span className={cn("min-w-0 break-all font-mono text-[15px] font-medium", taken && "text-(--mut) line-through decoration-(--fg)/30")}>{item.domain}</span>
               <span className={cn(chip, "w-fit", style)}>
                 <Icon className="size-3" strokeWidth={3} /> {label}
               </span>
-              <T path={["items", i, "note"]} value={item.note} className="text-[13.5px] text-(--mut)" placeholder="Anmerkung" />
-              <PickToggle on={item.pick} path={["items", i, "pick"]} label="Wahl" />
-              <ItemTools path={["items"]} index={i} count={b.items.length} />
-            </div>
+              <StrengthBar score={strength.score} muted={taken} />
+              <span className="text-[13px] leading-[1.4] text-(--mut)">{item.note || (taken ? "Gehört schon jemand anderem" : (strength.bad[0] ?? strength.good[0]))}</span>
+              {choose && !taken ? (
+                <button type="button" onClick={() => b.items.forEach((_, k) => choose(scope, ["items", k, "pick"], k === index))} className={cn(chip, "cursor-pointer border border-dashed border-(--fg)/25 text-(--mut) hover:border-(--p) hover:text-(--p)")}>
+                  <Star className="size-3" /> Wählen
+                </button>
+              ) : (
+                <span />
+              )}
+            </li>
           );
         })}
-      </div>
-      {tools && (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <AddItem path={["items"]} item={{ domain: "", status: "unknown", checked: "", note: "", pick: false }} label="Domain" />
-          <button type="button" onClick={() => tools.checkDomains(scope)} disabled={busy} className={cn(chip, "h-8 cursor-pointer bg-(--fg) px-3.5 text-white disabled:opacity-60")}>
-            {busy ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />} Alle live prüfen
-          </button>
-        </div>
+      </ol>
+      {rest.length > 7 && (
+        <button type="button" onClick={() => setAll(!all)} className="mt-2 text-[13.5px] font-medium text-(--p) hover:underline">
+          {all ? "Weniger zeigen" : `Alle ${rest.length + 1} Adressen zeigen`}
+        </button>
+      )}
+
+      {edit && (
+        <Details title="Adressen bearbeiten und Anmerkungen" count={b.items.length}>
+          <div className={cn(card, "divide-y divide-(--line)")}>
+            {b.items.map((item, i) => (
+              <div key={i} className="group/item relative grid gap-2 px-4 py-2.5 @3xl:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+                <T path={["items", i, "domain"]} value={item.domain} className="font-mono text-[14px]" placeholder="adresse.de" />
+                <T path={["items", i, "note"]} value={item.note} className="text-[13.5px] text-(--mut)" placeholder="Anmerkung, z. B. „bei Strato reserviert“" />
+                <ItemTools path={["items"]} index={i} count={b.items.length} />
+              </div>
+            ))}
+          </div>
+          <AddItem path={["items"]} item={{ domain: "", status: "unknown", checked: "", note: "", pick: false }} label="Adresse" className="mt-3" />
+        </Details>
       )}
     </div>
   );
 }
 
-// ---------- website check ----------
+// ---------------------------------------------------------------- competition: bars
 const checks: { label: string; ok: (a: Audit) => boolean | null; show?: (a: Audit) => string }[] = [
   { label: "Erreichbar", ok: (a) => !a.error && !!a.status && a.status < 400, show: (a) => (a.error ? a.error : `${a.status}`) },
   { label: "Verschlüsselt (HTTPS)", ok: (a) => !!a.https },
@@ -207,9 +367,7 @@ const checks: { label: string; ok: (a: Audit) => boolean | null; show?: (a: Audi
   { label: "Fürs Handy gebaut", ok: (a) => !!a.viewport },
   { label: "Titel für Google", ok: (a) => (a.title?.length ?? 0) >= 15 && (a.title?.length ?? 0) <= 70 },
   { label: "Beschreibung für Google", ok: (a) => (a.description?.length ?? 0) >= 70 },
-  { label: "Eine klare Hauptüberschrift", ok: (a) => a.h1 === 1, show: (a) => `${a.h1 ?? 0}× H1` },
   { label: "Firmendaten für Google", ok: (a) => !!a.localBusiness },
-  { label: "Sitemap", ok: (a) => !!a.sitemap },
   { label: "Telefon antippbar", ok: (a) => !!a.phone || !!a.whatsapp },
   { label: "Formular oder Terminbuchung", ok: (a) => (a.forms ?? 0) > 0 || !!a.booking },
   { label: "Bewertungen sichtbar", ok: (a) => !!a.reviews },
@@ -217,65 +375,72 @@ const checks: { label: string; ok: (a: Audit) => boolean | null; show?: (a: Audi
   { label: "Datenschutz", ok: (a) => !!a.datenschutz },
 ];
 
-function ScoreRing({ value, size = 46 }: { value: number; size?: number }) {
-  const r = (size - 6) / 2;
-  const c = 2 * Math.PI * r;
-  const tone = value >= 80 ? "#10b981" : value >= 55 ? "#f59e0b" : "#f43f5e";
-  return (
-    <span className="relative inline-flex shrink-0 items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(18,19,27,0.08)" strokeWidth="5" />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={tone} strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(c * value) / 100} ${c}`} />
-      </svg>
-      <span className="absolute text-[13px] font-bold tabular-nums">{value}</span>
-    </span>
-  );
-}
-
-function AuditTable({ b }: { b: AuditBlock }) {
+function AuditBars({ b }: { b: AuditBlock }) {
   const tools = useTools();
   const scope = useScope();
-  const edit = Edit();
   const busy = tools?.busy.has(scope);
-  if (!b.items.length && !edit) return null;
+  const sites = b.items.map((site, index) => ({ site, index, score: site.result?.score ?? -1 })).sort((x, y) => y.score - x.score);
+  const own = sites.find((s) => s.site.own);
+  const rank = own ? sites.indexOf(own) + 1 : 0;
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <T as="h3" path={["title"]} value={b.title} className={h3} placeholder="Überschrift" />
         {tools && b.items.length > 0 && (
           <button type="button" onClick={() => tools.audit(scope)} disabled={busy} className={cn(chip, "h-8 cursor-pointer bg-(--fg) px-3.5 text-white disabled:opacity-60")}>
-            {busy ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />} Alle prüfen
+            {busy ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />} Jetzt prüfen
           </button>
         )}
       </div>
+      <div className={cn(card, "space-y-3 p-5 @3xl:p-6")}>
+        {sites.map(({ site, index, score }) => {
+          const tone = score >= 80 ? "bg-emerald-500" : score >= 60 ? "bg-amber-400" : score >= 0 ? "bg-rose-400" : "bg-(--fg)/15";
+          return (
+            <div key={index} className="grid items-center gap-x-4 gap-y-1 @3xl:grid-cols-[minmax(0,240px)_minmax(0,1fr)_52px]">
+              <span className={cn("min-w-0 truncate text-[14.5px]", site.own ? "font-semibold text-(--p)" : "")}>{site.own ? `★ ${site.name}` : site.name}</span>
+              <span className="h-4 overflow-hidden rounded-full bg-(--fg)/[0.06]">
+                <span className={cn("block h-full rounded-full transition-[width] duration-700", site.own ? "bg-(--p)" : tone)} style={{ width: `${Math.max(0, score)}%` }} />
+              </span>
+              <span className="text-right text-[15px] font-semibold tabular-nums">{score >= 0 ? score : "–"}</span>
+            </div>
+          );
+        })}
+        {own && own.score >= 0 && (
+          <p className="border-t border-(--line) pt-3 text-[14.5px] leading-[1.5]">
+            {own.site.name}: <b>{own.score} von 100 Punkten</b> – Platz {rank} von {sites.length}. Die Punkte zeigen, wie gut eine Website die Grundlagen erfüllt: schnell, fürs Handy, bei Google gut beschrieben, Kontakt mit einem Tipp.
+          </p>
+        )}
+      </div>
+      <Details title="Alle Prüfpunkte einzeln" count={checks.length}>
+        <AuditTable b={b} />
+      </Details>
+    </div>
+  );
+}
+
+function AuditTable({ b }: { b: AuditBlock }) {
+  const tools = useTools();
+  const scope = useScope();
+  return (
+    <>
       <div className={cn(card, "overflow-x-auto")}>
         <table className="w-full min-w-[560px] border-collapse text-[13.5px]">
           <thead>
             <tr className="border-b border-(--line)">
-              <th className="w-[210px] p-3 text-left font-medium text-(--mut)">Prüfpunkt</th>
+              <th className="w-[200px] p-3 text-left font-medium text-(--mut)">Prüfpunkt</th>
               {b.items.map((site, i) => (
-                <th key={i} className={cn("group/item relative min-w-[150px] p-3 text-left align-top font-normal", site.own && "bg-(--soft)")}>
+                <th key={i} className={cn("group/item relative min-w-[140px] p-3 text-left align-top font-normal", site.own && "bg-(--soft)")}>
                   <T path={["items", i, "name"]} value={site.name} className="block text-[14px] font-semibold" placeholder="Name" />
-                  <T path={["items", i, "url"]} value={site.url} className="block max-w-[220px] truncate text-[12px] text-(--mut)" placeholder="adresse.de" />
-                  <div className="mt-2 flex items-center gap-2">
-                    {site.result ? <ScoreRing value={site.result.score ?? 0} /> : <span className="text-[12px] text-(--mut)">noch nicht geprüft</span>}
-                    {site.result?.psi && (
-                      <span className="text-[11.5px] leading-[1.35] text-(--mut)">
-                        Google mobil
-                        <br />
-                        <b className="text-(--fg)">{site.result.psi.performance}</b> Tempo · <b className="text-(--fg)">{site.result.psi.seo}</b> SEO
-                      </span>
-                    )}
-                  </div>
+                  <T path={["items", i, "url"]} value={site.url} className="block max-w-[200px] truncate text-[12px] text-(--mut)" placeholder="adresse.de" />
+                  {site.result?.psi && (
+                    <span className="mt-1 block text-[11.5px] text-(--mut)">
+                      Google mobil: <b className="text-(--fg)">{site.result.psi.performance}</b> Tempo · <b className="text-(--fg)">{site.result.psi.seo}</b> SEO
+                    </span>
+                  )}
                   {tools && (
-                    <div className="mt-2 flex gap-1">
-                      <button type="button" onClick={() => tools.audit(scope, i)} className="rounded-md px-1.5 py-0.5 text-[11.5px] font-medium text-(--p) hover:bg-(--soft)">
-                        Prüfen
-                      </button>
-                      <button type="button" onClick={() => tools.psi(scope, i)} disabled={tools.busy.has(`${scope}:psi:${i}`)} className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11.5px] font-medium text-(--p) hover:bg-(--soft) disabled:opacity-50">
-                        {tools.busy.has(`${scope}:psi:${i}`) ? <Loader2 className="size-3 animate-spin" /> : <Gauge className="size-3" />} Google-Messung
-                      </button>
-                    </div>
+                    <button type="button" onClick={() => tools.psi(scope, i)} disabled={tools.busy.has(`${scope}:psi:${i}`)} className="mt-1 inline-flex items-center gap-1 rounded-md py-0.5 text-[11.5px] font-medium text-(--p) hover:underline disabled:opacity-50">
+                      {tools.busy.has(`${scope}:psi:${i}`) ? <Loader2 className="size-3 animate-spin" /> : <Gauge className="size-3" />} Google-Messung
+                    </button>
                   )}
                   <ItemTools path={["items"]} index={i} count={b.items.length} />
                 </th>
@@ -308,11 +473,56 @@ function AuditTable({ b }: { b: AuditBlock }) {
         </table>
       </div>
       <AddItem path={["items"]} item={{ name: "Neue Website", url: "", own: false, result: null }} label="Website" className="mt-3" />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- the plain blocks
+function Cards({ b }: { b: Extract<FolioBlock, { type: "cards" }> }) {
+  return (
+    <div>
+      <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
+      <div className="grid gap-3 @2xl:grid-cols-2 @5xl:grid-cols-3">
+        {b.items.map((item, i) => (
+          <article key={i} className={cn(card, "group/item relative p-5")}>
+            <T path={["items", i, "tag"]} value={item.tag} className={cn(chip, "bg-(--soft) text-(--p)")} placeholder="Stichwort" />
+            <T as="h4" path={["items", i, "title"]} value={item.title} className="mt-3 block text-[17px] font-semibold leading-[1.25]" placeholder="Titel" />
+            <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-1.5 text-[14.5px] leading-[1.5] text-(--mut)" placeholder="Beschreibung" />
+            <ItemTools path={["items"]} index={i} count={b.items.length} />
+          </article>
+        ))}
+      </div>
+      <AddItem path={["items"]} item={{ title: "Neuer Punkt", text: "", tag: "" }} label="Karte" className="mt-3" />
     </div>
   );
 }
 
-function Table({ b }: { b: Extract<FolioBlock, { type: "table" }> }) {
+const whenTone: Record<string, string> = { Zuerst: "bg-emerald-500 text-white", Danach: "bg-amber-400 text-black", Später: "bg-(--fg)/10 text-(--mut)" };
+
+function Table({ b }: { b: TableBlock }) {
+  if (b.style === "ranked") {
+    return (
+      <div>
+        <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
+        <ol className="grid gap-2.5 @4xl:grid-cols-2">
+          {b.rows.map((row, r) => (
+            <li key={r} className={cn(card, "group/item relative flex gap-4 p-4")}>
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--fg) text-[15px] font-semibold text-white">{r + 1}</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <T as="h4" path={["rows", r, 0]} value={row[0]} className="text-[16.5px] font-semibold" placeholder="Weg" />
+                  <T path={["rows", r, 1]} value={row[1]} className={cn(chip, whenTone[row[1]] ?? "bg-(--soft) text-(--p)")} placeholder="Wann" />
+                </div>
+                <T as="p" path={["rows", r, 2]} value={row[2]} multiline className="mt-1 text-[14.5px] leading-[1.45] text-(--mut)" placeholder="Was wir tun" />
+              </div>
+              <ItemTools path={["rows"]} index={r} count={b.rows.length} />
+            </li>
+          ))}
+        </ol>
+        <AddItem path={["rows"]} item={["", "Danach", ""]} label="Weg" className="mt-3" />
+      </div>
+    );
+  }
   return (
     <div>
       <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
@@ -347,35 +557,31 @@ function Table({ b }: { b: Extract<FolioBlock, { type: "table" }> }) {
 }
 
 function Checklist({ b }: { b: Extract<FolioBlock, { type: "checklist" }> }) {
-  const edit = Edit();
+  const choose = useChoose();
   const scope = useScope();
-  const done = b.items.filter((i) => i.done).length;
   return (
     <div>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <T as="h3" path={["title"]} value={b.title} className={h3} placeholder="Überschrift" />
-        {b.items.length > 0 && <span className="text-[12.5px] text-(--mut)">{done} / {b.items.length} erledigt</span>}
-      </div>
+      <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
       <ul className={cn(card, "divide-y divide-(--line)")}>
         {b.items.map((item, i) => (
           <li key={i} className="group/item relative flex items-start gap-3 px-4 py-3">
             <button
               type="button"
-              disabled={!edit}
-              onClick={() => edit?.set(scope, ["items", i, "done"], !item.done)}
-              className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border", item.done ? "border-(--p) bg-(--p) text-(--p-on)" : "border-(--fg)/25", edit && "cursor-pointer")}
+              disabled={!choose}
+              onClick={() => choose?.(scope, ["items", i, "done"], !item.done)}
+              className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border", item.done ? "border-(--p) bg-(--p) text-(--p-on)" : "border-(--fg)/25", choose && "cursor-pointer")}
               aria-label={item.done ? "Erledigt" : "Offen"}
-              tabIndex={edit ? 0 : -1}
+              tabIndex={choose ? 0 : -1}
             >
               {item.done && <Check className="size-3.5" strokeWidth={3} />}
             </button>
-            <T path={["items", i, "text"]} value={item.text} multiline className={cn("min-w-0 flex-1 text-[14.5px] leading-[1.45]", item.done && "text-(--mut) line-through")} placeholder="Aufgabe" />
+            <T path={["items", i, "text"]} value={item.text} multiline className={cn("min-w-0 flex-1 text-[15px] leading-[1.45]", item.done && "text-(--mut) line-through")} placeholder="Aufgabe" />
             <T path={["items", i, "who"]} value={item.who} className={cn(chip, "shrink-0 bg-(--fg)/[0.06] text-(--mut)")} placeholder="Wer" />
             <ItemTools path={["items"]} index={i} count={b.items.length} />
           </li>
         ))}
       </ul>
-      <AddItem path={["items"]} item={{ text: "", who: "Team", done: false }} label="Punkt" className="mt-3" />
+      <AddItem path={["items"]} item={{ text: "", who: "Wir", done: false }} label="Punkt" className="mt-3" />
     </div>
   );
 }
@@ -383,41 +589,53 @@ function Checklist({ b }: { b: Extract<FolioBlock, { type: "checklist" }> }) {
 function Timeline({ b }: { b: Extract<FolioBlock, { type: "timeline" }> }) {
   return (
     <div>
-      <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-4 block")} placeholder="Überschrift" />
-      <ol className="relative grid gap-3 @4xl:grid-flow-col @4xl:auto-cols-fr">
+      <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
+      <ol className="grid gap-3 @4xl:grid-flow-col @4xl:auto-cols-fr">
         {b.items.map((item, i) => (
           <li key={i} className={cn(card, "group/item relative p-5")}>
             <span className="flex items-center gap-2.5">
-              <span className="flex size-7 items-center justify-center rounded-full bg-(--p) text-[12.5px] font-bold text-(--p-on)">{i + 1}</span>
-              <T path={["items", i, "when"]} value={item.when} className="text-[12.5px] font-semibold uppercase tracking-[0.08em] text-(--p)" placeholder="Wann" />
+              <span className="flex size-8 items-center justify-center rounded-full bg-(--p) text-[14px] font-bold text-(--p-on)">{i + 1}</span>
+              <T path={["items", i, "when"]} value={item.when} className="text-[13px] font-semibold uppercase tracking-[0.08em] text-(--p)" placeholder="Wann" />
             </span>
-            <T as="h4" path={["items", i, "title"]} value={item.title} className="mt-3 block text-[16.5px] font-semibold" placeholder="Etappe" />
-            <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-1 text-[14px] leading-[1.5] text-(--mut)" placeholder="Was passiert" />
+            <T as="h4" path={["items", i, "title"]} value={item.title} className="mt-3 block text-[18px] font-semibold" placeholder="Schritt" />
+            <T as="p" path={["items", i, "text"]} value={item.text} multiline className="mt-1 text-[14.5px] leading-[1.5] text-(--mut)" placeholder="Was passiert" />
             <ItemTools path={["items"]} index={i} count={b.items.length} />
           </li>
         ))}
       </ol>
-      <AddItem path={["items"]} item={{ when: "", title: "Neue Etappe", text: "" }} label="Etappe" className="mt-3" />
+      <AddItem path={["items"]} item={{ when: "", title: "Neuer Schritt", text: "" }} label="Schritt" className="mt-3" />
     </div>
   );
 }
 
 function Packages({ b }: { b: PackagesBlock }) {
+  const scope = useScope();
+  const choose = useChoose();
   return (
     <div>
       <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
       <div className="grid gap-3 @4xl:grid-cols-3">
         {b.items.map((item, i) => (
-          <article key={i} className={cn(card, "group/item relative flex flex-col p-6", item.pick && "border-(--p) bg-(--fg) text-white [--card:#12131B] [--line:rgba(255,255,255,0.12)] [--mut:rgba(255,255,255,0.65)]")}>
+          <article key={i} className={cn(card, "group/item relative flex flex-col p-6", item.pick && "border-(--fg) bg-(--fg) text-white [--line:rgba(255,255,255,0.12)] [--mut:rgba(255,255,255,0.65)]")}>
             <div className="flex items-start justify-between gap-2">
-              <T as="h4" path={["items", i, "name"]} value={item.name} className="block text-[20px] font-semibold" placeholder="Paket" />
-              <PickToggle on={item.pick} path={["items", i, "pick"]} exclusive count={b.items.length} />
+              <T as="h4" path={["items", i, "name"]} value={item.name} className="block text-[21px] font-semibold" placeholder="Paket" />
+              {choose ? (
+                <button type="button" onClick={() => b.items.forEach((_, k) => choose(scope, ["items", k, "pick"], k === i && !item.pick))} className={cn(chip, "cursor-pointer", item.pick ? "bg-(--p) text-(--p-on)" : "border border-dashed border-current/30 opacity-70")}>
+                  <Star className={cn("size-3", item.pick && "fill-current")} /> {item.pick ? "Empfohlen" : "Empfehlen"}
+                </button>
+              ) : (
+                item.pick && (
+                  <span className={cn(chip, "bg-(--p) text-(--p-on)")}>
+                    <Star className="size-3 fill-current" /> Empfohlen
+                  </span>
+                )
+              )}
             </div>
-            <T as="p" path={["items", i, "text"]} value={item.text} className="mt-1 text-[14px] text-(--mut)" placeholder="Für wen" />
-            <T path={["items", i, "price"]} value={item.price} className="mt-5 block text-[30px] font-semibold tracking-[-0.02em]" placeholder="Preis eintragen" />
+            <T as="p" path={["items", i, "text"]} value={item.text} className="mt-1 text-[14.5px] text-(--mut)" placeholder="Für wen" />
+            <T path={["items", i, "price"]} value={item.price} className="mt-5 block text-[32px] font-semibold tracking-[-0.02em]" placeholder="Preis eintragen" />
             <ul className="mt-5 flex-1 space-y-2 border-t border-(--line) pt-5">
               {item.features.map((f, k) => (
-                <li key={k} className="group/item relative flex gap-2 text-[14px] leading-[1.45]">
+                <li key={k} className="group/item relative flex gap-2 text-[14.5px] leading-[1.45]">
                   <Check className="mt-0.5 size-4 shrink-0 text-(--p)" strokeWidth={2.5} />
                   <T path={["items", i, "features", k]} value={f} className="min-w-0 flex-1" placeholder="Leistung" />
                   <ItemTools path={["items", i, "features"]} index={k} count={item.features.length} />
@@ -438,13 +656,13 @@ function Rules({ b }: { b: Extract<FolioBlock, { type: "rules" }> }) {
     <div>
       <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-3 block")} placeholder="Überschrift" />
       <div className="grid gap-3 @3xl:grid-cols-2">
-        <div className={cn(card, "border-emerald-200 bg-emerald-50/60 p-5")}>
-          <p className="mb-3 text-[13px] font-semibold text-emerald-800">Erlaubt & empfohlen</p>
-          <List items={b.dos} path={["dos"]} sign="check" tone="text-emerald-600" label="Punkt" />
+        <div className={cn(card, "border-emerald-200 bg-emerald-50/70 p-5")}>
+          <p className="mb-3 text-[15px] font-semibold text-emerald-800">Erlaubt</p>
+          <ListEdit items={b.dos} path={["dos"]} good label="Punkt" />
         </div>
-        <div className={cn(card, "border-rose-200 bg-rose-50/60 p-5")}>
-          <p className="mb-3 text-[13px] font-semibold text-rose-800">Tabu</p>
-          <List items={b.donts} path={["donts"]} sign="x" tone="text-rose-500" label="Punkt" />
+        <div className={cn(card, "border-rose-200 bg-rose-50/70 p-5")}>
+          <p className="mb-3 text-[15px] font-semibold text-rose-800">Tabu</p>
+          <ListEdit items={b.donts} path={["donts"]} good={false} label="Punkt" />
         </div>
       </div>
     </div>
@@ -453,9 +671,9 @@ function Rules({ b }: { b: Extract<FolioBlock, { type: "rules" }> }) {
 
 function TextBlock({ b }: { b: Extract<FolioBlock, { type: "text" }> }) {
   return (
-    <div className={cn(card, "p-5 @3xl:p-6")}>
+    <div className={cn(card, "p-5")}>
       <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-2 block")} placeholder="Überschrift" />
-      <T as="p" path={["text"]} value={b.text} multiline className="text-[16px] leading-[1.6]" placeholder="Text" />
+      <T as="p" path={["text"]} value={b.text} multiline className="text-[15.5px] leading-[1.6]" placeholder="Text" />
     </div>
   );
 }
@@ -463,47 +681,46 @@ function TextBlock({ b }: { b: Extract<FolioBlock, { type: "text" }> }) {
 const euro = (n: number) => n.toLocaleString("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 
 function Roi({ b }: { b: RoiBlock }) {
-  const edit = Edit();
+  const edit = useEditApi();
   const scope = useScope();
+  const ready = b.invest > 0 && b.value > 0;
+  if (!ready && !edit) return null;
   const field = (key: "invest" | "monthly" | "value", label: string) => (
     <label className="block">
       <span className="text-[12.5px] text-(--mut)">{label}</span>
-      {edit ? (
-        <input type="number" min={0} step={10} value={b[key] || ""} placeholder="0" onChange={(e) => edit.set(scope, [key], Number(e.target.value) || 0)} className="mt-1 block h-10 w-full rounded-[10px] border border-(--line) bg-white px-3 text-[15px] tabular-nums outline-none focus:border-(--p)" />
-      ) : (
-        <span className="mt-0.5 block text-[18px] font-semibold tabular-nums">{euro(b[key])}</span>
-      )}
+      <input type="number" min={0} step={10} value={b[key] || ""} placeholder="0" onChange={(e) => edit?.set(scope, [key], Number(e.target.value) || 0)} className="mt-1 block h-10 w-full rounded-[10px] border border-(--line) bg-white px-3 text-[15px] tabular-nums outline-none focus:border-(--p)" />
     </label>
   );
-  const ready = b.invest > 0 && b.value > 0;
-  const lines = b.recurring
-    ? [1, 2, 3].map((k) => {
-        const net = k * b.value - b.monthly;
-        return { k, text: net > 0 ? `nach ${Math.max(1, Math.ceil(b.invest / net))} Monaten zurück` : "deckt die laufenden Kosten noch nicht" };
-      })
-    : [{ k: Math.ceil((b.invest + b.monthly * 12) / Math.max(1, b.value)), text: "decken Investition und ein Jahr laufende Kosten" }];
+  const months = (k: number) => {
+    const net = k * b.value - b.monthly;
+    return net > 0 ? Math.max(1, Math.ceil(b.invest / net)) : 0;
+  };
   return (
     <div className={cn(card, "p-5 @3xl:p-6")}>
       <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-2 block")} placeholder="Überschrift" />
-      <T as="p" path={["text"]} value={b.text} multiline className="text-[14.5px] leading-[1.55] text-(--mut)" placeholder="Erklärung" />
-      <div className="mt-4 grid gap-4 @2xl:grid-cols-3">
-        {field("invest", "Einmalige Investition")}
-        {field("monthly", "Laufende Kosten pro Monat")}
-        {field("value", b.unit)}
-      </div>
-      {ready ? (
-        <ul className="mt-5 grid gap-2 @3xl:grid-cols-3">
-          {lines.map((l) => (
-            <li key={l.k} className="rounded-[12px] bg-(--soft) p-4">
-              <p className="text-[26px] font-semibold leading-none tracking-[-0.02em] text-(--p)">
-                {l.k} {b.recurring ? (l.k === 1 ? "Kunde" : "Kunden") : "Aufträge"}
-              </p>
-              <p className="mt-1.5 text-[13.5px] text-(--mut)">{l.text}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-4 text-[13.5px] text-(--mut)">{edit ? "Investition und Wert eintragen – die Rechnung erscheint sofort." : ""}</p>
+      {ready &&
+        (b.recurring ? (
+          <p className="text-[22px] font-semibold leading-[1.3] tracking-[-0.01em] @3xl:text-[26px]">
+            Mit <span className="text-(--p)">2 neuen Kunden</span> hat sich alles nach <span className="text-(--p)">{months(2) || "–"} Monaten</span> bezahlt gemacht.
+          </p>
+        ) : (
+          <p className="text-[22px] font-semibold leading-[1.3] tracking-[-0.01em] @3xl:text-[26px]">
+            Nach <span className="text-(--p)">{Math.ceil((b.invest + b.monthly * 12) / b.value)} Aufträgen</span> hat sich alles für ein Jahr bezahlt gemacht.
+          </p>
+        ))}
+      <T as="p" path={["text"]} value={b.text} multiline className="mt-2 text-[14px] leading-[1.5] text-(--mut)" placeholder="Erklärung" />
+      {edit && (
+        <div className="mt-4 grid gap-4 @2xl:grid-cols-3">
+          {field("invest", "Einmalige Investition (€)")}
+          {field("monthly", "Laufende Kosten pro Monat (€)")}
+          {field("value", b.unit)}
+        </div>
+      )}
+      {ready && !b.recurring ? null : ready && (
+        <p className="mt-3 text-[13.5px] text-(--mut)">
+          Investition {euro(b.invest)}
+          {b.monthly ? ` + ${euro(b.monthly)} im Monat` : ""} · gerechnet mit {euro(b.value)} pro Kunde und Monat · mit 1 Kunden: {months(1) ? `${months(1)} Monate` : "–"}, mit 3 Kunden: {months(3) ? `${months(3)} Monate` : "–"}
+        </p>
       )}
     </div>
   );
@@ -514,11 +731,11 @@ function Block({ block }: { block: FolioBlock }) {
     case "cards":
       return <Cards b={block} />;
     case "options":
-      return <Options b={block} />;
+      return block.items.some((i) => i.image) ? <Gallery b={block} /> : <Compare b={block} />;
     case "domains":
       return <Domains b={block} />;
     case "audit":
-      return <AuditTable b={block} />;
+      return <AuditBars b={block} />;
     case "table":
       return <Table b={block} />;
     case "checklist":
@@ -536,6 +753,20 @@ function Block({ block }: { block: FolioBlock }) {
   }
 }
 
+function Details({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-4 print:hidden">
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="inline-flex items-center gap-2 rounded-full border border-(--line) bg-white px-4 py-2 text-[13.5px] font-medium text-(--mut) transition-colors hover:border-(--p) hover:text-(--fg)">
+        <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} />
+        {title}
+        {count !== undefined && <span className="text-(--mut)/70">({count})</span>}
+      </button>
+      {open && <div className="mt-4 space-y-8">{children}</div>}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------- pages
 export function RoleBadge({ role, className }: { role: Chapter["role"]; className?: string }) {
   const r = roles[role];
@@ -550,183 +781,183 @@ export function RoleBadge({ role, className }: { role: Chapter["role"]; classNam
   );
 }
 
-export function ChapterView({ chapter, index, number }: { chapter: Chapter; index: number; number: number }) {
+export function ChapterView({ chapter, index, number, total }: { chapter: Chapter; index: number; number: number; total: number }) {
   const scope = `chapters.${index}`;
+  const editing = !!useEditApi();
+  // folios made before the short answers existed simply show none
+  const reasons = chapter.reasons ?? [];
+  const main = chapter.blocks.map((b, i) => [b, i] as const).filter(([b]) => !b.detail);
+  const details = chapter.blocks.map((b, i) => [b, i] as const).filter(([b]) => b.detail);
+  // a chapter that starts with pictures shows them first – you look at them together before talking about them
+  const pictures = main[0]?.[0].type === "options" && main[0][0].items.some((i) => i.image) ? main[0] : null;
+  const rest = pictures ? main.slice(1) : main;
+  const renderMain = (list: typeof main) =>
+    list.map(([block, b]) => (
+      <BlockContext.Provider key={block.id} value={`${scope}.blocks.${b}`}>
+        <Block block={block} />
+      </BlockContext.Provider>
+    ));
   return (
     <section id={`ch-${chapter.id}`} className="scroll-mt-20 break-before-page">
       <BlockContext.Provider value={scope}>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[13px] font-semibold tabular-nums text-(--p)">{String(number).padStart(2, "0")}</span>
-          <RoleBadge role={chapter.role} />
-        </div>
-        <T as="h2" path={["title"]} value={chapter.title} className={cn(h2, "mt-3 block")} placeholder="Kapitel" />
-        <T as="p" path={["lead"]} value={chapter.lead} multiline className="mt-2 max-w-[720px] text-[16.5px] leading-[1.55] text-(--mut)" placeholder="Worum es geht" />
-        <div className="mt-6 flex gap-4 rounded-[16px] bg-(--fg) p-5 text-white @3xl:p-6">
-          <Star className="mt-1 size-5 shrink-0 fill-(--p) text-(--p)" aria-hidden="true" />
-          <div className="min-w-0">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-white/55">Unsere Empfehlung</p>
-            <T as="p" path={["pick"]} value={chapter.pick} multiline className="mt-1 text-[17.5px] font-medium leading-[1.45] @3xl:text-[19px]" placeholder="Die Empfehlung in einem Satz" />
-          </div>
+        <p className="text-[13px] font-semibold text-(--p)">
+          Schritt {number} von {total}
+        </p>
+        <T as="h2" path={["title"]} value={chapter.title} className={cn(h2, "mt-1 block")} placeholder="Kapitel" />
+        <T as="p" path={["lead"]} value={chapter.lead} className="mt-2 block text-[17px] text-(--mut)" placeholder="Worum es geht" />
+      </BlockContext.Provider>
+      {pictures && <div className="mt-6">{renderMain([pictures])}</div>}
+      <BlockContext.Provider value={scope}>
+        <div className={cn("rounded-[22px] bg-(--fg) p-6 text-white @3xl:p-8", pictures ? "mt-8" : "mt-6")}>
+          <p className="flex items-center gap-2 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-white/55">
+            <Star className="size-4 fill-amber-400 text-amber-400" /> Unsere Empfehlung
+          </p>
+          <T as="p" path={["short"]} value={chapter.short} className="mt-2 block text-[26px] font-semibold leading-[1.15] tracking-[-0.02em] @3xl:text-[34px]" placeholder="In wenigen Worten" />
+          <T as="p" path={["pick"]} value={chapter.pick} multiline className="mt-2 max-w-[780px] text-[16px] leading-[1.5] text-white/75" placeholder="Die Empfehlung in einem Satz" />
+          {(reasons.length > 0 || editing) && (
+            <ul className="mt-5 grid gap-2 @3xl:grid-cols-3">
+              {reasons.map((r, i) => (
+                <li key={i} className="group/item relative flex gap-2 rounded-[12px] bg-white/[0.07] px-3.5 py-2.5 text-[14.5px] leading-[1.4]">
+                  <Check className="mt-0.5 size-4 shrink-0 text-emerald-400" strokeWidth={3} />
+                  <T path={["reasons", i]} value={r} className="min-w-0 flex-1" placeholder="Grund" />
+                  <ItemTools path={["reasons"]} index={i} count={reasons.length} />
+                </li>
+              ))}
+              <li className="empty:hidden">
+                <AddItem path={["reasons"]} item="" label="Grund" />
+              </li>
+            </ul>
+          )}
         </div>
       </BlockContext.Provider>
-      <div className="mt-8 space-y-9">
-        {chapter.blocks.map((block, b) => (
-          <BlockContext.Provider key={block.id} value={`${scope}.blocks.${b}`}>
-            <Block block={block} />
-          </BlockContext.Provider>
-        ))}
-      </div>
+
+      {rest.length > 0 && <div className="mt-8 space-y-10">{renderMain(rest)}</div>}
+      {details.length > 0 && (
+        <Details title="Mehr Details" count={details.length}>
+          {details.map(([block, b]) => (
+            <BlockContext.Provider key={block.id} value={`${scope}.blocks.${b}`}>
+              <Block block={block} />
+            </BlockContext.Provider>
+          ))}
+        </Details>
+      )}
     </section>
   );
 }
 
-/** Short facts about what each discipline did, from the folio itself – the live checks first. */
-export function roleFacts(doc: FolioDoc) {
-  const facts: Partial<Record<Chapter["role"], [number, string][]>> = {};
-  const add = (role: Chapter["role"], rank: number, text: string) => (facts[role] = [...(facts[role] ?? []), [rank, text]]);
-  for (const ch of doc.chapters.filter((c) => !c.hidden)) {
-    const r = ch.role;
-    for (const b of ch.blocks) {
-      if (b.type === "domains" && b.items.length) {
-        const checked = b.items.some((d) => d.checked);
-        add(r, 0, checked ? `${b.items.length} Domains live geprüft, ${b.items.filter((d) => d.status === "free").length} frei` : `${b.items.length} Domains vorgemerkt`);
-      }
-      if (b.type === "audit" && b.items.length) {
-        const done = b.items.filter((s) => s.result);
-        const label = r === "tech" ? (b.items.length === 1 ? "Ihre Website geprüft" : `${b.items.length} Websites geprüft`) : `${b.items.length} Wettbewerber geprüft`;
-        add(r, 0, done.length ? label : label.replace("geprüft", "zur Prüfung"));
-      }
-      if (b.type === "options" && b.items.length) add(r, 1, r === "brand" ? `${b.items.length} Namen verglichen` : `${b.items.length} Gestaltungen bewertet`);
-      if (b.type === "table" && b.rows.length) add(r, 1, `${b.rows.length} ${r === "seo" ? "Suchbegriffe" : r === "ads" ? "Kanäle bewertet" : "Seiten geplant"}`);
-      if (b.type === "rules" && r === "legal") add(r, 1, `${b.dos.length + b.donts.length} Regeln geprüft`);
-      if (b.type === "checklist" && r === "legal") add(r, 2, `${b.items.length} Pflichten`);
-      if (b.type === "cards" && r === "strategy" && /zielgruppe/i.test(b.title)) add(r, 1, `${b.items.length} Zielgruppen`);
-      if (b.type === "cards" && r === "content" && /überschrift/i.test(b.title)) add(r, 1, `${b.items.length} Überschriften`);
-      if (b.type === "checklist" && r === "content") add(r, 2, `${b.items.length} Punkte Material`);
-      if (b.type === "cards" && r === "seo" && /lokal/i.test(b.title)) add(r, 2, `${b.items.length} Ortsseiten`);
-      if (b.type === "cards" && r === "tech" && /plan/i.test(b.title)) add(r, 1, `${b.items.length} Bausteine geplant`);
-      if (b.type === "timeline") add(r, 1, `${b.items.length} Etappen`);
-      if (b.type === "checklist" && r === "lead" && /klären/i.test(b.title)) add(r, 2, `${b.items.length} offene Fragen`);
-      if (b.type === "packages") add(r, 1, `${b.items.length} Pakete`);
-      if (b.type === "roi") add(r, 2, "Rechnung, ab wann es sich lohnt");
-    }
-  }
-  return Object.fromEntries(Object.entries(facts).map(([role, list]) => [role, [...new Set(list.sort((a, b) => a[0] - b[0]).map(([, t]) => t))]])) as Partial<Record<Chapter["role"], string[]>>;
+/** What was looked at, in numbers a client understands. */
+export function checkedFacts(doc: FolioDoc) {
+  const blocks = doc.chapters.filter((c) => !c.hidden).flatMap((c) => c.blocks);
+  const facts: string[] = [];
+  const designs = blocks.find((b) => b.type === "options" && b.items.some((i) => i.image));
+  if (designs?.type === "options") facts.push(`${designs.items.length} Entwürfe`);
+  const domains = blocks.filter((b) => b.type === "domains").flatMap((b) => (b.type === "domains" ? b.items : []));
+  if (domains.length) facts.push(`${domains.length} Internetadressen geprüft`);
+  const sites = blocks.filter((b) => b.type === "audit").flatMap((b) => (b.type === "audit" ? b.items : []));
+  if (sites.length) facts.push(`${sites.length} Websites verglichen`);
+  return facts;
 }
 
 export function Cover({ doc }: { doc: FolioDoc }) {
+  const facts = checkedFacts(doc);
   return (
-    <header className="relative overflow-hidden rounded-[24px] bg-(--fg) px-6 py-12 text-white @3xl:px-12 @3xl:py-16">
-      <div className="pointer-events-none absolute -right-24 -top-24 size-[420px] rounded-full opacity-40 blur-[90px]" style={{ background: "var(--p)" }} aria-hidden="true" />
+    <header className="relative overflow-hidden rounded-[26px] bg-(--fg) px-6 py-12 text-white @3xl:px-12 @3xl:py-16">
+      <div className="pointer-events-none absolute -right-24 -top-24 size-[460px] rounded-full opacity-45 blur-[100px]" style={{ background: "var(--p)" }} aria-hidden="true" />
       <div className="relative">
-        <p className="text-[12.5px] font-semibold uppercase tracking-[0.16em] text-white/60">Projektmappe</p>
+        <p className="text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">Ihr Plan</p>
         <BlockContext.Provider value="meta">
-          <T as="h1" path={["client"]} value={doc.meta.client} className="mt-4 block text-[40px] font-semibold leading-[1.02] tracking-[-0.035em] @3xl:text-[64px]" placeholder="Kunde" />
-          <p className="mt-3 text-[17px] text-white/75">
+          <T as="h1" path={["client"]} value={doc.meta.client} className="mt-4 block text-[42px] font-semibold leading-[1.02] tracking-[-0.035em] @3xl:text-[68px]" placeholder="Kunde" />
+          <p className="mt-3 text-[18px] text-white/70">
             <T path={["industry"]} value={doc.meta.industry} placeholder="Branche" /> · <T path={["city"]} value={doc.meta.city} placeholder="Ort" />
           </p>
         </BlockContext.Provider>
         <BlockContext.Provider value="">
-          <T as="p" path={["intro"]} value={doc.intro} multiline className="mt-8 max-w-[640px] text-[16.5px] leading-[1.6] text-white/85" placeholder="Einleitung" />
+          <T as="p" path={["intro"]} value={doc.intro} multiline className="mt-8 max-w-[640px] text-[19px] leading-[1.5] text-white/90" placeholder="Worum es geht" />
         </BlockContext.Provider>
-        <p className="mt-10 flex flex-wrap gap-x-6 gap-y-1 text-[13px] text-white/55">
-          <span>Erstellt von lxclouds.com</span>
-          <span>Stand {new Date(doc.meta.date).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}</span>
+        {facts.length > 0 && (
+          <ul className="mt-8 flex flex-wrap gap-2">
+            {facts.map((f) => (
+              <li key={f} className="flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-[13.5px]">
+                <Check className="size-3.5 text-emerald-400" strokeWidth={3} /> {f}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-10 text-[13px] text-white/50">
+          lxclouds.com · Stand {new Date(doc.meta.date).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
       </div>
     </header>
   );
 }
 
-export function TeamView({ doc }: { doc: FolioDoc }) {
-  const facts = roleFacts(doc);
-  const used = roleOrder.filter((r) => doc.chapters.some((c) => c.role === r && !c.hidden));
+export function SummaryView({ doc }: { doc: FolioDoc }) {
+  const visible = doc.chapters.map((c, i) => [c, i] as const).filter(([c]) => !c.hidden);
   return (
     <section>
-      <p className={h3}>Wer daran gearbeitet hat</p>
-      <h2 className={cn(h2, "mt-2")}>Ihr Projektteam</h2>
-      <p className="mt-2 max-w-[640px] text-[16px] leading-[1.55] text-(--mut)">Jede Disziplin hat Ihr Vorhaben aus ihrer Sicht geprüft. Die Ergebnisse stehen in den Kapiteln dieser Mappe.</p>
-      <ul className="mt-6 grid gap-3 @2xl:grid-cols-2 @5xl:grid-cols-5">
-        {used.map((key) => {
-          const r = roles[key];
+      <h2 className={h2}>Das Wichtigste auf einen Blick</h2>
+      <ol className="mt-6 grid gap-3 @3xl:grid-cols-2 @5xl:grid-cols-3">
+        {visible.map(([c, i], n) => {
+          const r = roles[c.role];
           const Icon = r.icon;
           return (
-            <li key={key} className={cn(card, "p-4")}>
-              <span className="flex size-9 items-center justify-center rounded-[10px]" style={{ backgroundColor: r.tone }}>
-                <Icon className="size-[18px] text-white" />
-              </span>
-              <p className="mt-3 text-[15px] font-semibold leading-tight">{r.label}</p>
-              <p className="mt-1 text-[13px] leading-[1.4] text-(--mut)">{r.task}</p>
-              {facts[key]?.slice(0, 2).map((f) => (
-                <p key={f} className="mt-2 flex gap-1.5 text-[12.5px] font-medium leading-[1.35] text-(--fg)">
-                  <Check className="mt-px size-3.5 shrink-0" style={{ color: r.tone }} strokeWidth={3} />
-                  {f}
-                </p>
-              ))}
+            <li key={c.id}>
+              <a href={`#ch-${c.id}`} className={cn(card, "flex h-full flex-col p-5 transition-[border-color] hover:border-(--p)")}>
+                <span className="flex items-center gap-2.5">
+                  <span className="flex size-8 items-center justify-center rounded-[9px]" style={{ backgroundColor: r.tone }}>
+                    <Icon className="size-4 text-white" />
+                  </span>
+                  <span className="text-[13.5px] font-medium text-(--mut)">
+                    {n + 1}. {c.title}
+                  </span>
+                </span>
+                <BlockContext.Provider value={`chapters.${i}`}>
+                  <T as="p" path={["short"]} value={c.short} className="mt-3 block text-[20px] font-semibold leading-[1.25] tracking-[-0.01em]" placeholder="Kurz" />
+                </BlockContext.Provider>
+              </a>
             </li>
           );
         })}
-      </ul>
-    </section>
-  );
-}
-
-export function SummaryView({ doc }: { doc: FolioDoc }) {
-  const visible = doc.chapters.map((c, i) => [c, i] as const).filter(([c]) => !c.hidden && c.pick.trim());
-  return (
-    <section>
-      <p className={h3}>Das Wichtigste</p>
-      <h2 className={cn(h2, "mt-2")}>Unsere Empfehlung auf einen Blick</h2>
-      <ol className="mt-6 grid gap-3 @4xl:grid-cols-2">
-        {visible.map(([c, i], n) => (
-          <li key={c.id} className={cn(card, "flex gap-4 p-5")}>
-            <span className="text-[22px] font-semibold tabular-nums leading-none text-(--p)">{String(n + 1).padStart(2, "0")}</span>
-            <div className="min-w-0">
-              <RoleBadge role={c.role} />
-              <a href={`#ch-${c.id}`} className="mt-2 block text-[15.5px] font-semibold hover:text-(--p)">
-                {c.title}
-              </a>
-              <BlockContext.Provider value={`chapters.${i}`}>
-                <T as="p" path={["pick"]} value={c.pick} multiline className="mt-1 text-[14.5px] leading-[1.5] text-(--mut)" placeholder="Empfehlung" />
-              </BlockContext.Provider>
-            </div>
-          </li>
-        ))}
       </ol>
     </section>
   );
 }
 
-/** The whole folio as one page: cover, team, summary, chapters. Editable when `edit` is given. */
+/** The whole folio as one page: cover, overview, chapters. Editable when `edit` is given. */
 export function FolioView({ doc, edit = null, tools = null, className, children }: { doc: FolioDoc; edit?: EditApi | null; tools?: FolioTools | null; className?: string; children?: ReactNode }) {
   const visible = doc.chapters.map((c, i) => [c, i] as const).filter(([c]) => !c.hidden);
   return (
     <EditContext.Provider value={edit}>
       <ToolsContext.Provider value={tools}>
-        <div className={cn("folio @container bg-(--bg) text-(--fg) [font-family:Outfit,sans-serif]", edit && "demo-editing", className)} style={folioVars(doc)}>
-          <div className="mx-auto max-w-[1180px] space-y-16 px-4 py-6 @3xl:px-8 @3xl:py-10">
-            <Cover doc={doc} />
-            <TeamView doc={doc} />
-            <SummaryView doc={doc} />
-            {visible.map(([chapter, i], n) => (
-              <ChapterView key={chapter.id} chapter={chapter} index={i} number={n + 1} />
-            ))}
-            {children}
+        <DocContext.Provider value={doc}>
+          <div className={cn("folio @container bg-(--bg) text-(--fg) [font-family:Outfit,sans-serif]", edit && "demo-editing", className)} style={folioVars(doc)}>
+            <div className="mx-auto max-w-[1180px] space-y-20 px-4 py-6 @3xl:px-8 @3xl:py-10">
+              <Cover doc={doc} />
+              <SummaryView doc={doc} />
+              {visible.map(([chapter, i], n) => (
+                <ChapterView key={chapter.id} chapter={chapter} index={i} number={n + 1} total={visible.length} />
+              ))}
+              {children}
+            </div>
           </div>
-        </div>
+        </DocContext.Provider>
       </ToolsContext.Provider>
     </EditContext.Provider>
   );
 }
 
-/** Same context as FolioView, for rendering single pieces (slides). */
-export function FolioFrame({ doc, children, className }: { doc: FolioDoc; children: ReactNode; className?: string }) {
+/** Read-only context for rendering single pieces (slides); `choose` allows favourites and choices in the meeting. */
+export function FolioFrame({ doc, children, className, choose = null }: { doc: FolioDoc; children: ReactNode; className?: string; choose?: EditApi["set"] | null }) {
   return (
     <EditContext.Provider value={null}>
       <ToolsContext.Provider value={null}>
-        <div className={cn("folio @container bg-(--bg) text-(--fg) [font-family:Outfit,sans-serif]", className)} style={folioVars(doc)}>
-          {children}
-        </div>
+        <ChoiceContext.Provider value={choose}>
+          <DocContext.Provider value={doc}>
+            <div className={cn("folio @container bg-(--bg) text-(--fg) [font-family:Outfit,sans-serif]", className)} style={folioVars(doc)}>
+              {children}
+            </div>
+          </DocContext.Provider>
+        </ChoiceContext.Provider>
       </ToolsContext.Provider>
     </EditContext.Provider>
   );

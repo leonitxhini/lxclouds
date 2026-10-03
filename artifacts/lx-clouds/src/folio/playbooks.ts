@@ -34,6 +34,8 @@ export type Playbook = {
   donts: string[];
   /** the legal recommendation in one sentence */
   legalPick: string;
+  /** answers in a few words, for the big line of a chapter */
+  short: { audience: string; channels: string; legal: string };
   legalExtras: string[];
   contentNeeds: string[];
   questions: string[];
@@ -152,6 +154,7 @@ const buchhaltung: Playbook = {
     "Keine Texte von Mitbewerbern übernehmen, die mehr versprechen – sogenannte Überschusswerbung kann abgemahnt und mit Bußgeld belegt werden",
   ],
   legalPick: "Nur laufende Buchhaltung und Lohnabrechnung bewerben – Steuerberatung, Jahresabschluss und Umsatzsteuer bleiben beim Steuerberater.",
+  short: { audience: "Selbstständige & kleine Betriebe", channels: "Google-Profil, Steuerberater, Empfehlungen", legal: "Nur Buchhaltung & Lohn bewerben" },
   legalExtras: ["Hinweis auf die Befugnis nach § 6 Nr. 4 StBerG im Impressum oder auf der Leistungsseite", "Auftragsverarbeitungsverträge für Belege-Portal und Cloud-Speicher", "Verschwiegenheit und Datensicherheit sichtbar erklären (Mandantendaten)"],
   contentNeeds: [
     ...baseContent,
@@ -219,6 +222,7 @@ function generic(id: string, label: string, word: string, words: string[], custo
     ],
     dos: special.dos ?? ["Echte Leistungen und Preise klar benennen", "Bewertungen sammeln und beantworten"],
     legalPick: special.legalPick ?? "Pflichtseiten sauber, Datenschutz schlank, Bildrechte geklärt – und nur bewerben, was Sie auch leisten.",
+    short: special.short ?? { audience: special.audiences?.[0]?.title ?? "Kunden aus der Region", channels: "Google-Profil & Empfehlungen", legal: "Pflichtseiten & Datenschutz sauber" },
     donts: special.donts ?? ["Keine erfundenen Bewertungen oder Zahlen", "Keine fremden Fotos ohne Rechte"],
     legalExtras: special.legalExtras ?? [],
     contentNeeds: [...baseContent, ...(special.contentNeeds ?? [])],

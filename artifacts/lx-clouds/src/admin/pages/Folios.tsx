@@ -11,7 +11,7 @@ import { Present } from "@/folio/Present";
 import { roles } from "@/folio/roles";
 import type { Audit, AuditBlock, DomainsBlock, FolioDoc } from "@/folio/types";
 import { cn } from "@/lib/utils";
-import { api, ApiError, formatDate, useLoad, type Client } from "../api";
+import { api, ApiError, formatDate, useLoad, type BoardItem, type BoardSummary, type Client } from "../api";
 import { Badge, Btn, Card, Empty, Field, Input, Loading, Modal, PageHeader, Select, Textarea, useToast } from "../ui";
 
 type FolioSummary = { id: number; slug: string; title: string; client_id: number | null; client_name: string | null; shared: number; updated_at: string; industry: string | null };
@@ -73,6 +73,7 @@ export function NewFolioModal({ open, onClose, client }: { open: boolean; onClos
   const [, navigate] = useLocation();
   const toast = useToast();
   const clients = useLoad<{ clients: Client[] }>(open ? "/clients" : null);
+  const boards = useLoad<{ boards: BoardSummary[] }>(open ? "/boards" : null);
   const [clientId, setClientId] = useState(client ? String(client.id) : "");
   const [accent, setAccent] = useState("#6865FF");
   const [busy, setBusy] = useState(false);
@@ -82,6 +83,17 @@ export function NewFolioModal({ open, onClose, client }: { open: boolean; onClos
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const name = String(f.get("client") ?? "").trim() || chosen?.name || "Kunde";
+    // the drafts of a design collection become the first chapter: you look at them together
+    const boardId = String(f.get("board") ?? "");
+    let designs: { name: string; image: string }[] = [];
+    if (boardId) {
+      try {
+        const { items } = await api<{ items: BoardItem[] }>(`/boards/${boardId}`);
+        designs = items.map((i) => ({ name: i.group_name ? `${i.group_name} · ${i.title}` : i.title, image: i.image }));
+      } catch {
+        toast("Die Entwürfe konnten nicht geladen werden.", "error");
+      }
+    }
     const doc = generateFolio({
       client: name,
       playbook: String(f.get("playbook")),
@@ -100,6 +112,7 @@ export function NewFolioModal({ open, onClose, client }: { open: boolean; onClos
           const [a, b] = line.split("|").map((s) => s.trim());
           return b ? { name: a, url: b } : { name: a.replace(/^https?:\/\/(www\.)?/, "").split("/")[0], url: a };
         }),
+      designs,
       accent,
     });
     setBusy(true);
@@ -146,6 +159,16 @@ export function NewFolioModal({ open, onClose, client }: { open: boolean; onClos
         </Field>
         <Field label="Ziel des Kunden">
           <Input name="goal" placeholder="z. B. 5 neue Mandanten pro Monat" />
+        </Field>
+        <Field label="Design-Entwürfe" hint="Bilder aus „Entwürfe“ – ihr schaut sie in der Mappe gemeinsam an." className="sm:col-span-2">
+          <Select name="board" defaultValue={boards.data?.boards.find((b) => chosen && b.client_id === chosen.id)?.id ?? ""} key={`${chosen?.id}-${boards.data?.boards.length}`}>
+            <option value="">Keine – allgemeine Gestaltungsrichtungen</option>
+            {boards.data?.boards.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.title} ({b.items} Bilder{b.client_name ? ` · ${b.client_name}` : ""})
+              </option>
+            ))}
+          </Select>
         </Field>
         <Field label="Namensideen" hint="Komma-getrennt; jede wird bewertet und als Domain geprüft." className="sm:col-span-2">
           <Input name="names" placeholder="z. B. IC Buchhaltung, mybuchhalter" />
@@ -445,7 +468,7 @@ export function FolioEditor({ id }: { id: number }) {
         <FolioView doc={doc} edit={edit} tools={tools} className="min-h-dvh" />
       </div>
 
-      {presenting && <Present doc={doc} onClose={() => setPresenting(false)} />}
+      {presenting && <Present doc={doc} choose={edit.set} onClose={() => setPresenting(false)} />}
 
       <Modal open={shareOpen} onClose={() => setShareOpen(false)} title="Mappe teilen">
         <label className="flex cursor-pointer items-center justify-between gap-4 rounded-[14px] border border-ink/10 p-4">

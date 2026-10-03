@@ -1,14 +1,16 @@
 import { ChevronLeft, ChevronRight, LayoutGrid, Maximize, Minimize, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { ChapterView, Cover, FolioFrame, RoleBadge, SummaryView, TeamView } from "./Folio";
+import type { EditApi } from "@/demo/edit";
+import { ChapterView, Cover, FolioFrame, RoleBadge, SummaryView } from "./Folio";
 import { roles } from "./roles";
 import type { FolioDoc } from "./types";
 
 type Slide = { key: string; label: string; render: () => ReactNode };
 
 /** The folio as a full-screen presentation for the meeting: cover, team, summary, one slide per chapter, next steps. */
-export function Present({ doc, onClose, start = 0 }: { doc: FolioDoc; onClose: () => void; start?: number }) {
+/** `choose` lets favourites and choices be set during the meeting; texts stay as they are. */
+export function Present({ doc, onClose, start = 0, choose = null }: { doc: FolioDoc; onClose: () => void; start?: number; choose?: EditApi["set"] | null }) {
   const root = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(start);
@@ -23,9 +25,8 @@ export function Present({ doc, onClose, start = 0 }: { doc: FolioDoc; onClose: (
       label: "Titel",
       render: () => <Cover doc={doc} />,
     },
-    { key: "team", label: "Projektteam", render: () => <TeamView doc={doc} /> },
     { key: "summary", label: "Auf einen Blick", render: () => <SummaryView doc={doc} /> },
-    ...visible.map(([chapter, i], n) => ({ key: chapter.id, label: chapter.title, render: () => <ChapterView chapter={chapter} index={i} number={n + 1} /> })),
+    ...visible.map(([chapter, i], n) => ({ key: chapter.id, label: chapter.title, render: () => <ChapterView chapter={chapter} index={i} number={n + 1} total={visible.length} /> })),
     {
       key: "end",
       label: "Wie es weitergeht",
@@ -104,7 +105,7 @@ export function Present({ doc, onClose, start = 0 }: { doc: FolioDoc; onClose: (
 
   return (
     <div ref={root} className="fixed inset-0 z-[80] flex flex-col bg-[#F7F6F2]" onPointerDown={down} onPointerUp={up}>
-      <FolioFrame doc={doc} className="flex min-h-0 flex-1 flex-col">
+      <FolioFrame doc={doc} choose={choose} className="flex min-h-0 flex-1 flex-col">
         <div className="h-1 shrink-0 bg-(--fg)/[0.06]">
           <div className="h-full bg-(--p) transition-[width] duration-500" style={{ width: `${((index + 1) / slides.length) * 100}%` }} />
         </div>

@@ -9,7 +9,7 @@ export const roles: Record<RoleKey, { label: string; task: string; icon: LucideI
   design: { label: "Design & Nutzerführung", task: "Gestaltung, Seitenaufbau, Anfragewege", icon: Palette, tone: "#9333EA" },
   content: { label: "Text & Inhalte", task: "Botschaften, Texte, Material vom Kunden", icon: PenLine, tone: "#0E7490" },
   seo: { label: "SEO & lokale Sichtbarkeit", task: "Google-Suche, Maps, Bewertungen", icon: Search, tone: "#15803D" },
-  ads: { label: "Werbung & Kanäle", task: "Wo neue Kunden herkommen", icon: Megaphone, tone: "#DB2777" },
+  ads: { label: "Kunden gewinnen", task: "Google, Empfehlungen, Werbung", icon: Megaphone, tone: "#DB2777" },
   legal: { label: "Recht & Datenschutz", task: "Was erlaubt ist, was Pflicht ist", icon: Scale, tone: "#475569" },
   tech: { label: "Entwicklung & Technik", task: "Technik, Hosting, Messung, Pflege", icon: Code2, tone: "#2563EB" },
   sales: { label: "Angebot & Investition", task: "Pakete, Kosten, was es bringt", icon: Handshake, tone: "#0F766E" },
