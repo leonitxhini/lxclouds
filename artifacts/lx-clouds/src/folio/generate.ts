@@ -87,7 +87,8 @@ function chapter(role: RoleKey, title: string, lead: string, short: string, pick
   return { id: fid(), role, title, lead, short, pick, reasons, status: "draft", blocks };
 }
 
-const priority = { A: "Zuerst", B: "Danach", C: "Später" } as const;
+/** "2.490 €" → 2490 */
+const euros = (text: string) => Number(String(text).replace(/[^\d,]/g, "").replace(",", ".")) || 0;
 
 /**
  * The folio for the meeting with the client, in the order you go through it together:
@@ -103,6 +104,7 @@ export function generateFolio(input: FolioInput): FolioDoc {
   const areas = localAreas[key] ?? ["die wichtigsten Stadtteile", "die Nachbarorte"];
   const hasSite = /\S/.test(input.website);
   const designs = input.designs ?? [];
+  const recommended = book.packages[1] ?? book.packages[0];
 
   const designBlock: FolioBlock = designs.length
     ? { id: fid(), type: "options", title: "Die Entwürfe", items: designs.map((d, i) => ({ name: d.name, text: "", pros: [], cons: [], score: 3, pick: i === 0, image: d.image })) }
@@ -116,7 +118,7 @@ export function generateFolio(input: FolioInput): FolioDoc {
       { id: fid(), type: "cards", title: "So wird aus Besuchern eine Anfrage", items: book.conversion.map((c) => ({ ...c, text: prose(c.text) })), detail: true },
     ]),
 
-    chapter("brand", "Name & Internetadresse", "Welche Adresse ist stark – und warum?", names[0], "Eine kurze Adresse mit .de, die genau zum Namen passt – und die noch frei ist.", ["Kunden tippen sie ohne Nachfragen", "E-Mails kommen sicher bei Ihnen an", "Niemand kann sie Ihnen wegnehmen"], [
+    chapter("brand", "Name & Internetadresse", "Welche Adresse ist stark – und warum?", names[0], "Eine kurze .de-Adresse, die genau zum Namen passt, frei ist und nicht mit fremden Adressen verwechselt wird.", ["Kunden tippen sie ohne Nachfragen", "Name, Adresse und E-Mail aus einem Guss", "Niemand kann sie Ihnen wegnehmen"], [
       { id: fid(), type: "domains", title: "Internetadressen – live geprüft", items: domainIdeas(names, book, input.city).map((domain) => ({ domain, status: "unknown", checked: "", note: "", pick: false })) },
       { id: fid(), type: "options", title: "Die Namen im Vergleich", items: names.map((name, i) => ({ name, text: "", ...judgeName(name, book), pick: i === 0 })) },
       {
@@ -132,39 +134,33 @@ export function generateFolio(input: FolioInput): FolioDoc {
       },
     ]),
 
-    chapter("ads", "So finden Sie neue Kunden", `Wo neue ${book.customers} herkommen – das Wichtigste zuerst.`, book.short.channels, "Erst die kostenlosen Wege mit der größten Wirkung, dann Werbung mit kleinem Budget.", ["Kostet am Anfang fast nichts", "Wirkt schon in den ersten Wochen", "Alles wird gemessen"], [
-      { id: fid(), type: "table", style: "ranked", title: "Ihre Wege zu neuen Kunden", columns: ["Weg", "Wann", "Was wir tun"], rows: book.channels.slice().sort((a, b) => a[1].localeCompare(b[1])).map((r) => [search(r[0]), priority[r[1] as keyof typeof priority] ?? r[1], search(r[2])]) },
-      { id: fid(), type: "cards", title: "Wen wir ansprechen", items: book.audiences.slice(0, 3).map((a) => ({ title: a.title, text: firstSentence(prose(a.text)), tag: a.tag })) },
+    chapter("ads", "So finden Sie neue Kunden", `So kommt ein neuer ${book.customers === "Mandanten" ? "Mandant" : "Kunde"} zu Ihnen.`, book.short.channels, "Erst die Wege, die nichts kosten und sofort wirken. Werbung erst, wenn Website und Bewertungen stehen.", ["Kostet am Anfang fast nichts", "Wirkt schon in den ersten Wochen", "Jede Anfrage wird gezählt"], [
+      { id: fid(), type: "journey", title: "Der Weg zu Ihnen", items: book.journey.map((j) => ({ ...j, text: search(j.text).replace(/„([^“]+)“/, (_, q: string) => `„${q.replace(key, city.split(" ")[0])}“`) })), note: book.journeyNote },
+      { id: fid(), type: "channels", title: "Ihre Wege zu neuen Kunden", items: book.channels.map((c) => ({ ...c, text: prose(c.text) })) },
+      { id: fid(), type: "cards", title: "Wen wir ansprechen", items: book.audiences.slice(0, 3).map((a) => ({ title: a.title, text: firstSentence(prose(a.text)), tag: a.tag })), detail: true },
       { id: fid(), type: "table", title: "Wonach Ihre Kunden bei Google suchen", columns: ["Suchbegriff", "Was dahinter steckt", "Passende Seite"], rows: book.keywords.map((r) => [search(r[0]), prose(r[1]), prose(r[2])]), detail: true },
-      { id: fid(), type: "checklist", title: `Google-Profil einrichten (Kategorie „${book.gbpCategory}“)`, items: ["Profil anlegen und bestätigen", "Leistungen und Öffnungszeiten eintragen", "Echte Fotos hochladen", "Nach jedem Auftrag um eine Bewertung bitten", "Jede Bewertung beantworten", ...book.gbpExtras].map((text) => ({ text, who: "Team", done: false })), detail: true },
+      { id: fid(), type: "checklist", title: `Google-Profil einrichten (Kategorie „${book.gbpCategory}“)`, items: ["Profil anlegen und bestätigen", "Leistungen und Öffnungszeiten eintragen", "Echte Fotos hochladen", "Nach jedem Auftrag um eine Bewertung bitten", "Jede Bewertung beantworten", ...book.gbpExtras].map((text) => ({ text, who: "Wir", done: false })), detail: true },
       { id: fid(), type: "cards", title: "Eigene Seiten für die Umgebung", items: areas.slice(0, 6).map((area) => ({ title: area, text: `Eine eigene Seite für ${book.customers} aus ${area}.`, tag: "Ort" })), detail: true },
     ]),
 
-    chapter("strategy", "Wie die Konkurrenz dasteht", "Wir haben die Websites der Mitbewerber geprüft.", "Hier können Sie vorbeiziehen", prose(book.positioning), book.usps.slice(0, 3).map((u) => prose(u.title)), [
-      { id: fid(), type: "audit", title: "Websites im Vergleich (0–100 Punkte)", items: [...(hasSite ? [{ name: "Ihre Website", url: input.website, own: true, result: null }] : []), ...input.competitors.filter((c) => c.url.trim()).map((c) => ({ name: c.name || c.url, url: c.url, own: false, result: null }))] },
+    chapter("strategy", "Wie die Konkurrenz dasteht", "Wer ist gut, wer schwach – und wo ist Ihre Chance?", "Hier können Sie vorbeiziehen", prose(book.positioning), book.usps.slice(0, 3).map((u) => prose(u.title)), [
+      { id: fid(), type: "audit", title: "Die Websites im Vergleich", items: [...(hasSite ? [{ name: "Ihre Website", url: input.website, own: true, result: null }] : []), ...input.competitors.filter((c) => c.url.trim()).map((c) => ({ name: c.name || c.url, url: c.url, own: false, result: null }))] },
     ]),
 
-    chapter("legal", "Was erlaubt ist", "Damit keine Abmahnung den Start verdirbt.", book.short.legal, book.legalPick, ["Schützt vor Abmahnungen", "Wirkt ehrlich und seriös", "Impressum und Datenschutz machen wir"], [
-      { id: fid(), type: "rules", title: "Erlaubt und tabu", dos: book.dos.slice(0, 4), donts: book.donts.slice(0, 4) },
-      { id: fid(), type: "checklist", title: "Pflichten für die Website", items: ["Impressum nach § 5 DDG", "Datenschutzerklärung", "Statistik ohne Cookies – kein Cookie-Banner nötig", "Schriften lokal eingebunden", "Bildrechte geklärt", ...book.legalExtras].map((text) => ({ text, who: "Team", done: false })), detail: true },
-      { id: fid(), type: "text", title: "Hinweis", text: "Diese Übersicht ersetzt keine Rechtsberatung.", detail: true },
-    ]),
-
-    chapter("sales", "Ablauf & Kosten", "Was passiert, wann – und was es kostet.", "In 6 Wochen online", "Paket „Wachstum“: genug, um bei Google gefunden zu werden – ohne mehr zu bezahlen als nötig.", ["Fester Preis, keine Überraschungen", "Sie sehen jeden Entwurf vorher", "Danach 3 Monate Begleitung"], [
+    chapter("sales", "Ablauf & Kosten", "Was passiert, wann – und was es kostet.", `In 2–3 Wochen online · ab ${book.packages[0]?.price ?? "–"}`, `Unsere Empfehlung: Paket „${recommended.name}“ für ${recommended.price} – genug, um bei Google gefunden zu werden, ohne mehr zu bezahlen als nötig.`, ["Fester Preis, keine Überraschungen", "Sie sehen jeden Schritt vorher", "In 2–3 Wochen online"], [
       {
         id: fid(),
         type: "timeline",
         title: "Der Ablauf",
         items: [
-          { when: "Woche 1", title: "Entscheiden", text: "Name, Adresse, Design und Paket." },
-          { when: "Woche 2–3", title: "Erster Entwurf", text: "Startseite im gewählten Design – gemeinsam angepasst." },
-          { when: "Woche 3–5", title: "Fertig bauen", text: "Alle Seiten, Texte, Google-Profil." },
-          { when: "Woche 6", title: "Online", text: "Test, Start, erste Bewertungen sammeln." },
+          { when: "Woche 1", title: "Entscheiden", text: "Design, Name, Adresse und Paket festlegen – Fotos und Texte sammeln." },
+          { when: "Woche 2", title: "Bauen", text: "Die Website entsteht – Sie sehen jeden Zwischenstand und sagen, was anders soll." },
+          { when: "Woche 3", title: "Online", text: "Start, Google-Profil, erste Bewertungen – ab jetzt kommen Anfragen." },
         ],
       },
-      { id: fid(), type: "packages", title: "Pakete", items: book.packages.map((p, i) => ({ ...p, price: "", pick: i === 1 })) },
-      { id: fid(), type: "roi", title: "Ab wann es sich rechnet", invest: 0, monthly: 0, value: book.roi.value, unit: book.roi.unit, text: book.roi.text, recurring: book.roi.recurring },
-      { id: fid(), type: "checklist", title: "Nächste Schritte", items: [{ text: "Entwurf und Adresse festlegen", who: "Gemeinsam", done: false }, { text: "Paket wählen", who: "Sie", done: false }, { text: "Adresse sichern", who: "Wir", done: false }, { text: "Fotos und Texte zusammenstellen", who: "Sie", done: false }] },
+      { id: fid(), type: "packages", title: "Pakete", items: book.packages.map((p) => ({ ...p, pick: p === recommended })) },
+      { id: fid(), type: "roi", title: "Ab wann es sich rechnet", invest: euros(recommended.price), monthly: euros(/(\d[\d.]*) €/.exec(recommended.unit)?.[1] ?? "0"), value: book.roi.value, unit: book.roi.unit, text: book.roi.text, recurring: book.roi.recurring },
+      { id: fid(), type: "checklist", title: "Nächste Schritte", items: [{ text: "Design und Adresse festlegen", who: "Gemeinsam", done: false }, { text: "Paket wählen", who: "Sie", done: false }, { text: "Adresse sichern", who: "Wir", done: false }, { text: "Fotos und Texte schicken", who: "Sie", done: false }] },
       { id: fid(), type: "checklist", title: "Was wir von Ihnen brauchen", items: book.contentNeeds.map((text) => ({ text, who: "Sie", done: false })), detail: true },
       { id: fid(), type: "checklist", title: "Offene Fragen", items: book.questions.map((text) => ({ text, who: "Sie", done: false })), detail: true },
     ]),

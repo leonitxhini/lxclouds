@@ -1,12 +1,12 @@
-import { Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Loader2, Maximize2, Minus, Plus, RefreshCw, Star, X } from "lucide-react";
+import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, RefreshCw, Rocket, Search, Star, Users, X, type LucideIcon } from "lucide-react";
 import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddItem, BlockContext, EditContext, ItemTools, T, imageUrl, type EditApi } from "@/demo/edit";
 import { onColour } from "@/demo/theme";
 import { cn } from "@/lib/utils";
 import { roles } from "./roles";
-import { domainContext, rankDomains } from "./strength";
-import type { Audit, AuditBlock, Chapter, DomainsBlock, FolioBlock, FolioDoc, OptionsBlock, PackagesBlock, RoiBlock, TableBlock } from "./types";
+import { criteria, domainContext, rankDomains, type CriterionKey } from "./strength";
+import type { Audit, AuditBlock, Chapter, ChannelsBlock, DomainsBlock, FolioBlock, FolioDoc, JourneyBlock, OptionsBlock, PackagesBlock, RoiBlock, TableBlock } from "./types";
 
 /** Live checks the editor can run; absent in the read-only views. */
 export type FolioTools = {
@@ -233,12 +233,17 @@ function Compare({ b }: { b: OptionsBlock }) {
   );
 }
 
-// ---------------------------------------------------------------- web addresses: which is strong and why
+// ---------------------------------------------------------------- web addresses: a marketing check
 const statusChip = {
   free: ["frei", "bg-emerald-50 text-emerald-700", Check],
   taken: ["vergeben", "bg-rose-50 text-rose-700", X],
   unknown: ["ungeprüft", "bg-(--fg)/[0.06] text-(--mut)", CircleDashed],
 } as const;
+
+const levelDot = ["bg-rose-500", "bg-amber-400", "bg-emerald-500"];
+const levelIcon = [X, Minus, Check];
+const levelTone = ["text-rose-600", "text-amber-600", "text-emerald-600"];
+const shortLabel: Record<CriterionKey, string> = { brand: "Marke", trust: "Vertrauen", confusion: "Verwechslung", memory: "Merkbar", phone: "Telefon", future: "Zukunft" };
 
 function StrengthBar({ score, muted }: { score: number; muted?: boolean }) {
   const tone = muted ? "bg-(--fg)/20" : score >= 7 ? "bg-emerald-500" : score >= 5 ? "bg-amber-400" : "bg-rose-400";
@@ -265,7 +270,7 @@ function Domains({ b }: { b: DomainsBlock }) {
   const ranked = rankDomains(b, ctx);
   const top = ranked.find((d) => d.item.pick) ?? ranked.find((d) => d.item.status === "free") ?? ranked[0];
   const rest = ranked.filter((d) => d !== top);
-  const shown = all ? rest : rest.slice(0, 7);
+  const shown = all ? rest : rest.slice(0, 8);
   const checked = b.items.map((d) => d.checked).filter(Boolean).sort().at(-1);
   const busy = tools?.busy.has(scope);
 
@@ -284,62 +289,129 @@ function Domains({ b }: { b: DomainsBlock }) {
       </div>
 
       {top && (
-        <div className="rounded-[20px] border-2 border-(--p) bg-white p-6 @3xl:p-8">
-          <p className="flex items-center gap-2 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-(--p)">
-            <Star className="size-4 fill-amber-400 text-amber-400" /> {top.item.pick ? "Unsere Wahl" : "Die stärkste freie Adresse"}
-          </p>
-          <p className="mt-3 break-all font-mono text-[30px] font-semibold leading-[1.1] @3xl:text-[44px]">{top.item.domain}</p>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className={cn(chip, top.item.status === "free" ? "bg-emerald-500 text-white" : top.item.status === "taken" ? "bg-rose-500 text-white" : "bg-(--fg)/10 text-(--mut)")}>
-              {top.item.status === "free" ? "✓ frei – jetzt sichern" : top.item.status === "taken" ? "vergeben" : "noch prüfen"}
-            </span>
-            <StrengthBar score={top.strength.score} />
-          </div>
-          <div className="mt-5 grid gap-x-8 gap-y-1.5 @3xl:grid-cols-2">
-            {top.strength.good.map((r) => (
-              <p key={r} className="flex gap-2 text-[15px]">
-                <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" strokeWidth={3} /> {r}
+        <div className="rounded-[22px] border-2 border-(--p) bg-white p-6 @3xl:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-(--p)">
+                <Star className="size-4 fill-amber-400 text-amber-400" /> {top.item.pick ? "Unsere Wahl" : "Die stärkste freie Adresse"}
               </p>
-            ))}
-            {top.strength.bad.map((r) => (
-              <p key={r} className="flex gap-2 text-[15px] text-(--mut)">
-                <Minus className="mt-0.5 size-4 shrink-0 text-amber-500" strokeWidth={3} /> {r}
-              </p>
-            ))}
+              <p className="mt-2 break-all font-mono text-[30px] font-semibold leading-[1.1] @3xl:text-[44px]">{top.item.domain}</p>
+              <p className="mt-2 text-[16px] font-medium">{top.strength.verdict}</p>
+            </div>
+            <div className="flex flex-col items-start gap-2 @3xl:items-end">
+              <span className={cn(chip, "px-3 py-1.5 text-[13px]", top.item.status === "free" ? "bg-emerald-500 text-white" : top.item.status === "taken" ? "bg-rose-500 text-white" : "bg-(--fg)/10 text-(--mut)")}>
+                {top.item.status === "free" ? "✓ frei – jetzt sichern" : top.item.status === "taken" ? "vergeben" : "noch prüfen"}
+              </span>
+              <StrengthBar score={top.strength.score} />
+            </div>
           </div>
-          {top.item.note && <p className="mt-4 border-t border-(--line) pt-3 text-[14.5px] font-medium">{top.item.note}</p>}
+          <p className="mt-6 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-(--mut)">Der Marketing-Check</p>
+          <ul className="mt-3 grid gap-3 @3xl:grid-cols-2">
+            {top.strength.criteria.map((c) => {
+              const Icon = levelIcon[c.level];
+              return (
+                <li key={c.key} className="flex gap-3 rounded-[14px] bg-(--bg) p-3.5">
+                  <span className={cn("mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full text-white", levelDot[c.level])}>
+                    <Icon className="size-3.5" strokeWidth={3} />
+                  </span>
+                  <span>
+                    <span className="block text-[14.5px] font-semibold">{criteria.find((x) => x.key === c.key)?.label}</span>
+                    <span className="mt-0.5 block text-[14px] leading-[1.45] text-(--mut)">{c.text}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          {top.item.note && (
+            <p className="mt-4 rounded-[14px] bg-(--soft) px-4 py-3 text-[15px] leading-[1.45]">
+              <b className="text-(--p)">Unser Plan: </b>
+              {top.item.note}
+            </p>
+          )}
         </div>
       )}
 
-      <ol className={cn(card, "mt-3 divide-y divide-(--line) overflow-hidden")}>
-        {shown.map(({ item, index, strength }, n) => {
-          const [label, style, Icon] = statusChip[item.status] ?? statusChip.unknown;
-          const taken = item.status === "taken";
-          return (
-            <li key={index} className={cn("grid items-center gap-x-4 gap-y-1.5 px-4 py-3 @3xl:grid-cols-[28px_minmax(0,1fr)_110px_150px_minmax(0,1.3fr)_auto]", taken && "bg-(--fg)/[0.025]")}>
-              <span className="hidden text-[13px] font-semibold tabular-nums text-(--mut) @3xl:block">{n + 2}</span>
-              <span className={cn("min-w-0 break-all font-mono text-[15px] font-medium", taken && "text-(--mut) line-through decoration-(--fg)/30")}>{item.domain}</span>
-              <span className={cn(chip, "w-fit", style)}>
-                <Icon className="size-3" strokeWidth={3} /> {label}
-              </span>
-              <StrengthBar score={strength.score} muted={taken} />
-              <span className="text-[13px] leading-[1.4] text-(--mut)">{item.note || (taken ? "Gehört schon jemand anderem" : (strength.bad[0] ?? strength.good[0]))}</span>
-              {choose && !taken ? (
-                <button type="button" onClick={() => b.items.forEach((_, k) => choose(scope, ["items", k, "pick"], k === index))} className={cn(chip, "cursor-pointer border border-dashed border-(--fg)/25 text-(--mut) hover:border-(--p) hover:text-(--p)")}>
-                  <Star className="size-3" /> Wählen
-                </button>
-              ) : (
-                <span />
-              )}
+      <p className="mb-3 mt-8 text-[12.5px] font-semibold uppercase tracking-[0.12em] text-(--mut)">Die Alternativen im Vergleich</p>
+      <div className={cn(card, "overflow-x-auto")}>
+        <table className="w-full min-w-[880px] border-collapse text-[14px]">
+          <thead>
+            <tr className="border-b border-(--line) text-left">
+              <th className="p-3 font-medium text-(--mut)">Adresse</th>
+              {criteria.map((c) => (
+                <th key={c.key} className="p-2 text-center text-[12px] font-medium text-(--mut)" title={c.question}>
+                  {shortLabel[c.key]}
+                </th>
+              ))}
+              <th className="p-3 font-medium text-(--mut)">Stärke</th>
+              <th className="p-3 font-medium text-(--mut)">Fazit</th>
+              {choose && <th />}
+            </tr>
+          </thead>
+          <tbody>
+            {shown.map(({ item, index, strength }) => {
+              const taken = item.status === "taken";
+              const [label, style, Icon] = statusChip[item.status] ?? statusChip.unknown;
+              return (
+                <tr key={index} className={cn("border-b border-(--line) last:border-0", taken && "bg-(--fg)/[0.025]")}>
+                  <td className="min-w-[230px] p-3">
+                    <span className={cn("block whitespace-nowrap font-mono text-[14.5px] font-medium", taken && "text-(--mut) line-through decoration-(--fg)/30")}>{item.domain}</span>
+                    <span className={cn(chip, "mt-1 px-2 py-0.5 text-[11px]", style)}>
+                      <Icon className="size-3" strokeWidth={3} /> {label}
+                    </span>
+                  </td>
+                  {criteria.map((c) => {
+                    const crit = strength.criteria.find((x) => x.key === c.key)!;
+                    return (
+                      <td key={c.key} className="p-2 text-center" title={crit.text}>
+                        <span className={cn("inline-block size-3.5 rounded-full", taken ? "bg-(--fg)/15" : levelDot[crit.level])} aria-label={`${c.label}: ${crit.text}`} />
+                      </td>
+                    );
+                  })}
+                  <td className="p-3">
+                    <StrengthBar score={strength.score} muted={taken} />
+                  </td>
+                  <td className="p-3 text-[13.5px] leading-[1.4] text-(--mut)">{item.note || strength.verdict}</td>
+                  {choose && (
+                    <td className="p-3">
+                      {!taken && (
+                        <button type="button" onClick={() => b.items.forEach((_, k) => choose(scope, ["items", k, "pick"], k === index))} className={cn(chip, "cursor-pointer whitespace-nowrap border border-dashed border-(--fg)/25 text-(--mut) hover:border-(--p) hover:text-(--p)")}>
+                          <Star className="size-3" /> Wählen
+                        </button>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+        <p className="flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-(--mut)">
+          <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-emerald-500" /> gut</span>
+          <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-amber-400" /> geht so</span>
+          <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-rose-500" /> schwach</span>
+          <span>· Punkte antippen oder darüberfahren für die Begründung</span>
+        </p>
+        {rest.length > 8 && (
+          <button type="button" onClick={() => setAll(!all)} className="text-[13.5px] font-medium text-(--p) hover:underline">
+            {all ? "Weniger zeigen" : `Alle ${rest.length + 1} Adressen zeigen`}
+          </button>
+        )}
+      </div>
+
+      <Details title="So bewerten wir eine Adresse">
+        <ul className="grid gap-3 @3xl:grid-cols-2">
+          {criteria.map((c) => (
+            <li key={c.key} className={cn(card, "p-4")}>
+              <p className="text-[15px] font-semibold">
+                {c.label} <span className="text-[12.5px] font-normal text-(--mut)">· zählt {c.weight === 3 ? "dreifach" : c.weight === 2 ? "doppelt" : "einfach"}</span>
+              </p>
+              <p className="mt-1 text-[14px] text-(--mut)">{c.question}</p>
             </li>
-          );
-        })}
-      </ol>
-      {rest.length > 7 && (
-        <button type="button" onClick={() => setAll(!all)} className="mt-2 text-[13.5px] font-medium text-(--p) hover:underline">
-          {all ? "Weniger zeigen" : `Alle ${rest.length + 1} Adressen zeigen`}
-        </button>
-      )}
+          ))}
+        </ul>
+      </Details>
 
       {edit && (
         <Details title="Adressen bearbeiten und Anmerkungen" count={b.items.length}>
@@ -359,7 +431,118 @@ function Domains({ b }: { b: DomainsBlock }) {
   );
 }
 
-// ---------------------------------------------------------------- competition: bars
+// ---------------------------------------------------------------- new customers: the way to you, the channels
+const CHANNEL_ICONS: Record<string, LucideIcon> = { pin: MapPin, handshake: Handshake, star: Star, globe: Globe, book: BookOpen, rocket: Rocket, megaphone: Megaphone, users: Users, camera: Camera, search: Search, calendar: CalendarCheck, phone: Phone };
+const iconFor = (key: string) => CHANNEL_ICONS[key] ?? Star;
+
+function Journey({ b }: { b: JourneyBlock }) {
+  const editing = !!useEditApi();
+  return (
+    <div>
+      <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-4 block")} placeholder="Überschrift" />
+      <ol className="grid gap-3 @4xl:grid-cols-4">
+        {b.items.map((step, i) => {
+          const Icon = iconFor(step.icon);
+          return (
+            <li key={i} className="group/item relative">
+              <div className={cn(card, "h-full p-5")}>
+                <span className="flex items-center justify-between">
+                  <span className="flex size-12 items-center justify-center rounded-[14px] bg-(--soft) text-(--p)">
+                    <Icon className="size-6" strokeWidth={1.8} />
+                  </span>
+                  <span className="text-[28px] font-semibold leading-none text-(--fg)/10">{i + 1}</span>
+                </span>
+                <T as="h4" path={["items", i, "title"]} value={step.title} className="mt-4 block text-[19px] font-semibold" placeholder="Schritt" />
+                <T as="p" path={["items", i, "text"]} value={step.text} multiline className="mt-1 text-[15px] leading-[1.45] text-(--mut)" placeholder="Was passiert" />
+              </div>
+              {i < b.items.length - 1 && (
+                <span className="absolute -right-[13px] top-1/2 z-10 hidden size-6 -translate-y-1/2 items-center justify-center rounded-full bg-(--p) text-(--p-on) shadow @4xl:flex" aria-hidden="true">
+                  <ChevronRight className="size-4" strokeWidth={3} />
+                </span>
+              )}
+              <ItemTools path={["items"]} index={i} count={b.items.length} />
+            </li>
+          );
+        })}
+      </ol>
+      {(b.note || editing) && (
+        <p className="mt-3 flex items-center gap-3 rounded-[14px] border border-dashed border-(--p)/40 bg-(--soft) px-4 py-3 text-[15px]">
+          <Handshake className="size-5 shrink-0 text-(--p)" />
+          <T path={["note"]} value={b.note} className="min-w-0 flex-1" placeholder="Der zweite Weg" />
+        </p>
+      )}
+    </div>
+  );
+}
+
+const columns: { when: ChannelsBlock["items"][number]["when"]; label: string; hint: string; tone: string }[] = [
+  { when: "Zuerst", label: "Zuerst", hint: "ab Woche 1", tone: "bg-emerald-500 text-white" },
+  { when: "Danach", label: "Danach", hint: "im ersten Monat", tone: "bg-amber-400 text-black" },
+  { when: "Später", label: "Später", hint: "wenn alles läuft", tone: "bg-(--fg)/80 text-white" },
+];
+
+function Channels({ b }: { b: ChannelsBlock }) {
+  const choose = useChoose();
+  const scope = useScope();
+  return (
+    <div>
+      <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-4 block")} placeholder="Überschrift" />
+      <div className="grid gap-4 @4xl:grid-cols-3">
+        {columns.map((col) => {
+          const items = b.items.map((item, index) => ({ item, index })).filter(({ item }) => item.when === col.when);
+          return (
+            <div key={col.when} className="rounded-[20px] bg-(--fg)/[0.035] p-3">
+              <p className="mb-3 flex items-center gap-2 px-1">
+                <span className={cn(chip, col.tone)}>{col.label}</span>
+                <span className="text-[13px] text-(--mut)">{col.hint}</span>
+              </p>
+              <ul className="space-y-2.5">
+                {items.map(({ item, index }) => {
+                  const Icon = iconFor(item.icon);
+                  const free = /kostenlos|im paket/i.test(item.cost);
+                  return (
+                    <li key={index} className={cn(card, "group/item relative p-4")}>
+                      <div className="flex items-start gap-3">
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-(--soft) text-(--p)">
+                          <Icon className="size-5" strokeWidth={1.8} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <T as="h4" path={["items", index, "name"]} value={item.name} className="block text-[16.5px] font-semibold leading-tight" placeholder="Weg" />
+                          <T as="p" path={["items", index, "text"]} value={item.text} multiline className="mt-1 text-[14px] leading-[1.45] text-(--mut)" placeholder="Was es bringt" />
+                        </div>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between gap-2 border-t border-(--line) pt-3">
+                        <T path={["items", index, "cost"]} value={item.cost} className={cn(chip, free ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800")} placeholder="Kosten" />
+                        <span className="flex items-center gap-1.5 text-[12px] text-(--mut)">
+                          Wirkung
+                          {[1, 2, 3].map((n) => (
+                            <button
+                              key={n}
+                              type="button"
+                              disabled={!choose}
+                              onClick={() => choose?.(scope, ["items", index, "effect"], n)}
+                              className={cn("h-3 w-4 rounded-[3px]", n <= item.effect ? "bg-(--p)" : "bg-(--fg)/10", choose && "cursor-pointer")}
+                              aria-label={choose ? `Wirkung ${n} von 3` : undefined}
+                              tabIndex={choose ? 0 : -1}
+                            />
+                          ))}
+                        </span>
+                      </div>
+                      <ItemTools path={["items"]} index={index} count={b.items.length} />
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+      <AddItem path={["items"]} item={{ name: "Neuer Weg", icon: "star", when: "Danach", text: "", cost: "kostenlos", effect: 2 }} label="Weg" className="mt-3" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- competition: who is good, who is weak, why
 const checks: { label: string; ok: (a: Audit) => boolean | null; show?: (a: Audit) => string }[] = [
   { label: "Erreichbar", ok: (a) => !a.error && !!a.status && a.status < 400, show: (a) => (a.error ? a.error : `${a.status}`) },
   { label: "Verschlüsselt (HTTPS)", ok: (a) => !!a.https },
@@ -375,48 +558,6 @@ const checks: { label: string; ok: (a: Audit) => boolean | null; show?: (a: Audi
   { label: "Datenschutz", ok: (a) => !!a.datenschutz },
 ];
 
-function AuditBars({ b }: { b: AuditBlock }) {
-  const tools = useTools();
-  const scope = useScope();
-  const busy = tools?.busy.has(scope);
-  const sites = b.items.map((site, index) => ({ site, index, score: site.result?.score ?? -1 })).sort((x, y) => y.score - x.score);
-  const own = sites.find((s) => s.site.own);
-  const rank = own ? sites.indexOf(own) + 1 : 0;
-  return (
-    <div>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <T as="h3" path={["title"]} value={b.title} className={h3} placeholder="Überschrift" />
-        {tools && b.items.length > 0 && (
-          <button type="button" onClick={() => tools.audit(scope)} disabled={busy} className={cn(chip, "h-8 cursor-pointer bg-(--fg) px-3.5 text-white disabled:opacity-60")}>
-            {busy ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />} Jetzt prüfen
-          </button>
-        )}
-      </div>
-      <div className={cn(card, "space-y-3 p-5 @3xl:p-6")}>
-        {sites.map(({ site, index, score }) => {
-          const tone = score >= 80 ? "bg-emerald-500" : score >= 60 ? "bg-amber-400" : score >= 0 ? "bg-rose-400" : "bg-(--fg)/15";
-          return (
-            <div key={index} className="grid items-center gap-x-4 gap-y-1 @3xl:grid-cols-[minmax(0,240px)_minmax(0,1fr)_52px]">
-              <span className={cn("min-w-0 truncate text-[14.5px]", site.own ? "font-semibold text-(--p)" : "")}>{site.own ? `★ ${site.name}` : site.name}</span>
-              <span className="h-4 overflow-hidden rounded-full bg-(--fg)/[0.06]">
-                <span className={cn("block h-full rounded-full transition-[width] duration-700", site.own ? "bg-(--p)" : tone)} style={{ width: `${Math.max(0, score)}%` }} />
-              </span>
-              <span className="text-right text-[15px] font-semibold tabular-nums">{score >= 0 ? score : "–"}</span>
-            </div>
-          );
-        })}
-        {own && own.score >= 0 && (
-          <p className="border-t border-(--line) pt-3 text-[14.5px] leading-[1.5]">
-            {own.site.name}: <b>{own.score} von 100 Punkten</b> – Platz {rank} von {sites.length}. Die Punkte zeigen, wie gut eine Website die Grundlagen erfüllt: schnell, fürs Handy, bei Google gut beschrieben, Kontakt mit einem Tipp.
-          </p>
-        )}
-      </div>
-      <Details title="Alle Prüfpunkte einzeln" count={checks.length}>
-        <AuditTable b={b} />
-      </Details>
-    </div>
-  );
-}
 
 function AuditTable({ b }: { b: AuditBlock }) {
   const tools = useTools();
@@ -474,6 +615,120 @@ function AuditTable({ b }: { b: AuditBlock }) {
       </div>
       <AddItem path={["items"]} item={{ name: "Neue Website", url: "", own: false, result: null }} label="Website" className="mt-3" />
     </>
+  );
+}
+
+// ---------------------------------------------------------------- the plain blocks
+
+/** What a website does well or badly, in words a client understands – most important first. */
+const traits: { ok: (a: Audit) => boolean; good: string; bad: string; chance: (n: number, m: number) => string }[] = [
+  { ok: (a) => !!a.reviews, good: "Zeigt Bewertungen", bad: "Keine Bewertungen sichtbar", chance: (n, m) => `${n} von ${m} zeigen keine Bewertungen – Ihre Google-Sterne kommen bei Ihnen gleich nach oben.` },
+  { ok: (a) => (a.forms ?? 0) > 0 || !!a.booking, good: "Anfrage direkt online", bad: "Kein Formular, keine Terminbuchung", chance: (n, m) => `${n} von ${m} haben keine Online-Anfrage – bei Ihnen: Termin mit einem Klick.` },
+  { ok: (a) => !!a.phone || !!a.whatsapp, good: "Anruf mit einem Tipp", bad: "Telefon nicht antippbar", chance: (n, m) => `${n} von ${m} lassen sich am Handy nicht direkt anrufen – bei Ihnen ein Tipp.` },
+  { ok: (a) => !!a.localBusiness, good: "Firmendaten für Google hinterlegt", bad: "Keine Firmendaten für Google", chance: (n, m) => `${n} von ${m} geben Google keine Firmendaten – Ihre Seite bekommt sie, das hilft auf der Karte.` },
+  { ok: (a) => (a.ms ?? 99999) < 1500, good: "Lädt schnell", bad: "Lädt langsam", chance: (n, m) => `${n} von ${m} laden langsam – Ihre Seite öffnet sich in unter einer Sekunde.` },
+  { ok: (a) => !!a.viewport, good: "Gut auf dem Handy", bad: "Nicht fürs Handy gebaut", chance: (n, m) => `${n} von ${m} sind nicht fürs Handy gebaut.` },
+  { ok: (a) => (a.description?.length ?? 0) >= 70 && (a.title?.length ?? 0) >= 15, good: "Bei Google gut beschrieben", bad: "Bei Google schwach beschrieben", chance: (n, m) => `${n} von ${m} sind bei Google schwach beschrieben.` },
+  { ok: (a) => !!a.https, good: "Sicher verschlüsselt", bad: "Nicht verschlüsselt", chance: (n, m) => `${n} von ${m} sind nicht verschlüsselt.` },
+  { ok: (a) => !!a.impressum && !!a.datenschutz, good: "Impressum & Datenschutz da", bad: "Pflichtangaben fehlen", chance: (n, m) => `${n} von ${m} fehlen Pflichtangaben.` },
+];
+
+const verdictOf = (score: number) => (score >= 85 ? ["Starker Mitbewerber", "text-emerald-700 bg-emerald-50"] : score >= 70 ? ["Solide, mit Lücken", "text-amber-800 bg-amber-50"] : ["Schwach aufgestellt", "text-rose-700 bg-rose-50"]);
+
+function Competition({ b }: { b: AuditBlock }) {
+  const tools = useTools();
+  const scope = useScope();
+  const busy = tools?.busy.has(scope);
+  const sites = b.items.map((site, index) => ({ site, index, score: site.result?.score ?? -1 })).sort((x, y) => y.score - x.score);
+  const rivals = sites.filter((s) => !s.site.own && s.site.result && !s.site.result.error);
+  const chances = traits
+    .map((t) => ({ t, n: rivals.filter((s) => !t.ok(s.site.result!)).length }))
+    .filter((c) => c.n > 0 && c.n >= Math.ceil(rivals.length / 3))
+    .sort((x, y) => y.n - x.n)
+    .slice(0, 3);
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <T as="h3" path={["title"]} value={b.title} className={h3} placeholder="Überschrift" />
+        {tools && b.items.length > 0 && (
+          <button type="button" onClick={() => tools.audit(scope)} disabled={busy} className={cn(chip, "h-8 cursor-pointer bg-(--fg) px-3.5 text-white disabled:opacity-60")}>
+            {busy ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />} Jetzt prüfen
+          </button>
+        )}
+      </div>
+
+      {chances.length > 0 && (
+        <div className="mb-5 grid gap-3 @4xl:grid-cols-3">
+          {chances.map(({ t, n }) => (
+            <div key={t.bad} className="rounded-[18px] bg-(--p) p-5 text-(--p-on)">
+              <p className="text-[34px] font-semibold leading-none tracking-[-0.02em]">
+                {n} <span className="text-[18px] font-medium opacity-75">von {rivals.length}</span>
+              </p>
+              <p className="mt-2 text-[15px] font-medium leading-[1.4]">{t.chance(n, rivals.length).replace(/^\d+ von \d+ /, "")}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ol className="space-y-3">
+        {sites.map(({ site, index, score }, rank) => {
+          const a = site.result;
+          const [label, tone] = verdictOf(score);
+          const good = a ? traits.filter((t) => t.ok(a)).slice(0, 3) : [];
+          const bad = a ? traits.filter((t) => !t.ok(a)).slice(0, 3) : [];
+          return (
+            <li key={index} className={cn(card, "group/item relative grid gap-4 p-5 @4xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)]", site.own && "border-(--p) shadow-[0_0_0_1.5px_var(--p)]")}>
+              <div className="flex gap-4">
+                <span className="text-[22px] font-semibold tabular-nums leading-none text-(--fg)/25">{rank + 1}</span>
+                <div className="min-w-0 flex-1">
+                  <T as="h4" path={["items", index, "name"]} value={site.name} className={cn("block text-[17px] font-semibold leading-tight", site.own && "text-(--p)")} placeholder="Name" />
+                  <T path={["items", index, "note"]} value={site.note} className="mt-0.5 block text-[13.5px] text-(--mut)" placeholder="Wer ist das? (optional)" />
+                  {score >= 0 ? (
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <span className="text-[30px] font-semibold leading-none tabular-nums">{score}</span>
+                      <span className="h-2 w-24 overflow-hidden rounded-full bg-(--fg)/[0.08]">
+                        <span className={cn("block h-full rounded-full", site.own ? "bg-(--p)" : score >= 85 ? "bg-emerald-500" : score >= 70 ? "bg-amber-400" : "bg-rose-400")} style={{ width: `${score}%` }} />
+                      </span>
+                      {!site.own && <span className={cn(chip, tone)}>{label}</span>}
+                      {site.own && a?.noindex && <span className={cn(chip, "bg-(--soft) text-(--p)")}>Vorschau – noch für Google gesperrt</span>}
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-[13.5px] text-(--mut)">{a?.error ?? "Noch nicht geprüft"}</p>
+                  )}
+                </div>
+              </div>
+              <div>
+                <p className="mb-1.5 text-[12.5px] font-semibold text-emerald-700">Macht gut</p>
+                <ul className="space-y-1">
+                  {good.map((t) => (
+                    <li key={t.good} className="flex gap-2 text-[14.5px]">
+                      <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" strokeWidth={3} /> {t.good}
+                    </li>
+                  ))}
+                  {!good.length && <li className="text-[14px] text-(--mut)">–</li>}
+                </ul>
+              </div>
+              <div>
+                <p className="mb-1.5 text-[12.5px] font-semibold text-rose-700">Schwach</p>
+                <ul className="space-y-1">
+                  {bad.map((t) => (
+                    <li key={t.bad} className="flex gap-2 text-[14.5px]">
+                      <X className="mt-0.5 size-4 shrink-0 text-rose-500" strokeWidth={3} /> {t.bad}
+                    </li>
+                  ))}
+                  {!bad.length && a && <li className="text-[14px] text-(--mut)">Keine Schwachstelle in den Grundlagen</li>}
+                </ul>
+              </div>
+              <ItemTools path={["items"]} index={index} count={b.items.length} />
+            </li>
+          );
+        })}
+      </ol>
+      <p className="mt-2 text-[12.5px] text-(--mut)">Punkte 0–100: wie gut eine Website die Grundlagen erfüllt – schnell, fürs Handy, bei Google gut beschrieben, Kontakt mit einem Tipp, Vertrauen.</p>
+      <Details title="Alle Prüfpunkte einzeln" count={checks.length}>
+        <AuditTable b={b} />
+      </Details>
+    </div>
   );
 }
 
@@ -632,7 +887,8 @@ function Packages({ b }: { b: PackagesBlock }) {
               )}
             </div>
             <T as="p" path={["items", i, "text"]} value={item.text} className="mt-1 text-[14.5px] text-(--mut)" placeholder="Für wen" />
-            <T path={["items", i, "price"]} value={item.price} className="mt-5 block text-[32px] font-semibold tracking-[-0.02em]" placeholder="Preis eintragen" />
+            <T path={["items", i, "price"]} value={item.price} className="mt-5 block text-[34px] font-semibold tracking-[-0.02em]" placeholder="Preis eintragen" />
+            <T path={["items", i, "unit"]} value={item.unit} className="mt-0.5 block text-[13.5px] text-(--mut)" placeholder="einmalig · danach … im Monat" />
             <ul className="mt-5 flex-1 space-y-2 border-t border-(--line) pt-5">
               {item.features.map((f, k) => (
                 <li key={k} className="group/item relative flex gap-2 text-[14.5px] leading-[1.45]">
@@ -735,7 +991,11 @@ function Block({ block }: { block: FolioBlock }) {
     case "domains":
       return <Domains b={block} />;
     case "audit":
-      return <AuditBars b={block} />;
+      return <Competition b={block} />;
+    case "journey":
+      return <Journey b={block} />;
+    case "channels":
+      return <Channels b={block} />;
     case "table":
       return <Table b={block} />;
     case "checklist":

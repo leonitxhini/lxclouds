@@ -6,6 +6,10 @@
 
 type Row = [string, string, string];
 
+/** A way to new customers: when to start, what it costs, how much it brings (1–3). Icons: see CHANNEL_ICONS in Folio.tsx. */
+export type Channel = { name: string; icon: string; when: "Zuerst" | "Danach" | "Später"; text: string; cost: string; effect: number };
+export type Step = { icon: string; title: string; text: string };
+
 export type Playbook = {
   id: string;
   label: string;
@@ -28,8 +32,10 @@ export type Playbook = {
   /** Google Business Profile: main category and things to fill in */
   gbpCategory: string;
   gbpExtras: string[];
-  /** channel, priority, first step */
-  channels: Row[];
+  channels: Channel[];
+  /** how a new customer finds the business, in four steps, plus a second way in one line */
+  journey: Step[];
+  journeyNote: string;
   dos: string[];
   donts: string[];
   /** the legal recommendation in one sentence */
@@ -40,7 +46,8 @@ export type Playbook = {
   contentNeeds: string[];
   questions: string[];
   designs: { name: string; text: string; pros: string[]; cons: string[]; score: number }[];
-  packages: { name: string; text: string; features: string[] }[];
+  /** prices are our suggestion and stay editable in every folio */
+  packages: { name: string; text: string; price: string; unit: string; features: string[] }[];
   /** value of one new customer; recurring = per month (bookkeeping), otherwise per sale */
   roi: { value: number; unit: string; text: string; recurring: boolean };
 };
@@ -129,15 +136,22 @@ const buchhaltung: Playbook = {
   gbpCategory: "Buchhalter",
   gbpExtras: ["Nebenkategorie „Buchhaltungsdienst“ prüfen", "Leistungen nur so benennen, wie sie nach § 6 StBerG erlaubt sind (keine Steuerberatung)"],
   channels: [
-    ["Google-Unternehmensprofil", "A", "Sofort anlegen, Fotos, Leistungen, erste Bewertungen von Bestandsmandanten"],
-    ["Kooperation mit Steuerberatern", "A", "3–5 Kanzleien in der Nähe ansprechen: Sie liefern saubere laufende Buchhaltung, die Kanzlei macht Abschluss und Steuern"],
-    ["Lokale Suchseiten (SEO)", "A", "Leistungsseiten + Stadtteil-/Umlandseiten mit echtem Inhalt"],
-    ["Branchenverzeichnisse", "B", "Gelbe Seiten, Das Örtliche, 11880, buchhalterverzeichnis.de – überall gleiche Daten"],
-    ["Gründungsnetzwerke", "B", "IHK-Gründertage, Coworking-Spaces, Gründerstammtische – Vortrag „Buchhaltung im ersten Jahr“"],
-    ["Google-Anzeigen", "B", "Kleines Budget auf „buchhalter {city}“ und „lohnabrechnung {city}“, nur mit eigener Landingpage"],
-    ["LinkedIn", "C", "Profil mit klarer Positionierung, monatlich ein praktischer Tipp"],
-    ["Empfehlungen", "A", "Zufriedene Mandanten aktiv fragen – kleines Dankeschön für Empfehlungen"],
+    { name: "Google-Profil", icon: "pin", when: "Zuerst", text: "Wer „Buchhalter {city}“ sucht, sieht Sie auf der Karte – mit Sternen, Telefon und Weg.", cost: "kostenlos", effect: 3 },
+    { name: "Steuerberater als Partner", icon: "handshake", when: "Zuerst", text: "Kanzleien geben die laufende Buchhaltung gern ab – und empfehlen Sie an ihre Mandanten weiter.", cost: "kostenlos", effect: 3 },
+    { name: "Bewertungen sammeln", icon: "star", when: "Zuerst", text: "Jeder zufriedene Mandant gibt eine Bewertung – das stärkste Argument bei Google.", cost: "kostenlos", effect: 3 },
+    { name: "Website mit Ortsseiten", icon: "globe", when: "Zuerst", text: "Eigene Seiten für Lohnabrechnung, Selbstständige und die Stadtteile – so findet Google Sie öfter.", cost: "im Paket", effect: 2 },
+    { name: "Branchenbücher", icon: "book", when: "Danach", text: "Gelbe Seiten, Das Örtliche, 11880, buchhalterverzeichnis.de – überall dieselben Daten.", cost: "kostenlos", effect: 1 },
+    { name: "Gründer-Netzwerke", icon: "rocket", when: "Danach", text: "IHK-Gründertage und Coworking-Spaces – dort sitzen die Mandanten von morgen.", cost: "kostenlos", effect: 2 },
+    { name: "Google-Anzeigen", icon: "megaphone", when: "Später", text: "Kleines Tagesbudget auf „Buchhalter {city}“ – erst, wenn Website und Bewertungen stehen.", cost: "z. B. 5 € am Tag", effect: 2 },
+    { name: "LinkedIn", icon: "users", when: "Später", text: "Ein praktischer Tipp im Monat – hält Sie bei Gründern im Gedächtnis.", cost: "kostenlos", effect: 1 },
   ],
+  journey: [
+    { icon: "search", title: "Sucht", text: "Ein Handwerker googelt „Buchhalter {city}“." },
+    { icon: "pin", title: "Findet Sie", text: "Ihr Google-Profil steht auf der Karte – mit Sternen." },
+    { icon: "globe", title: "Prüft", text: "Auf der Website: Preise, Ablauf und Ihr Gesicht." },
+    { icon: "calendar", title: "Fragt an", text: "Ein Klick – das Erstgespräch ist gebucht." },
+  ],
+  journeyNote: "Der zweite Weg: Sein Steuerberater empfiehlt Sie – und er ruft direkt an.",
   dos: [
     "Kontieren und Buchen laufender Geschäftsvorfälle (§ 6 Nr. 4 StBerG)",
     "Laufende Lohnabrechnung und Fertigen der Lohnsteuer-Anmeldungen",
@@ -175,9 +189,9 @@ const buchhaltung: Playbook = {
     { name: "Klar & digital", text: "Kontrastreich, große Typografie, Schwarz-Weiß mit einer Akzentfarbe.", pros: ["Spricht Gründer und digitale Selbstständige an"], cons: ["Kann auf traditionelle Betriebe kühl wirken"], score: 3 },
   ],
   packages: [
-    { name: "Start", text: "Für den Auftritt, der Anfragen bringt.", features: ["Website mit 5–6 Seiten", "Mobil optimiert, schnell", "Kontaktformular & Terminbuchung", "Google-Unternehmensprofil eingerichtet", "Impressum & Datenschutz eingebunden"] },
-    { name: "Wachstum", text: "Für mehr Sichtbarkeit bei Google.", features: ["Alles aus Start", "Preisrechner nach Belegmenge", "Leistungs- und Stadtteilseiten", "Bewertungs-Kit (QR-Karte, Vorlage)", "3 Monate Begleitung bei Google"] },
-    { name: "Rundum", text: "Für alles aus einer Hand.", features: ["Alles aus Wachstum", "Logo & Markenauftritt", "Fotoshooting-Planung", "Monatliche Pflege & Auswertung", "Anzeigen-Start mit Budgetberatung"] },
+    { name: "Start", text: "Für den Auftritt, der Anfragen bringt.", price: "1.490 €", unit: "einmalig · danach 29 € im Monat", features: ["Website mit 5–6 Seiten", "Mobil optimiert, schnell", "Kontaktformular & Terminbuchung", "Google-Unternehmensprofil eingerichtet", "Impressum & Datenschutz eingebunden"] },
+    { name: "Wachstum", text: "Für mehr Sichtbarkeit bei Google.", price: "2.490 €", unit: "einmalig · danach 49 € im Monat", features: ["Alles aus Start", "Preisrechner nach Belegmenge", "Leistungs- und Stadtteilseiten", "Bewertungs-Kit (QR-Karte, Vorlage)", "3 Monate Begleitung bei Google"] },
+    { name: "Rundum", text: "Für alles aus einer Hand.", price: "3.990 €", unit: "einmalig · danach 99 € im Monat", features: ["Alles aus Wachstum", "Logo & Markenauftritt", "Fotoshooting-Planung", "Monatliche Pflege & Auswertung", "Anzeigen-Start mit Budgetberatung"] },
   ],
   roi: { value: 200, unit: "€ Honorar pro Mandant und Monat (Beispielwert)", text: "Laufende Buchhaltung ist ein Monatsgeschäft: ein gewonnener Mandant bringt jeden Monat wieder Umsatz.", recurring: true },
 };
@@ -213,13 +227,21 @@ function generic(id: string, label: string, word: string, words: string[], custo
     gbpCategory: special.gbpCategory ?? label,
     gbpExtras: special.gbpExtras ?? [],
     channels: special.channels ?? [
-      ["Google-Unternehmensprofil", "A", "Sofort anlegen, Fotos, Leistungen, Bewertungen sammeln"],
-      ["Lokale Suchseiten (SEO)", "A", "Leistungs- und Ortsseiten mit echtem Inhalt"],
-      ["Instagram", "B", "Zwei Beiträge pro Woche aus dem Alltag, Story-Highlights mit Leistungen"],
-      ["Branchenverzeichnisse", "B", "Gleiche Daten überall: Gelbe Seiten, Das Örtliche, 11880"],
-      ["Google-Anzeigen", "B", "Kleines Budget auf die wichtigsten Suchbegriffe, eigene Landingpage"],
-      ["Empfehlungen", "A", "Zufriedene Kunden aktiv fragen – Empfehlungskarte"],
+      { name: "Google-Profil", icon: "pin", when: "Zuerst", text: "Auf der Karte gefunden werden – mit Sternen, Telefon und Weg.", cost: "kostenlos", effect: 3 },
+      { name: "Bewertungen sammeln", icon: "star", when: "Zuerst", text: "Jeder zufriedene Kunde eine Bewertung – das stärkste Argument bei Google.", cost: "kostenlos", effect: 3 },
+      { name: "Empfehlungen", icon: "handshake", when: "Zuerst", text: "Zufriedene Kunden aktiv fragen – mit einer kleinen Empfehlungskarte.", cost: "kostenlos", effect: 3 },
+      { name: "Website mit Ortsseiten", icon: "globe", when: "Zuerst", text: "Eigene Seiten für Leistungen und Stadtteile – so findet Google Sie öfter.", cost: "im Paket", effect: 2 },
+      { name: "Instagram", icon: "camera", when: "Danach", text: "Zwei Beiträge pro Woche aus dem Alltag – zeigt, wer hinter dem Betrieb steht.", cost: "kostenlos", effect: 2 },
+      { name: "Branchenbücher", icon: "book", when: "Danach", text: "Gelbe Seiten, Das Örtliche, 11880 – überall dieselben Daten.", cost: "kostenlos", effect: 1 },
+      { name: "Google-Anzeigen", icon: "megaphone", when: "Später", text: "Kleines Tagesbudget auf die wichtigsten Suchbegriffe.", cost: "z. B. 5 € am Tag", effect: 2 },
     ],
+    journey: special.journey ?? [
+      { icon: "search", title: "Sucht", text: `Jemand googelt „${label} {city}“.` },
+      { icon: "pin", title: "Findet Sie", text: "Ihr Google-Profil steht auf der Karte – mit Sternen." },
+      { icon: "globe", title: "Prüft", text: "Auf der Website: Leistungen, Preise, echte Fotos." },
+      { icon: "calendar", title: "Fragt an", text: `Ein Klick – ${action}.` },
+    ],
+    journeyNote: special.journeyNote ?? "Der zweite Weg: Ein zufriedener Kunde empfiehlt Sie weiter.",
     dos: special.dos ?? ["Echte Leistungen und Preise klar benennen", "Bewertungen sammeln und beantworten"],
     legalPick: special.legalPick ?? "Pflichtseiten sauber, Datenschutz schlank, Bildrechte geklärt – und nur bewerben, was Sie auch leisten.",
     short: special.short ?? { audience: special.audiences?.[0]?.title ?? "Kunden aus der Region", channels: "Google-Profil & Empfehlungen", legal: "Pflichtseiten & Datenschutz sauber" },
