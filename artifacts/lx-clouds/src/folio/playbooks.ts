@@ -189,9 +189,9 @@ const buchhaltung: Playbook = {
     { name: "Klar & modern", text: "Kontrastreich, große Typografie, eine Akzentfarbe.", pros: ["Wirkt aufgeräumt und zeitgemäß"], cons: ["Kann auf traditionelle Betriebe kühl wirken"], score: 3 },
   ],
   packages: [
-    { name: "Start", text: "Für den Auftritt, der Anrufe bringt.", price: "1.490 €", unit: "einmalig · danach 29 € im Monat", features: ["Website mit 5–6 Seiten", "Seite „Büro & Anfahrt“ mit Karte", "Kontaktformular & Terminwunsch", "Google-Karteneintrag eingerichtet", "Impressum & Datenschutz eingebunden"] },
-    { name: "Wachstum", text: "Für mehr Sichtbarkeit in der Umgebung.", price: "2.490 €", unit: "einmalig · danach 49 € im Monat", features: ["Alles aus Start", "Preisübersicht nach Belegmenge", "Seiten für Leistungen und Stadtteile", "Bewertungs-Paket (QR-Karte für den Tresen)", "3 Monate Begleitung bei Google"] },
-    { name: "Rundum", text: "Für alles aus einer Hand.", price: "3.990 €", unit: "einmalig · danach 99 € im Monat", features: ["Alles aus Wachstum", "Logo & Markenauftritt", "Fotoshooting im Büro", "Visitenkarten & Schild-Entwurf", "Monatliche Pflege & Auswertung"] },
+    { name: "Start", text: "Die Website, die Anrufe bringt.", price: "299 €", unit: "einmalig · zzgl. Internetadresse (wenige Euro im Jahr)", features: ["Website nach Ihrem Lieblingsentwurf", "Für Handy und Computer", "Anruf-Knopf & Kontaktformular", "Impressum & Datenschutz eingebunden", "Online in 2–3 Wochen"] },
+    { name: "Plus", text: "Dazu: gefunden werden in der Umgebung.", price: "499 €", unit: "einmalig · zzgl. Internetadresse", features: ["Alles aus Start", "Google-Karteneintrag eingerichtet", "Eigene Seiten für Ihre Leistungen", "Bewertungs-Karte mit QR-Code für den Tresen", "E-Mail-Adresse mit Ihrem Namen eingerichtet"] },
+    { name: "Rundum", text: "Wir kümmern uns auch danach.", price: "799 €", unit: "einmalig · danach 19 € im Monat", features: ["Alles aus Plus", "Logo-Feinschliff", "Kleine Änderungen jederzeit inklusive", "Monatlicher Kurzbericht: Besucher und Anrufe", "Technik, Updates und Sicherheit"] },
   ],
   roi: { value: 200, unit: "€ Honorar pro Mandant und Monat (Beispielwert)", text: "Laufende Buchhaltung ist ein Monatsgeschäft: ein gewonnener Mandant bringt jeden Monat wieder Umsatz.", recurring: true },
 };

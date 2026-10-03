@@ -951,13 +951,17 @@ function Roi({ b }: { b: RoiBlock }) {
     const net = k * b.value - b.monthly;
     return net > 0 ? Math.max(1, Math.ceil(b.invest / net)) : 0;
   };
+  const span = (n: number) => (n ? (n === 1 ? "einem Monat" : `${n} Monaten`) : "–");
+  const plain = (n: number) => (n ? (n === 1 ? "1 Monat" : `${n} Monate`) : "–");
+  // a small investment is already paid by one new client – say so instead of the two-client example
+  const k = months(1) && months(1) <= 6 ? 1 : 2;
   return (
     <div className={cn(card, "p-5 @3xl:p-6")}>
       <T as="h3" path={["title"]} value={b.title} className={cn(h3, "mb-2 block")} placeholder="Überschrift" />
       {ready &&
         (b.recurring ? (
           <p className="text-[22px] font-semibold leading-[1.3] tracking-[-0.01em] @3xl:text-[26px]">
-            Mit <span className="text-(--p)">2 neuen Kunden</span> hat sich alles nach <span className="text-(--p)">{months(2) || "–"} Monaten</span> bezahlt gemacht.
+            {k === 1 ? "Schon mit" : "Mit"} <span className="text-(--p)">{k === 1 ? "einem neuen Kunden" : "2 neuen Kunden"}</span> hat sich alles nach <span className="text-(--p)">{span(months(k))}</span> bezahlt gemacht.
           </p>
         ) : (
           <p className="text-[22px] font-semibold leading-[1.3] tracking-[-0.01em] @3xl:text-[26px]">
@@ -975,7 +979,7 @@ function Roi({ b }: { b: RoiBlock }) {
       {ready && !b.recurring ? null : ready && (
         <p className="mt-3 text-[13.5px] text-(--mut)">
           Investition {euro(b.invest)}
-          {b.monthly ? ` + ${euro(b.monthly)} im Monat` : ""} · gerechnet mit {euro(b.value)} pro Kunde und Monat · mit 1 Kunden: {months(1) ? `${months(1)} Monate` : "–"}, mit 3 Kunden: {months(3) ? `${months(3)} Monate` : "–"}
+          {b.monthly ? ` + ${euro(b.monthly)} im Monat` : ""} · gerechnet mit {euro(b.value)} pro Kunde und Monat · mit 1 Kunden: {plain(months(1))}, mit 3 Kunden: {plain(months(3))}
         </p>
       )}
     </div>
