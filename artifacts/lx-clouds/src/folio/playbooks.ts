@@ -325,6 +325,7 @@ export const localAreas: Record<string, string[]> = {
   hamburg: ["Altona", "Eimsbüttel", "Winterhude", "Wandsbek", "Harburg", "Norderstedt"],
   münchen: ["Schwabing", "Maxvorstadt", "Sendling", "Pasing", "Bogenhausen", "Unterschleißheim"],
   köln: ["Ehrenfeld", "Nippes", "Deutz", "Lindenthal", "Kalk", "Leverkusen"],
+  rödermark: ["Ober-Roden", "Urberach", "Messenhausen", "Waldacker", "Rodgau", "Dietzenbach", "Dieburg", "Eppertshausen"],
 };
 
 /** Short forms people use for a city, for domain ideas. */

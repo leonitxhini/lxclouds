@@ -62,7 +62,7 @@ export function domainStrength(domain: string, ctx: ReturnType<typeof domainCont
         ? { key: "trust", level: 1, text: ".com wirkt international – Kunden hier tippen trotzdem oft .de." }
         : { key: "trust", level: 0, text: `.${tld} ist ungewohnt – wirkt weniger vertrauenswürdig.` },
     lookAlike
-      ? { key: "confusion", level: 0, text: `${lookAlike} gehört jemand anderem – wer sich vertippt, landet dort, und E-Mails gehen verloren.` }
+      ? { key: "confusion", level: 0, text: `${lookAlike} ist schon vergeben – gehört sie nicht Ihnen, landen Vertipper und E-Mails dort.` }
       : { key: "confusion", level: 2, text: "Keine ähnliche Adresse bei jemand anderem – Anfragen landen sicher bei Ihnen." },
     plain.length <= 12
       ? { key: "memory", level: 2, text: "Kurz – nach einmal Hören gemerkt." }
@@ -91,7 +91,7 @@ export function domainStrength(domain: string, ctx: ReturnType<typeof domainCont
     const weakest = list.filter((c) => c.level === 0).sort((a, b) => weight[b.key] - weight[a.key])[0];
     if (!weakest) verdict = list.every((c) => c.level === 2) ? "Ideal: kurz, klar, genau Ihr Name." : "Stark – kleine Abstriche, aber eine gute Wahl.";
     else if (weakest.key === "brand") verdict = other ? `Nur für den Namen „${other.label}“ – sonst austauschbar.` : "Austauschbar – ohne Ihren Namen baut sie keine Marke auf.";
-    else if (weakest.key === "confusion") verdict = "Gute Adresse – aber eine fast gleiche gehört jemand anderem.";
+    else if (weakest.key === "confusion") verdict = "Gute Adresse – aber eine fast gleiche ist schon vergeben.";
     else if (weakest.key === "trust") verdict = "Endung ungewohnt – wirkt weniger seriös.";
     else if (weakest.key === "memory") verdict = "Zu lang – im Gespräch geht sie verloren.";
     else verdict = "Am Telefon schwer weiterzugeben.";
