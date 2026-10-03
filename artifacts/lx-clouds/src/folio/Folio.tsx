@@ -1,4 +1,4 @@
-import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, Plus, RefreshCw, Rocket, Search, Star, Store, Users, X, type LucideIcon } from "lucide-react";
+import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, ExternalLink, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, Plus, RefreshCw, Rocket, Search, Star, Store, Users, X, type LucideIcon } from "lucide-react";
 import { Fragment, createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddItem, BlockContext, EditContext, ItemTools, T, imageUrl, type EditApi } from "@/demo/edit";
@@ -635,9 +635,19 @@ const traits: { ok: (a: Audit) => boolean; good: string; bad: string; chance: (n
 
 const verdictOf = (score: number) => (score >= 85 ? ["Starker Mitbewerber", "text-emerald-700 bg-emerald-50"] : score >= 70 ? ["Solide, mit Lücken", "text-amber-800 bg-amber-50"] : ["Schwach aufgestellt", "text-rose-700 bg-rose-50"]);
 
+/** "https://www.buchmeister.com/x/" → "buchmeister.com" */
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+};
+
 function Competition({ b }: { b: AuditBlock }) {
   const tools = useTools();
   const scope = useScope();
+  const edit = useEditApi();
   const busy = tools?.busy.has(scope);
   const sites = b.items.map((site, index) => ({ site, index, score: site.result?.score ?? -1 })).sort((x, y) => y.score - x.score);
   const rivals = sites.filter((s) => !s.site.own && s.site.result && !s.site.result.error);
@@ -683,6 +693,16 @@ function Competition({ b }: { b: AuditBlock }) {
                 <div className="min-w-0 flex-1">
                   <T as="h4" path={["items", index, "name"]} value={site.name} className={cn("block text-[17px] font-semibold leading-tight", site.own && "text-(--p)")} placeholder="Name" />
                   <T path={["items", index, "note"]} value={site.note} className="mt-0.5 block text-[13.5px] text-(--mut)" placeholder="Wer ist das? (optional)" />
+                  {edit ? (
+                    <T path={["items", index, "url"]} value={site.url} className="mt-1 block break-all font-mono text-[12.5px] text-(--mut)" placeholder="https://…" />
+                  ) : (
+                    site.url && (
+                      <a href={site.url} target="_blank" rel="noopener noreferrer" className="mt-1.5 inline-flex max-w-full items-center gap-1 rounded-full bg-(--soft) px-2.5 py-1 text-[12.5px] font-medium text-(--p) hover:underline">
+                        <span className="truncate">{hostOf(site.url)}</span>
+                        <ExternalLink className="size-3.5 shrink-0" />
+                      </a>
+                    )
+                  )}
                   {score >= 0 ? (
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="text-[30px] font-semibold leading-none tabular-nums">{score}</span>
