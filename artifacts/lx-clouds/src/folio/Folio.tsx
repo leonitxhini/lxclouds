@@ -824,13 +824,13 @@ function Checklist({ b }: { b: Extract<FolioBlock, { type: "checklist" }> }) {
               type="button"
               disabled={!choose}
               onClick={() => choose?.(scope, ["items", i, "done"], !item.done)}
-              className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border", item.done ? "border-(--p) bg-(--p) text-(--p-on)" : "border-(--fg)/25", choose && "cursor-pointer")}
+              className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center border", b.status ? "rounded-full" : "rounded-md", item.done ? (b.status ? "border-emerald-500 bg-emerald-500 text-white" : "border-(--p) bg-(--p) text-(--p-on)") : "border-(--fg)/25", choose && "cursor-pointer")}
               aria-label={item.done ? "Erledigt" : "Offen"}
               tabIndex={choose ? 0 : -1}
             >
               {item.done && <Check className="size-3.5" strokeWidth={3} />}
             </button>
-            <T path={["items", i, "text"]} value={item.text} multiline className={cn("min-w-0 flex-1 text-[15px] leading-[1.45]", item.done && "text-(--mut) line-through")} placeholder="Aufgabe" />
+            <T path={["items", i, "text"]} value={item.text} multiline className={cn("min-w-0 flex-1 text-[15px] leading-[1.45]", item.done && !b.status && "text-(--mut) line-through")} placeholder="Aufgabe" />
             <T path={["items", i, "who"]} value={item.who} className={cn(chip, "shrink-0 bg-(--fg)/[0.06] text-(--mut)")} placeholder="Wer" />
             <ItemTools path={["items"]} index={i} count={b.items.length} />
           </li>

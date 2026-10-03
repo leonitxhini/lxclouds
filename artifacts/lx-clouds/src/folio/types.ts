@@ -51,7 +51,8 @@ export type OptionsBlock = Base<"options", { title: string; items: { name: strin
 export type DomainsBlock = Base<"domains", { title: string; items: { domain: string; status: "free" | "taken" | "unknown"; checked: string; note: string; pick: boolean }[] }>;
 export type AuditBlock = Base<"audit", { title: string; items: { name: string; url: string; own: boolean; result: Audit | null; /** who they are, in a few words */ note?: string }[] }>;
 export type TableBlock = Base<"table", { title: string; columns: string[]; rows: string[][]; /** "ranked": rows as a numbered list – name, priority (A/B/C), what to do */ style?: "ranked" }>;
-export type ChecklistBlock = Base<"checklist", { title: string; items: { text: string; who: string; done: boolean }[] }>;
+/** `status`: a state of affairs (green = already fine, open = still to do) rather than a to-do list – nothing is crossed out */
+export type ChecklistBlock = Base<"checklist", { title: string; items: { text: string; who: string; done: boolean }[]; status?: boolean }>;
 export type TimelineBlock = Base<"timeline", { title: string; items: { when: string; title: string; text: string }[] }>;
 export type PackagesBlock = Base<"packages", { title: string; items: { name: string; price: string; /** under the price, e.g. "einmalig · danach 49 € im Monat" */ unit?: string; text: string; features: string[]; pick: boolean }[] }>;
 export type RulesBlock = Base<"rules", { title: string; dos: string[]; donts: string[] }>;
