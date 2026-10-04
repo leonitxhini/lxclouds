@@ -87,6 +87,7 @@ export function domainStrength(domain: string, ctx: ReturnType<typeof domainCont
 
   let verdict: string;
   if (status === "taken") verdict = "Vergeben – nur möglich, wenn der Inhaber verkauft.";
+  else if (status === "own" && !list.some((c) => c.level === 0 && (c.key === "brand" || c.key === "confusion"))) verdict = "Gehört Ihnen schon – sofort nutzbar.";
   else {
     const weakest = list.filter((c) => c.level === 0).sort((a, b) => weight[b.key] - weight[a.key])[0];
     if (!weakest) verdict = list.every((c) => c.level === 2) ? "Ideal: kurz, klar, genau Ihr Name." : "Stark – kleine Abstriche, aber eine gute Wahl.";
@@ -106,7 +107,7 @@ export function rankDomains(block: DomainsBlock, ctx: ReturnType<typeof domainCo
     .map((item, index) => ({ item, index, strength: domainStrength(item.domain, ctx, item.status) }))
     .filter((d) => d.item.domain.trim())
     .sort((a, b) => {
-      const rank = (s: string) => (s === "free" ? 0 : s === "unknown" ? 1 : 2);
+      const rank = (s: string) => (s === "own" ? 0 : s === "free" ? 1 : s === "unknown" ? 2 : 3);
       return rank(a.item.status) - rank(b.item.status) || b.strength.score - a.strength.score || (a.item.domain.endsWith(".de") ? -1 : 1);
     });
 }

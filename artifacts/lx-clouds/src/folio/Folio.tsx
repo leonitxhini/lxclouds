@@ -1,4 +1,4 @@
-import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, ExternalLink, Gauge, Globe, Handshake, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, Plus, RefreshCw, Rocket, Search, Star, Store, Users, X, type LucideIcon } from "lucide-react";
+import { BookOpen, CalendarCheck, Camera, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDashed, ExternalLink, Gauge, Globe, Handshake, KeyRound, Loader2, MapPin, Maximize2, Megaphone, Minus, Phone, Plus, RefreshCw, Rocket, Search, Star, Store, Users, X, type LucideIcon } from "lucide-react";
 import { Fragment, createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AddItem, BlockContext, EditContext, ItemTools, T, imageUrl, type EditApi } from "@/demo/edit";
@@ -238,6 +238,7 @@ const statusChip = {
   free: ["frei", "bg-emerald-50 text-emerald-700", Check],
   taken: ["vergeben", "bg-rose-50 text-rose-700", X],
   unknown: ["ungeprüft", "bg-(--fg)/[0.06] text-(--mut)", CircleDashed],
+  own: ["gehört Ihnen", "bg-(--soft) text-(--p)", KeyRound],
 } as const;
 
 const levelDot = ["bg-rose-500", "bg-amber-400", "bg-emerald-500"];
@@ -268,7 +269,7 @@ function Domains({ b }: { b: DomainsBlock }) {
   const [all, setAll] = useState(false);
   const ctx = domainContext(doc);
   const ranked = rankDomains(b, ctx);
-  const top = ranked.find((d) => d.item.pick) ?? ranked.find((d) => d.item.status === "free") ?? ranked[0];
+  const top = ranked.find((d) => d.item.pick) ?? ranked.find((d) => d.item.status === "own") ?? ranked.find((d) => d.item.status === "free") ?? ranked[0];
   const rest = ranked.filter((d) => d !== top);
   const shown = all ? rest : rest.slice(0, 8);
   const checked = b.items.map((d) => d.checked).filter(Boolean).sort().at(-1);
@@ -299,8 +300,8 @@ function Domains({ b }: { b: DomainsBlock }) {
               <p className="mt-2 text-[16px] font-medium">{top.strength.verdict}</p>
             </div>
             <div className="flex flex-col items-start gap-2 @3xl:items-end">
-              <span className={cn(chip, "px-3 py-1.5 text-[13px]", top.item.status === "free" ? "bg-emerald-500 text-white" : top.item.status === "taken" ? "bg-rose-500 text-white" : "bg-(--fg)/10 text-(--mut)")}>
-                {top.item.status === "free" ? "✓ frei – jetzt sichern" : top.item.status === "taken" ? "vergeben" : "noch prüfen"}
+              <span className={cn(chip, "px-3 py-1.5 text-[13px]", top.item.status === "free" || top.item.status === "own" ? "bg-emerald-500 text-white" : top.item.status === "taken" ? "bg-rose-500 text-white" : "bg-(--fg)/10 text-(--mut)")}>
+                {top.item.status === "own" ? "✓ gehört Ihnen" : top.item.status === "free" ? "✓ frei – jetzt sichern" : top.item.status === "taken" ? "vergeben" : "noch prüfen"}
               </span>
               <StrengthBar score={top.strength.score} />
             </div>
@@ -420,6 +421,11 @@ function Domains({ b }: { b: DomainsBlock }) {
               <div key={i} className="group/item relative grid gap-2 px-4 py-2.5 @3xl:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
                 <T path={["items", i, "domain"]} value={item.domain} className="font-mono text-[14px]" placeholder="adresse.de" />
                 <T path={["items", i, "note"]} value={item.note} className="text-[13.5px] text-(--mut)" placeholder="Anmerkung, z. B. „bei Strato reserviert“" />
+                {(item.status === "taken" || item.status === "own") && (
+                  <button type="button" onClick={() => edit.set(scope, ["items", i, "status"], item.status === "own" ? "taken" : "own")} className={cn(chip, "w-fit cursor-pointer", item.status === "own" ? "bg-(--p) text-(--p-on)" : "border border-dashed border-(--fg)/25 text-(--mut) hover:border-(--p) hover:text-(--p)")}>
+                    <KeyRound className="size-3" /> {item.status === "own" ? "Gehört dem Kunden" : "Gehört dem Kunden?"}
+                  </button>
+                )}
                 <ItemTools path={["items"]} index={i} count={b.items.length} />
               </div>
             ))}

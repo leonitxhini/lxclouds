@@ -48,7 +48,7 @@ type Base<T extends string, P> = { id: string; type: T; detail?: boolean } & P;
 
 export type CardsBlock = Base<"cards", { title: string; items: { title: string; text: string; tag: string }[] }>;
 export type OptionsBlock = Base<"options", { title: string; items: { name: string; text: string; pros: string[]; cons: string[]; score: number; pick: boolean; /** picture of the option, e.g. a design draft */ image?: string }[] }>;
-export type DomainsBlock = Base<"domains", { title: string; items: { domain: string; status: "free" | "taken" | "unknown"; checked: string; note: string; pick: boolean }[] }>;
+export type DomainsBlock = Base<"domains", { title: string; items: { domain: string; /** own: registered already, by the client */ status: "free" | "taken" | "unknown" | "own"; checked: string; note: string; pick: boolean }[] }>;
 export type AuditBlock = Base<"audit", { title: string; items: { name: string; url: string; own: boolean; result: Audit | null; /** who they are, in a few words */ note?: string }[] }>;
 export type TableBlock = Base<"table", { title: string; columns: string[]; rows: string[][]; /** "ranked": rows as a numbered list – name, priority (A/B/C), what to do */ style?: "ranked" }>;
 /** `status`: a state of affairs (green = already fine, open = still to do) rather than a to-do list – nothing is crossed out */

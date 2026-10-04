@@ -338,7 +338,8 @@ export function FolioEditor({ id }: { id: number }) {
             return setIn(
               d,
               [...parseScope(scope), "items"],
-              current.items.map((item, i) => (results[i] ? { ...item, domain: results[i].domain, status: results[i].status, checked: results[i].status === "unknown" ? item.checked : now } : item)),
+              // an address the client owns shows up as taken at the registry – it stays marked as theirs
+              current.items.map((item, i) => (results[i] ? { ...item, domain: results[i].domain, status: item.status === "own" && results[i].status === "taken" ? "own" : results[i].status, checked: results[i].status === "unknown" ? item.checked : now } : item)),
             );
           });
         } catch (err) {
