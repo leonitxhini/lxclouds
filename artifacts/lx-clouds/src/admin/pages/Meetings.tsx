@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Copy, Images, MessagesSquare, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Copy, Images, MessageSquarePlus, MessagesSquare, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation } from "wouter";
 import { imageUrl } from "@/demo/edit";
@@ -169,6 +169,7 @@ function useAutosave(id: number, row: Row | null) {
 }
 
 // ---------------------------------------------------------------- the page
+// One topic at a time: a step bar on top, the topic in the middle, what you have chosen on the right.
 
 export function MeetingPage({ id }: { id: number }) {
   const { data, error } = useLoad<{ talk: Row }>(`/talks/${id}`);
@@ -176,10 +177,11 @@ export function MeetingPage({ id }: { id: number }) {
   const [doc, setDoc] = useState<MeetingDoc | null>(null);
   const [title, setTitle] = useState("");
   const [prep, setPrep] = useState(() => new URLSearchParams(window.location.search).has("vorbereiten"));
-  const [summary, setSummary] = useState(false);
+  const [step, setStep] = useState(0);
   const [zoom, setZoom] = useState<Item | null>(null);
   const toast = useToast();
   const { save, state, rename } = useAutosave(id, row);
+  const top = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!row) return;
@@ -222,6 +224,13 @@ export function MeetingPage({ id }: { id: number }) {
   if (error) return <p className="py-20 text-center text-red-600">{error.message}</p>;
   if (!row || !doc) return <Loading />;
 
+  const steps = doc.sections.length + 1; // the topics, then the result
+  const current = Math.min(step, steps - 1);
+  const section = doc.sections[current] as Section | undefined;
+  const go = (n: number) => {
+    setStep(Math.max(0, Math.min(steps - 1, n)));
+    top.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const decided = doc.sections.reduce((n, s) => n + s.items.filter((i) => i.pick).length, 0);
   const total = doc.sections.reduce((n, s) => n + s.items.length, 0);
 
@@ -236,70 +245,119 @@ export function MeetingPage({ id }: { id: number }) {
         </div>
       )}
 
-      <Link href="/besprechungen" className="mb-4 inline-flex items-center gap-1.5 text-[13.5px] text-muted hover:text-ink">
-        <ArrowLeft className="size-4" /> Besprechungen
-      </Link>
-
-      <header className="mb-8 grid gap-4 rounded-[24px] bg-ink px-6 py-7 text-white sm:px-8 sm:py-9">
-        <p className="text-[12.5px] font-semibold uppercase tracking-[0.14em] text-white/55">{row.client_name ?? "Besprechung"}</p>
-        {prep ? (
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={() => title.trim() && title !== row.title && rename(title.trim())}
-            aria-label="Titel"
-            className="w-full rounded-[10px] bg-white/10 px-2 py-1 text-[28px] font-semibold leading-tight tracking-[-0.02em] outline-none sm:text-[38px]"
-          />
-        ) : (
-          <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] text-balance sm:text-[38px]">{title}</h1>
-        )}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="inline-flex rounded-full bg-white/10 p-1" role="group" aria-label="Ansicht">
-            {[
+      {/* head: who, what, how far */}
+      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <Link href="/besprechungen" className="inline-flex items-center gap-1.5 text-[13px] text-muted hover:text-ink">
+            <ArrowLeft className="size-3.5" /> Besprechungen
+          </Link>
+          <p className="mt-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent-ink">{row.client_name ?? "Besprechung"}</p>
+          {prep ? (
+            <input value={title} onChange={(e) => setTitle(e.target.value)} onBlur={() => title.trim() && title !== row.title && rename(title.trim())} aria-label="Titel" className="mt-1 w-full rounded-[10px] border border-dashed border-ink/15 bg-white px-2 py-0.5 text-[26px] font-semibold tracking-[-0.02em] outline-none focus:border-accent sm:text-[30px]" />
+          ) : (
+            <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.02em] text-balance sm:text-[30px]">{title}</h1>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 sm:items-end">
+          <div className="inline-flex w-fit rounded-full bg-ink/[0.06] p-1" role="group" aria-label="Ansicht">
+            {([
               [true, "Vorbereiten"],
               [false, "Mit dem Kunden"],
-            ].map(([value, label]) => (
-              <button key={String(label)} type="button" aria-pressed={prep === value} onClick={() => setPrep(value as boolean)} className={cn("rounded-full px-4 py-1.5 text-[13.5px] font-medium", prep === value ? "bg-white text-ink" : "text-white/75 hover:text-white")}>
-                {label as string}
+            ] as const).map(([value, label]) => (
+              <button key={label} type="button" aria-pressed={prep === value} onClick={() => setPrep(value)} className={cn("rounded-full px-4 py-1.5 text-[13.5px] font-medium", prep === value ? "bg-white text-ink shadow-sm" : "text-muted hover:text-ink")}>
+                {label}
               </button>
             ))}
           </div>
-          <span className="text-[13.5px] text-white/60 tabular-nums">
-            {decided} von {total} Punkten entschieden · {state === "saving" ? "speichert …" : state === "saved" ? "gespeichert" : "nicht gespeichert"}
-          </span>
+          <span className="text-[12.5px] text-faint tabular-nums">{state === "saving" ? "speichert …" : state === "saved" ? "gespeichert" : "nicht gespeichert"}</span>
         </div>
-      </header>
+      </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="grid min-w-0 gap-10 [&>*]:min-w-0">
-          {doc.sections.map((s, n) => (
+      {/* progress */}
+      <div className="mb-5 flex items-center gap-3">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink/[0.07]">
+          <div className="h-full rounded-full bg-accent transition-[width] duration-500" style={{ width: `${total ? (decided / total) * 100 : 0}%` }} />
+        </div>
+        <span className="text-[12.5px] text-muted tabular-nums">
+          {decided} von {total} entschieden
+        </span>
+      </div>
+
+      {/* steps */}
+      <div ref={top} className="scroll-mt-4" />
+      <nav aria-label="Themen" className="-mx-4 mb-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <ol className="flex w-max gap-1.5 sm:w-auto sm:flex-wrap">
+          {doc.sections.map((s, i) => {
+            const done = s.items.filter((x) => x.pick).length;
+            const complete = s.items.length > 0 && (s.kind === "choice" ? s.items.some((x) => x.pick === "yes") : done === s.items.length);
+            return (
+              <li key={s.id}>
+                <button type="button" onClick={() => go(i)} aria-current={current === i ? "step" : undefined} className={cn("flex h-10 items-center gap-2 rounded-full border px-3.5 text-[13.5px] font-medium transition-colors", current === i ? "border-ink bg-ink text-white" : "border-ink/10 bg-white text-ink/75 hover:border-ink/25")}>
+                  <span className={cn("flex size-5 items-center justify-center rounded-full text-[11px] font-semibold", complete ? "bg-emerald-500 text-white" : current === i ? "bg-white/20" : "bg-ink/[0.07]")}>{complete ? <Check className="size-3" strokeWidth={3} /> : i + 1}</span>
+                  <span className="whitespace-nowrap">{s.title || "Ohne Titel"}</span>
+                  {s.kind !== "choice" && s.items.length > 0 && <span className={cn("text-[12px] tabular-nums", current === i ? "text-white/60" : "text-faint")}>{done}/{s.items.length}</span>}
+                </button>
+              </li>
+            );
+          })}
+          <li>
+            <button type="button" onClick={() => go(steps - 1)} aria-current={current === steps - 1 ? "step" : undefined} className={cn("flex h-10 items-center gap-2 rounded-full border px-3.5 text-[13.5px] font-semibold", current === steps - 1 ? "border-accent bg-accent text-white" : "border-accent/30 bg-accent-soft text-accent-ink hover:border-accent")}>
+              <Sparkles className="size-4" aria-hidden="true" /> Ergebnis
+            </button>
+          </li>
+        </ol>
+      </nav>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="min-w-0">
+          {section ? (
             <SectionBlock
-              key={s.id}
-              section={s}
-              index={n}
+              key={section.id}
+              section={section}
+              index={current}
               prep={prep}
-              onSection={(fn) => setSection(s.id, fn)}
-              onItem={(iid, patch) => setItem(s.id, iid, patch)}
-              onPick={(item, pick) => choose(s, item, pick)}
-              onRemove={() => change((d) => ({ ...d, sections: d.sections.filter((x) => x.id !== s.id) }))}
-              onImport={row.client_id ? () => importDesigns(s) : undefined}
+              onSection={(fn) => setSection(section.id, fn)}
+              onItem={(iid, patch) => setItem(section.id, iid, patch)}
+              onPick={(item, pick) => choose(section, item, pick)}
+              onRemove={() => {
+                change((d) => ({ ...d, sections: d.sections.filter((x) => x.id !== section.id) }));
+                setStep((n) => Math.max(0, n - 1));
+              }}
+              onImport={row.client_id ? () => importDesigns(section) : undefined}
               onZoom={setZoom}
             />
-          ))}
-          {prep && <AddSection onAdd={(kind) => change((d) => ({ ...d, sections: [...d.sections, blankSection(kind)] }))} />}
-          <Todos todos={doc.todos} onChange={(todos) => change((d) => ({ ...d, todos }))} />
+          ) : (
+            <Result title={title} doc={doc} onTodos={(todos) => change((d) => ({ ...d, todos }))} onJump={go} />
+          )}
+
+          {prep && section && (
+            <AddSection
+              onAdd={(kind) => {
+                change((d) => ({ ...d, sections: [...d.sections, blankSection(kind)] }));
+                setStep(doc.sections.length);
+              }}
+            />
+          )}
+
+          <div className="mt-8 flex items-center justify-between gap-3 border-t border-ink/[0.07] pt-5">
+            <Btn variant="ghost" onClick={() => go(current - 1)} disabled={current === 0}>
+              <ArrowLeft className="size-4" /> Zurück
+            </Btn>
+            {current < steps - 1 && (
+              <Btn onClick={() => go(current + 1)}>
+                {current === steps - 2 ? "Zum Ergebnis" : `Weiter: ${doc.sections[current + 1]?.title ?? ""}`} <ArrowRight className="size-4" />
+              </Btn>
+            )}
+          </div>
         </div>
 
-        <aside className="min-w-0">
+        <aside className="min-w-0 lg:order-none">
           <div className="sticky top-6">
-            <Choice doc={doc} onSummary={() => setSummary(true)} />
+            <Choice doc={doc} onJump={go} />
           </div>
         </aside>
       </div>
 
-      <Modal open={summary} onClose={() => setSummary(false)} title="Zusammenfassung" wide>
-        <SummaryText text={summaryText(title, doc)} />
-      </Modal>
       <Modal open={!!zoom} onClose={() => setZoom(null)} title={zoom?.title ?? ""} wide>
         {zoom?.image && <img src={imageUrl(zoom.image)} alt={zoom.title} className="w-full rounded-[12px]" />}
       </Modal>
@@ -316,21 +374,21 @@ const blankSection = (kind: SectionKind): Section => ({
   notes: "",
 });
 
-// ---------------------------------------------------------------- one section
+// ---------------------------------------------------------------- small pieces
 
-const pickTone: Record<Exclude<Pick, "">, string> = {
-  yes: "border-emerald-500 bg-emerald-500 text-white",
-  maybe: "border-amber-400 bg-amber-400 text-black",
-  no: "border-ink/70 bg-ink/70 text-white",
+const segTone: Record<Exclude<Pick, "">, string> = {
+  yes: "bg-emerald-500 text-white",
+  maybe: "bg-amber-400 text-black",
+  no: "bg-ink/75 text-white",
 };
 
-function PickButtons({ item, labels, onPick, small }: { item: Item; labels: [string, string, string]; onPick: (p: Pick) => void; small?: boolean }) {
+/** Three connected buttons – one decision per point. */
+function Segmented({ item, labels, onPick, full }: { item: Item; labels: [string, string, string]; onPick: (p: Pick) => void; full?: boolean }) {
   const picks: Exclude<Pick, "">[] = ["yes", "maybe", "no"];
   return (
-    <div className="flex gap-1.5">
+    <div className={cn("flex w-full shrink-0 rounded-full bg-ink/[0.05] p-0.5", !full && "sm:inline-flex sm:w-auto")} role="group">
       {picks.map((p, i) => (
-        <button key={p} type="button" aria-pressed={item.pick === p} onClick={() => onPick(item.pick === p ? "" : p)} className={cn("flex-1 rounded-full border font-medium transition-colors", small ? "h-8 text-[12.5px]" : "h-9 text-[13.5px]", item.pick === p ? pickTone[p] : "border-ink/12 bg-white text-ink/70 hover:border-ink/30")}>
-          {item.pick === p && p === "yes" && <Check className="-mt-0.5 mr-1 inline size-3.5" aria-hidden="true" />}
+        <button key={p} type="button" aria-pressed={item.pick === p} onClick={() => onPick(item.pick === p ? "" : p)} className={cn("h-8 flex-1 whitespace-nowrap rounded-full px-3 text-[12.5px] font-medium transition-colors", !full && "sm:flex-none", item.pick === p ? segTone[p] : "text-ink/60 hover:bg-white hover:text-ink")}>
           {labels[i]}
         </button>
       ))}
@@ -340,21 +398,45 @@ function PickButtons({ item, labels, onPick, small }: { item: Item; labels: [str
 
 /** Text that is plain while talking and editable while preparing. */
 function Editable({ prep, value, onChange, placeholder, className, multiline }: { prep: boolean; value: string; onChange: (v: string) => void; placeholder: string; className?: string; multiline?: boolean }) {
-  if (!prep) return value ? <span className={className}>{value}</span> : null;
-  const base = cn("block w-full rounded-[8px] border border-dashed border-ink/15 bg-white/60 px-2 py-1 outline-none focus:border-accent focus:bg-white", className);
-  return multiline ? <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={2} className={cn(base, "resize-y")} /> : <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={base} />;
+  if (!prep) return value ? <span className={cn("block", className)}>{value}</span> : null;
+  const base = cn("block w-full rounded-[8px] border border-dashed border-ink/15 bg-white px-2 py-1 outline-none focus:border-accent", className);
+  return multiline ? <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={Math.max(2, value.split("\n").length)} className={cn(base, "resize-y")} /> : <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={base} />;
 }
 
-function NoteField({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
-  const [open, setOpen] = useState(!!value);
-  if (!open)
+/** A note to a point: a small link until there is one. */
+function Note({ value, onChange, label = "Notiz" }: { value: string; onChange: (v: string) => void; label?: string }) {
+  const [open, setOpen] = useState(false);
+  if (!open && !value)
     return (
-      <button type="button" onClick={() => setOpen(true)} className="w-fit text-[12.5px] font-medium text-faint hover:text-accent-ink">
-        + Notiz
+      <button type="button" onClick={() => setOpen(true)} className="inline-flex w-fit items-center gap-1 text-[12.5px] text-faint hover:text-accent-ink">
+        <MessageSquarePlus className="size-3.5" /> {label}
       </button>
     );
-  return <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={label} aria-label={label} autoFocus={!value} className="h-9 w-full rounded-[10px] border border-ink/10 bg-white px-2.5 text-[13.5px] placeholder:text-faint/70 focus:border-accent focus:outline-none" />;
+  return <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="Was er dazu sagt …" aria-label={label} autoFocus={open && !value} onBlur={() => setOpen(false)} className="h-8 w-full rounded-[8px] border border-transparent bg-amber-50/70 px-2.5 text-[13px] text-ink placeholder:text-faint/70 focus:border-accent focus:bg-white focus:outline-none" />;
 }
+
+/** Text with "– " lines shown as a list. */
+function Lines({ text }: { text: string }) {
+  const lines = text.split("\n").filter((l) => l.trim());
+  return (
+    <div className="grid gap-1.5 text-[14px] leading-snug text-muted">
+      {lines.map((l, i) =>
+        l.startsWith("– ") ? (
+          <p key={i} className="flex gap-2">
+            <Check className="mt-0.5 size-3.5 shrink-0 text-accent" strokeWidth={3} aria-hidden="true" />
+            <span>{l.slice(2)}</span>
+          </p>
+        ) : (
+          <p key={i} className={cn(i > 0 && /einmalig|inklusive/.test(l) && "pt-1 text-[12.5px] text-faint")}>
+            {l}
+          </p>
+        ),
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- one topic
 
 function SectionBlock({
   section: s,
@@ -388,52 +470,51 @@ function SectionBlock({
     );
 
   return (
-    <section aria-labelledby={`sec-${s.id}`}>
-      <div className="mb-4 flex items-start gap-3">
-        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[14px] font-semibold text-accent-ink tabular-nums">{index + 1}</span>
-        <div className="grid min-w-0 flex-1 gap-1">
+    <section aria-labelledby={`sec-${s.id}`} className="grid gap-5">
+      <header className="flex items-start gap-3">
+        <div className="grid min-w-0 flex-1 gap-1.5">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Thema {index + 1}</p>
           {prep ? (
-            <Editable prep value={s.title} onChange={(v) => onSection((x) => ({ ...x, title: v }))} placeholder="Überschrift" className="text-[22px] font-semibold tracking-[-0.015em]" />
+            <Editable prep value={s.title} onChange={(v) => onSection((x) => ({ ...x, title: v }))} placeholder="Überschrift" className="text-[28px] font-semibold tracking-[-0.02em]" />
           ) : (
-            <h2 id={`sec-${s.id}`} className="text-[22px] font-semibold leading-tight tracking-[-0.015em]">
+            <h2 id={`sec-${s.id}`} className="text-[28px] font-semibold leading-tight tracking-[-0.02em] text-balance sm:text-[32px]">
               {s.title}
             </h2>
           )}
-          <Editable prep={prep} value={s.intro} onChange={(v) => onSection((x) => ({ ...x, intro: v }))} placeholder="Frage an den Kunden (optional)" className="text-[15px] text-muted" />
+          <Editable prep={prep} value={s.intro} onChange={(v) => onSection((x) => ({ ...x, intro: v }))} placeholder="Frage an den Kunden (optional)" className="text-[16px] text-muted" />
         </div>
         {prep && (
-          <button type="button" onClick={onRemove} className="flex size-9 shrink-0 items-center justify-center rounded-full text-faint hover:bg-red-50 hover:text-red-600" aria-label="Bereich entfernen">
+          <button type="button" onClick={onRemove} className="flex size-9 shrink-0 items-center justify-center rounded-full text-faint hover:bg-red-50 hover:text-red-600" aria-label="Thema entfernen">
             <Trash2 className="size-4" />
           </button>
         )}
-      </div>
+      </header>
 
       {s.kind === "designs" && (
         <>
-          {s.items.length === 0 && <p className="rounded-[14px] bg-ink/[0.03] px-4 py-6 text-center text-[14px] text-muted">Noch keine Entwürfe drin.</p>}
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 [&>*]:min-w-0">
+          {s.items.length === 0 && <p className="rounded-[16px] bg-ink/[0.03] px-4 py-10 text-center text-[14px] text-muted">Noch keine Entwürfe drin.</p>}
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 [&>*]:min-w-0">
             {s.items.map((item) => (
-              <li key={item.id} className={cn("overflow-hidden rounded-[18px] border bg-white transition-shadow", item.pick === "yes" ? "border-emerald-500 shadow-[0_0_0_2px_rgb(16_185_129)]" : item.pick === "no" ? "border-ink/[0.08] opacity-60" : "border-ink/[0.08]")}>
-                <button type="button" onClick={() => onZoom(item)} className="relative block w-full bg-ink/[0.04]" aria-label={`${item.title} groß ansehen`}>
-                  {item.image && <img src={imageUrl(item.image)} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover object-top" />}
-                  {item.tag && <span className="absolute left-3 top-3 rounded-full bg-ink px-2.5 py-1 text-[11.5px] font-semibold text-white">{item.tag}</span>}
+              <li key={item.id} className={cn("group overflow-hidden rounded-[20px] bg-white ring-1 transition-[box-shadow,opacity]", item.pick === "yes" ? "ring-2 ring-emerald-500" : "ring-ink/[0.08]", item.pick === "no" && "opacity-55")}>
+                <button type="button" onClick={() => onZoom(item)} className="relative block w-full overflow-hidden bg-ink/[0.04]" aria-label={`${item.title} groß ansehen`}>
+                  {item.image && <img src={imageUrl(item.image)} alt="" loading="lazy" className="aspect-[16/11] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]" />}
+                  {item.tag && <span className="absolute left-3 top-3 rounded-full bg-ink/85 px-2.5 py-1 text-[11.5px] font-semibold text-white backdrop-blur">{item.tag}</span>}
+                  {item.pick && <span className={cn("absolute right-3 top-3 rounded-full px-2.5 py-1 text-[11.5px] font-semibold", segTone[item.pick])}>{labels[["yes", "maybe", "no"].indexOf(item.pick)]}</span>}
                 </button>
-                <div className="grid gap-2.5 p-3.5">
+                <div className="grid gap-3 p-4">
                   <div className="flex items-center gap-2">
-                    <div className="min-w-0 flex-1">
-                      {prep ? <Editable prep value={item.title} onChange={(v) => onItem(item.id, { title: v })} placeholder="Name" className="text-[14.5px] font-medium" /> : <p className="truncate text-[14.5px] font-medium">{item.title}</p>}
-                    </div>
+                    <div className="min-w-0 flex-1">{prep ? <Editable prep value={item.title} onChange={(v) => onItem(item.id, { title: v })} placeholder="Name" className="text-[15px] font-semibold" /> : <p className="truncate text-[15px] font-semibold">{item.title}</p>}</div>
                     {del(item.id)}
                   </div>
                   {prep && <Editable prep value={item.tag ?? ""} onChange={(v) => onItem(item.id, { tag: v })} placeholder="Etikett, z. B. Unser Favorit" className="text-[12.5px]" />}
-                  <PickButtons item={item} labels={labels} onPick={(p) => onPick(item, p)} small />
-                  <NoteField value={item.note} onChange={(v) => onItem(item.id, { note: v })} label="Was er dazu sagt" />
+                  <Segmented item={item} labels={labels} onPick={(p) => onPick(item, p)} full />
+                  <Note value={item.note} onChange={(v) => onItem(item.id, { note: v })} />
                 </div>
               </li>
             ))}
           </ul>
           {prep && onImport && (
-            <Btn variant="outline" size="sm" className="mt-3" onClick={onImport}>
+            <Btn variant="outline" size="sm" className="w-fit" onClick={onImport}>
               <Images className="size-3.5" /> Entwürfe aus „Entwürfe“ holen
             </Btn>
           )}
@@ -441,34 +522,32 @@ function SectionBlock({
       )}
 
       {s.kind === "choice" && (
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 [&>*]:min-w-0">
+        <ul className={cn("grid grid-cols-1 gap-4 [&>*]:min-w-0", s.items.length > 1 && "md:grid-cols-2")}>
           {s.items.map((item) => {
             const on = item.pick === "yes";
-            return (
-              <li key={item.id}>
-                <div className={cn("flex h-full flex-col gap-3 rounded-[18px] border-2 bg-white p-5 transition-colors", on ? "border-accent shadow-[0_10px_30px_-18px_rgb(104_101_255)]" : "border-ink/[0.08]")}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="grid min-w-0 flex-1 gap-1">
-                      <Editable prep={prep} value={item.title} onChange={(v) => onItem(item.id, { title: v })} placeholder="Option" className="text-[19px] font-semibold leading-snug" />
-                      <Editable prep={prep} value={item.text} onChange={(v) => onItem(item.id, { text: v })} placeholder="Kurz: was dafür spricht" className="whitespace-pre-line text-[14.5px] leading-relaxed text-muted" multiline />
-                    </div>
-                    {del(item.id)}
+            const card = (
+              <>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="grid min-w-0 flex-1 gap-1">
+                    <Editable prep={prep} value={item.title} onChange={(v) => onItem(item.id, { title: v })} placeholder="Option" className="text-[20px] font-semibold leading-snug tracking-[-0.01em]" />
                   </div>
-                  {(item.price || prep) && <Editable prep={prep} value={item.price ?? ""} onChange={(v) => onItem(item.id, { price: v })} placeholder="Preis (optional)" className="text-[28px] font-semibold tracking-[-0.02em]" />}
-                  <div className="mt-auto grid gap-2">
-                    <button type="button" aria-pressed={on} onClick={() => onPick(item, on ? "" : "yes")} className={cn("h-10 rounded-full text-[14px] font-semibold", on ? "bg-accent text-white" : "border border-ink/12 text-ink/80 hover:border-accent/50")}>
-                      {on ? (
-                        <>
-                          <Check className="-mt-0.5 mr-1.5 inline size-4" aria-hidden="true" />
-                          Das nehmen wir
-                        </>
-                      ) : (
-                        "Das nehmen"
-                      )}
-                    </button>
-                    <NoteField value={item.note} onChange={(v) => onItem(item.id, { note: v })} label="Was er dazu sagt" />
-                  </div>
+                  {prep ? del(item.id) : <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full border-2", on ? "border-accent bg-accent text-white" : "border-ink/15")}>{on && <Check className="size-4" strokeWidth={3} />}</span>}
                 </div>
+                {(item.price || prep) && <Editable prep={prep} value={item.price ?? ""} onChange={(v) => onItem(item.id, { price: v })} placeholder="Preis (optional)" className="text-[34px] font-semibold leading-none tracking-[-0.03em]" />}
+                {prep ? <Editable prep value={item.text} onChange={(v) => onItem(item.id, { text: v })} placeholder="Was dafür spricht – Zeilen mit „– “ werden zur Liste" className="text-[14px]" multiline /> : item.text && <Lines text={item.text} />}
+              </>
+            );
+            return (
+              <li key={item.id} className="grid gap-2">
+                {prep ? (
+                  <div className="grid gap-3 rounded-[20px] border-2 border-ink/[0.08] bg-white p-5">{card}</div>
+                ) : (
+                  <button type="button" aria-pressed={on} onClick={() => onPick(item, on ? "" : "yes")} className={cn("grid h-full gap-3 rounded-[20px] border-2 bg-white p-5 text-left transition-[border-color,box-shadow]", on ? "border-accent shadow-[0_18px_40px_-24px_rgb(104_101_255)]" : "border-ink/[0.08] hover:border-ink/20")}>
+                    {card}
+                    <span className={cn("mt-1 text-[13px] font-semibold", on ? "text-accent-ink" : "text-faint")}>{on ? "Das nehmen wir" : "Antippen zum Auswählen"}</span>
+                  </button>
+                )}
+                <Note value={item.note} onChange={(v) => onItem(item.id, { note: v })} />
               </li>
             );
           })}
@@ -476,53 +555,59 @@ function SectionBlock({
       )}
 
       {s.kind === "list" && (
-        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 [&>*]:min-w-0">
+        <ul className="divide-y divide-ink/[0.06] overflow-hidden rounded-[20px] bg-white ring-1 ring-ink/[0.08]">
           {s.items.map((item) => (
-            <li key={item.id} className={cn("grid gap-3 rounded-[16px] border bg-white p-4", item.pick === "yes" ? "border-emerald-500/60" : "border-ink/[0.08]", item.pick === "no" && "opacity-60")}>
-              <div className="flex items-start gap-2">
-                <div className="grid min-w-0 flex-1 gap-0.5">
-                  <Editable prep={prep} value={item.title} onChange={(v) => onItem(item.id, { title: v })} placeholder="Punkt" className="text-[15.5px] font-semibold" />
-                  <Editable prep={prep} value={item.text} onChange={(v) => onItem(item.id, { text: v })} placeholder="Kurz erklärt (optional)" className="text-[13.5px] text-muted" />
+            <li key={item.id} className={cn("flex flex-col gap-3 px-4 py-3.5 transition-colors sm:flex-row sm:items-center sm:px-5", item.pick === "yes" && "bg-emerald-50/50", item.pick === "no" && "opacity-55")}>
+              <div className="grid min-w-0 flex-1 gap-0.5">
+                <div className="flex items-start gap-2">
+                  <div className="grid min-w-0 flex-1 gap-0.5">
+                    <Editable prep={prep} value={item.title} onChange={(v) => onItem(item.id, { title: v })} placeholder="Punkt" className="text-[15.5px] font-semibold" />
+                    <Editable prep={prep} value={item.text} onChange={(v) => onItem(item.id, { text: v })} placeholder="Kurz erklärt (optional)" className="text-[13.5px] text-muted" />
+                  </div>
+                  {del(item.id)}
                 </div>
-                {del(item.id)}
+                <div className="mt-1">
+                  <Note value={item.note} onChange={(v) => onItem(item.id, { note: v })} />
+                </div>
               </div>
-              <PickButtons item={item} labels={labels} onPick={(p) => onPick(item, p)} small />
-              <NoteField value={item.note} onChange={(v) => onItem(item.id, { note: v })} label="Notiz" />
+              <Segmented item={item} labels={labels} onPick={(p) => onPick(item, p)} />
             </li>
           ))}
         </ul>
       )}
 
       {prep && s.kind !== "designs" && (
-        <Btn variant="outline" size="sm" className="mt-3" onClick={addItem}>
+        <Btn variant="outline" size="sm" className="w-fit" onClick={addItem}>
           <Plus className="size-3.5" /> {s.kind === "choice" ? "Option" : "Punkt"}
         </Btn>
       )}
 
-      <label htmlFor={`notes-${s.id}`} className="sr-only">
-        Notizen zu {s.title}
-      </label>
-      <textarea
-        id={`notes-${s.id}`}
-        value={s.notes}
-        onChange={(e) => onSection((x) => ({ ...x, notes: e.target.value }))}
-        rows={s.notes ? Math.max(2, s.notes.split("\n").length) : 1}
-        placeholder="Was er dazu sagt …"
-        className="mt-3 block w-full resize-y rounded-[12px] border border-ink/[0.08] bg-white/70 px-3.5 py-2.5 text-[14.5px] leading-relaxed placeholder:text-faint/70 focus:border-accent focus:bg-white focus:outline-none"
-      />
+      <div className="rounded-[16px] bg-amber-50/60 p-1">
+        <label htmlFor={`notes-${s.id}`} className="block px-3 pt-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-amber-800/70">
+          Notizen zu diesem Thema
+        </label>
+        <textarea
+          id={`notes-${s.id}`}
+          value={s.notes}
+          onChange={(e) => onSection((x) => ({ ...x, notes: e.target.value }))}
+          rows={Math.max(2, s.notes.split("\n").length)}
+          placeholder="Was er sagt, was ihm wichtig ist …"
+          className="block w-full resize-y rounded-[12px] bg-transparent px-3 py-2 text-[14.5px] leading-relaxed placeholder:text-faint/70 focus:bg-white focus:outline-none"
+        />
+      </div>
     </section>
   );
 }
 
 function AddSection({ onAdd }: { onAdd: (kind: SectionKind) => void }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-[16px] border border-dashed border-ink/15 p-4">
-      <span className="mr-1 text-[14px] text-muted">Neuer Bereich:</span>
+    <div className="mt-6 flex flex-wrap items-center gap-2 rounded-[16px] border border-dashed border-ink/15 p-4">
+      <span className="mr-1 text-[14px] text-muted">Neues Thema:</span>
       <Btn variant="outline" size="sm" onClick={() => onAdd("list")}>
-        <Plus className="size-3.5" /> Punkte zum Abhaken
+        <Plus className="size-3.5" /> Punkte
       </Btn>
       <Btn variant="outline" size="sm" onClick={() => onAdd("choice")}>
-        <Plus className="size-3.5" /> Eins von mehreren wählen
+        <Plus className="size-3.5" /> Eins wählen
       </Btn>
       <Btn variant="outline" size="sm" onClick={() => onAdd("designs")}>
         <Plus className="size-3.5" /> Entwürfe
@@ -533,50 +618,123 @@ function AddSection({ onAdd }: { onAdd: (kind: SectionKind) => void }) {
 
 // ---------------------------------------------------------------- what we take – live
 
-function Choice({ doc, onSummary }: { doc: MeetingDoc; onSummary: () => void }) {
+function Choice({ doc, onJump }: { doc: MeetingDoc; onJump: (n: number) => void }) {
   const price = doc.sections.flatMap((s) => (s.kind === "choice" ? s.items.filter((i) => i.pick === "yes" && i.price) : []))[0];
+  const groups = doc.sections
+    .map((s, n) => ({ s, n, chosen: s.labels ? [] : s.items.filter((i) => i.pick === "yes"), open: s.items.filter((i) => i.pick === "maybe") }))
+    .filter((g) => g.chosen.length || g.open.length);
   return (
-    <Card className="overflow-hidden">
-      <div className="bg-accent px-5 py-4 text-white">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-white/70">Unsere Auswahl</p>
+    <div className="overflow-hidden rounded-[20px] bg-white ring-1 ring-ink/[0.08]">
+      <div className="bg-ink px-5 py-4 text-white">
+        <p className="text-[11.5px] font-semibold uppercase tracking-[0.14em] text-white/55">Unsere Auswahl</p>
         {price ? (
-          <p className="mt-1 text-[28px] font-semibold leading-tight tracking-[-0.02em]">
-            {price.price} <span className="text-[15px] font-medium text-white/80">· {price.title}</span>
+          <p className="mt-1 text-[30px] font-semibold leading-tight tracking-[-0.02em] tabular-nums">
+            {price.price} <span className="text-[14px] font-medium text-white/65">{price.title}</span>
           </p>
         ) : (
-          <p className="mt-1 text-[15px] text-white/85">Wächst mit, während ihr entscheidet.</p>
+          <p className="mt-1 text-[14px] text-white/75">Füllt sich, während ihr entscheidet.</p>
         )}
       </div>
       <div className="grid gap-4 p-5">
-        {doc.sections.map((s) => {
-          const maybe = labelsOf(s)[1];
-          // for "what we need from you" the open points matter, not the ones already there
-          const chosen = s.labels ? [] : s.items.filter((i) => i.pick === "yes");
-          const open = s.items.filter((i) => i.pick === "maybe");
-          if (!chosen.length && !open.length) return null;
+        {groups.map(({ s, n, chosen, open }) => (
+          <button key={s.id} type="button" onClick={() => onJump(n)} className="grid gap-1.5 rounded-[10px] text-left hover:bg-ink/[0.02]">
+            <span className="text-[11.5px] font-semibold uppercase tracking-[0.1em] text-faint">{s.title}</span>
+            {chosen.map((i) => (
+              <span key={i.id} className="flex gap-2 text-[14px] leading-snug">
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" strokeWidth={3} aria-hidden="true" />
+                <span className="min-w-0">{i.title}</span>
+              </span>
+            ))}
+            {open.length > 0 && (
+              <span className="text-[13px] leading-snug text-amber-700">
+                {labelsOf(s)[1]}: {open.map((i) => i.title).join(", ")}
+              </span>
+            )}
+          </button>
+        ))}
+        {!groups.length && <p className="text-[14px] text-muted">Noch nichts gewählt.</p>}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- the result: what was decided, next steps, text to send
+
+function Result({ title, doc, onTodos, onJump }: { title: string; doc: MeetingDoc; onTodos: (t: Todo[]) => void; onJump: (n: number) => void }) {
+  const text = summaryText(title, doc);
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // the text stays selectable in the summary below
+    }
+  }
+  const undecided = doc.sections.map((s, n) => ({ s, n, left: s.kind === "choice" ? (s.items.some((i) => i.pick === "yes") ? 0 : 1) : s.items.filter((i) => !i.pick).length })).filter((x) => x.left > 0);
+
+  return (
+    <section className="grid gap-6">
+      <header className="grid gap-1.5">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Zum Schluss</p>
+        <h2 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] sm:text-[32px]">Das haben wir entschieden</h2>
+      </header>
+
+      {undecided.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-[14px] bg-amber-50 px-4 py-3 text-[14px]">
+          <span className="text-amber-900">Noch offen:</span>
+          {undecided.map(({ s, n, left }) => (
+            <button key={s.id} type="button" onClick={() => onJump(n)} className="rounded-full bg-white px-3 py-1 text-[13px] font-medium text-amber-900 ring-1 ring-amber-200 hover:ring-amber-400">
+              {s.title}
+              {s.kind !== "choice" && ` · ${left}`}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="grid gap-4 sm:grid-cols-2 [&>*]:min-w-0">
+        {doc.sections.map((s, n) => {
+          const [yes, maybe, no] = labelsOf(s);
+          const by = (p: Pick) => s.items.filter((i) => i.pick === p);
+          const rows: [string, Item[], string][] = [
+            [s.kind === "choice" ? "Gewählt" : yes, by("yes"), "text-emerald-700"],
+            [maybe, by("maybe"), "text-amber-700"],
+            [no, s.kind === "choice" ? [] : by("no"), "text-faint"],
+          ];
           return (
-            <div key={s.id} className="grid gap-1.5">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-faint">{s.title}</p>
-              {chosen.map((i) => (
-                <p key={i.id} className="flex gap-2 text-[14px] leading-snug">
-                  <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" strokeWidth={3} aria-hidden="true" />
-                  <span className="min-w-0">{i.title}</span>
-                </p>
-              ))}
-              {open.length > 0 && (
-                <p className="text-[13px] text-amber-700">
-                  {maybe}: {open.map((i) => i.title).join(", ")}
-                </p>
+            <button key={s.id} type="button" onClick={() => onJump(n)} className="grid content-start gap-2.5 rounded-[18px] bg-white p-5 text-left ring-1 ring-ink/[0.08] hover:ring-ink/20">
+              <span className="text-[15px] font-semibold">{s.title}</span>
+              {rows.every(([, list]) => !list.length) && <span className="text-[13.5px] text-faint">Noch nichts entschieden</span>}
+              {rows.map(([label, list, tone]) =>
+                list.length ? (
+                  <span key={label} className="grid gap-0.5">
+                    <span className={cn("text-[11.5px] font-semibold uppercase tracking-[0.08em]", tone)}>{label}</span>
+                    <span className="text-[14px] leading-snug">{list.map((i) => i.title + (i.price ? ` · ${i.price}` : "")).join(", ")}</span>
+                  </span>
+                ) : null,
               )}
-            </div>
+              {s.notes.trim() && <span className="whitespace-pre-line rounded-[10px] bg-amber-50/70 px-3 py-2 text-[13px] text-ink/80">{s.notes.trim()}</span>}
+            </button>
           );
         })}
-        {!doc.sections.some((s) => s.items.some((i) => i.pick === "yes" || i.pick === "maybe")) && <p className="text-[14px] text-muted">Noch nichts gewählt. Tippt bei jedem Punkt an, was ihr nehmt.</p>}
-        <Btn variant="outline" onClick={onSummary}>
-          Zusammenfassung
-        </Btn>
       </div>
-    </Card>
+
+      <Todos todos={doc.todos} onChange={onTodos} />
+
+      <div className="grid gap-3 rounded-[20px] bg-ink/[0.03] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-[15px] font-semibold">Text zum Schicken</p>
+            <p className="text-[13.5px] text-muted">Per WhatsApp oder E-Mail an den Kunden.</p>
+          </div>
+          <Btn onClick={copy}>
+            {copied ? <Check className="size-4" /> : <Copy className="size-4" />} {copied ? "Kopiert" : "Text kopieren"}
+          </Btn>
+        </div>
+        <pre className="max-h-[320px] overflow-auto whitespace-pre-wrap rounded-[12px] bg-white p-4 font-sans text-[13.5px] leading-relaxed ring-1 ring-ink/[0.06]">{text}</pre>
+      </div>
+    </section>
   );
 }
 
@@ -585,55 +743,33 @@ function Choice({ doc, onSummary }: { doc: MeetingDoc; onSummary: () => void }) 
 function Todos({ todos, onChange }: { todos: Todo[]; onChange: (t: Todo[]) => void }) {
   const set = (id: string, patch: Partial<Todo>) => onChange(todos.map((t) => (t.id === id ? { ...t, ...patch } : t)));
   return (
-    <section aria-labelledby="sec-todos">
-      <h2 id="sec-todos" className="text-[22px] font-semibold tracking-[-0.015em]">
-        Nächste Schritte
-      </h2>
-      <p className="mt-1 text-[15px] text-muted">Wer macht was?</p>
-      <ul className="mt-4 grid gap-2">
-        {todos.map((t) => (
-          <li key={t.id} className="flex items-center gap-2">
-            <input type="checkbox" checked={t.done} onChange={() => set(t.id, { done: !t.done })} className="size-[18px] shrink-0 accent-[var(--color-accent)]" aria-label="Erledigt" />
-            <input value={t.text} onChange={(e) => set(t.id, { text: e.target.value })} placeholder="z. B. Logo als Datei schicken" aria-label="Schritt" className={cn("h-10 min-w-0 flex-1 rounded-[10px] border border-ink/10 bg-white px-3 text-[14.5px] focus:border-accent focus:outline-none", t.done && "text-faint line-through")} />
-            <button type="button" onClick={() => set(t.id, { who: t.who === "Ich" ? "Kunde" : "Ich" })} className={cn("h-10 w-[72px] shrink-0 rounded-[10px] text-[13px] font-medium", t.who === "Ich" ? "bg-accent-soft text-accent-ink" : "bg-amber-50 text-amber-800")} title="Wer macht es? Antippen zum Wechseln">
-              {t.who}
-            </button>
-            <button type="button" onClick={() => onChange(todos.filter((x) => x.id !== t.id))} className="flex size-10 shrink-0 items-center justify-center rounded-[10px] text-faint hover:bg-red-50 hover:text-red-600" aria-label="Schritt löschen">
-              <X className="size-4" />
-            </button>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-3 flex flex-wrap gap-2">
+    <div className="grid gap-3 rounded-[20px] bg-white p-5 ring-1 ring-ink/[0.08]">
+      <div>
+        <p className="text-[15px] font-semibold">Nächste Schritte</p>
+        <p className="text-[13.5px] text-muted">Wer macht was?</p>
+      </div>
+      {todos.length > 0 && (
+        <ul className="grid gap-2">
+          {todos.map((t) => (
+            <li key={t.id} className="flex items-center gap-2">
+              <input type="checkbox" checked={t.done} onChange={() => set(t.id, { done: !t.done })} className="size-[18px] shrink-0 accent-[var(--color-accent)]" aria-label="Erledigt" />
+              <input value={t.text} onChange={(e) => set(t.id, { text: e.target.value })} placeholder="z. B. Logo als Datei schicken" aria-label="Schritt" className={cn("h-10 min-w-0 flex-1 rounded-[10px] border border-ink/10 bg-white px-3 text-[14.5px] focus:border-accent focus:outline-none", t.done && "text-faint line-through")} />
+              <button type="button" onClick={() => set(t.id, { who: t.who === "Ich" ? "Kunde" : "Ich" })} className={cn("h-10 w-[72px] shrink-0 rounded-[10px] text-[13px] font-medium", t.who === "Ich" ? "bg-accent-soft text-accent-ink" : "bg-amber-50 text-amber-800")} title="Wer macht es? Antippen zum Wechseln">
+                {t.who}
+              </button>
+              <button type="button" onClick={() => onChange(todos.filter((x) => x.id !== t.id))} className="flex size-10 shrink-0 items-center justify-center rounded-[10px] text-faint hover:bg-red-50 hover:text-red-600" aria-label="Schritt löschen">
+                <X className="size-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="flex flex-wrap gap-2">
         <Btn variant="outline" size="sm" onClick={() => onChange([...todos, { id: uid(), text: "", who: "Ich", done: false }])}>
           <Plus className="size-3.5" /> Für mich
         </Btn>
         <Btn variant="outline" size="sm" onClick={() => onChange([...todos, { id: uid(), text: "", who: "Kunde", done: false }])}>
           <Plus className="size-3.5" /> Für den Kunden
-        </Btn>
-      </div>
-    </section>
-  );
-}
-
-function SummaryText({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // the text stays selectable
-    }
-  }
-  return (
-    <div className="grid gap-4">
-      <p className="text-[14px] text-muted">Alles, was ihr entschieden habt – zum Schicken an den Kunden.</p>
-      <pre className="max-h-[60vh] overflow-auto whitespace-pre-wrap rounded-[12px] bg-ink/[0.04] p-4 font-sans text-[14px] leading-relaxed">{text}</pre>
-      <div>
-        <Btn onClick={copy}>
-          {copied ? <Check className="size-4" /> : <Copy className="size-4" />} {copied ? "Kopiert" : "Text kopieren"}
         </Btn>
       </div>
     </div>

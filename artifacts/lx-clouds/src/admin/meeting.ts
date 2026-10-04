@@ -72,7 +72,7 @@ export function newMeeting(designs: { title: string; image: string }[] = []): Me
         kind: "list",
         title: "Was wir von Ihnen brauchen",
         intro: "Was ist schon da, was kommt noch?",
-        labels: ["Ist da", "Kommt noch", "Brauchen wir nicht"],
+        labels: ["Ist da", "Kommt noch", "Nicht nötig"],
         items: [item("Logo", "Als Datei"), item("Fotos von Ihnen"), item("Fotos vom Büro / Laden"), item("Texte zu den Leistungen", "Stichpunkte reichen"), item("Zugang zum Domain-Anbieter", "Für den Umzug der Adresse")],
         notes: "",
       },
