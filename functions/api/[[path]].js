@@ -476,14 +476,14 @@ async function updateBoardItem(request, env, id) {
   return json({ ok: true });
 }
 
-// ---------- client conversations ----------
+// ---------- client meetings (table "talks"): everything prepared for a client, decided together ----------
 function parseTalk(value) {
-  if (!value || typeof value !== "object" || typeof value.answers !== "object" || !Array.isArray(value.todos)) throw new HttpError(400, "Das Gespräch ist beschädigt.");
+  if (!value || typeof value !== "object" || !Array.isArray(value.sections) || !Array.isArray(value.todos)) throw new HttpError(400, "Die Besprechung ist beschädigt.");
   const text = JSON.stringify(value);
   if (text.length > 400_000) throw new HttpError(413, "Das Gespräch ist zu groß.");
   return text;
 }
-const TALK_FIELDS = { title: (v) => str(v, 160) ?? "Gespräch", client_id: int, doc: parseTalk };
+const TALK_FIELDS = { title: (v) => str(v, 160) ?? "Besprechung", client_id: int, doc: parseTalk };
 
 async function listTalks(env) {
   const { results } = await env.DB.prepare(
@@ -494,7 +494,7 @@ async function listTalks(env) {
 
 async function getTalk(env, id) {
   const row = await env.DB.prepare("SELECT t.*, c.name AS client_name FROM talks t LEFT JOIN clients c ON c.id = t.client_id WHERE t.id = ?").bind(id).first();
-  if (!row) throw new HttpError(404, "Dieses Gespräch gibt es nicht.");
+  if (!row) throw new HttpError(404, "Diese Besprechung gibt es nicht.");
   return json({ talk: { ...row, doc: JSON.parse(row.doc) } });
 }
 
@@ -502,8 +502,8 @@ async function createTalk(request, env) {
   const body = await readJson(request);
   const title = TALK_FIELDS.title(body.title);
   const clientId = int(body.client_id);
-  const result = await env.DB.prepare("INSERT INTO talks (client_id, title, doc) VALUES (?, ?, ?)").bind(clientId, title, parseTalk(body.doc ?? { answers: {}, todos: [] })).run();
-  if (clientId) await env.DB.prepare("INSERT INTO activities (client_id, kind, text) VALUES (?, 'system', ?)").bind(clientId, `Gespräch angelegt: ${title}`).run();
+  const result = await env.DB.prepare("INSERT INTO talks (client_id, title, doc) VALUES (?, ?, ?)").bind(clientId, title, parseTalk(body.doc ?? { sections: [], todos: [] })).run();
+  if (clientId) await env.DB.prepare("INSERT INTO activities (client_id, kind, text) VALUES (?, 'system', ?)").bind(clientId, `Besprechung angelegt: ${title}`).run();
   return json({ id: result.meta.last_row_id }, 201);
 }
 
@@ -513,7 +513,7 @@ async function updateTalk(request, env, id) {
   if ("doc" in body) {
     if (!body.base) throw new HttpError(409, "Diese Seite ist veraltet – bitte neu laden.");
     const row = await env.DB.prepare("SELECT updated_at FROM talks WHERE id = ?").bind(id).first();
-    if (row && row.updated_at !== body.base) throw new HttpError(409, "Das Gespräch wurde inzwischen an anderer Stelle geändert.");
+    if (row && row.updated_at !== body.base) throw new HttpError(409, "Die Besprechung wurde inzwischen an anderer Stelle geändert.");
   }
   const { sets, values } = patch(body, TALK_FIELDS);
   if (sets.length) await env.DB.prepare(`UPDATE talks SET ${sets.join(", ")}, updated_at = datetime('now') WHERE id = ?`).bind(...values, id).run();

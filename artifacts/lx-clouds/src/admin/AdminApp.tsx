@@ -11,7 +11,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Demos } from "./pages/Demos";
 import { FolioEditor, Folios } from "./pages/Folios";
 import { Knowledge, KnowledgeGuide } from "./pages/Knowledge";
-import { TalkSheet, Talks } from "./pages/Talks";
+import { MeetingPage, Meetings } from "./pages/Meetings";
 import { Inquiries, Projects, SettingsPage, Tasks } from "./pages/More";
 import { Templates } from "./pages/Templates";
 import { Btn, Field, Input, Loading, ToastProvider } from "./ui";
@@ -19,7 +19,7 @@ import { Btn, Field, Input, Loading, ToastProvider } from "./ui";
 const nav: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/", label: "Übersicht", icon: LayoutDashboard },
   { href: "/kunden", label: "Kunden", icon: Users },
-  { href: "/gespraeche", label: "Gespräche", icon: MessagesSquare },
+  { href: "/besprechungen", label: "Besprechungen", icon: MessagesSquare },
   { href: "/demos", label: "Demos", icon: MonitorPlay },
   { href: "/entwuerfe", label: "Entwürfe", icon: Images },
   { href: "/vorlagen", label: "Vorlagen", icon: LayoutTemplate },
@@ -168,8 +168,8 @@ function Shell({ user, onLogout }: { user: User; onLogout: () => void }) {
             <Route path="/kunden" component={Clients} />
             <Route path="/kunden/:id">{(params) => <ClientDetail key={params.id} id={Number(params.id)} />}</Route>
             <Route path="/mappen" component={Folios} />
-            <Route path="/gespraeche" component={Talks} />
-            <Route path="/gespraeche/:id">{(params) => <TalkSheet key={params.id} id={Number(params.id)} />}</Route>
+            <Route path="/besprechungen" component={Meetings} />
+            <Route path="/besprechungen/:id">{(params) => <MeetingPage key={params.id} id={Number(params.id)} />}</Route>
             <Route path="/demos" component={Demos} />
             <Route path="/entwuerfe" component={Boards} />
             <Route path="/entwuerfe/:id">{(params) => <BoardDetail key={params.id} id={Number(params.id)} />}</Route>
