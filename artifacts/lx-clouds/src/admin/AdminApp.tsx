@@ -1,4 +1,4 @@
-import { CheckSquare, FileText, FolderKanban, Images, Inbox, LayoutDashboard, LayoutTemplate, LogOut, Menu, MonitorPlay, Settings, Users, X, type LucideIcon } from "lucide-react";
+import { BookOpen, CheckSquare, FileText, FolderKanban, Images, Inbox, LayoutDashboard, LayoutTemplate, LogOut, Menu, MonitorPlay, Settings, Users, X, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, Route, Router, Switch, useLocation } from "wouter";
 import { LogoMark } from "@/components/Logo";
@@ -10,6 +10,7 @@ import { Clients, ClientDetail } from "./pages/Clients";
 import { Dashboard } from "./pages/Dashboard";
 import { Demos } from "./pages/Demos";
 import { FolioEditor, Folios } from "./pages/Folios";
+import { Knowledge, KnowledgeGuide } from "./pages/Knowledge";
 import { Inquiries, Projects, SettingsPage, Tasks } from "./pages/More";
 import { Templates } from "./pages/Templates";
 import { Btn, Field, Input, Loading, ToastProvider } from "./ui";
@@ -24,6 +25,7 @@ const nav: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/projekte", label: "Projekte", icon: FolderKanban },
   { href: "/aufgaben", label: "Aufgaben", icon: CheckSquare },
   { href: "/anfragen", label: "Anfragen", icon: Inbox },
+  { href: "/wissen", label: "Wissen", icon: BookOpen },
   { href: "/einstellungen", label: "Einstellungen", icon: Settings },
 ];
 
@@ -172,6 +174,8 @@ function Shell({ user, onLogout }: { user: User; onLogout: () => void }) {
             <Route path="/projekte" component={Projects} />
             <Route path="/aufgaben" component={Tasks} />
             <Route path="/anfragen" component={Inquiries} />
+            <Route path="/wissen" component={Knowledge} />
+            <Route path="/wissen/:slug">{(params) => <KnowledgeGuide key={params.slug} slug={params.slug} />}</Route>
             <Route path="/einstellungen">{() => <SettingsPage user={user} onLogout={onLogout} />}</Route>
             <Route>
               <p className="py-20 text-center text-muted">Diese Seite gibt es nicht.</p>

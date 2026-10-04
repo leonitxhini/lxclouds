@@ -5,7 +5,7 @@
  * Data lives in D1 (binding DB, schema in /migrations), uploaded images in R2 (binding MEDIA).
  */
 
-import { auditSite, checkDomain } from "../../lib/sitecheck.mjs";
+import { auditSite, checkDomain, inspectDomain } from "../../lib/sitecheck.mjs";
 
 const COOKIE = "lx_studio";
 const SESSION_DAYS = 30;
@@ -722,6 +722,10 @@ async function route(request, env) {
   if (a === "tools" && method === "POST") {
     if (b === "domains") return checkDomains(request);
     if (b === "audit") return auditPage(request);
+    if (b === "dns") {
+      const body = await readJson(request);
+      return json({ result: await inspectDomain(str(body.domain, 120)) });
+    }
   }
 
   if (a === "boards") {

@@ -130,3 +130,7 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+### Wissen (/admin/wissen)
+
+Guides for client work, opened from the admin navigation. The first one, "Domain in dein Cloudflare holen" (`src/admin/pages/Knowledge.tsx`), explains moving any client domain into our Cloudflare by switching nameservers while the registration stays with the client, with phases to tick off (remembered in the browser), click paths for Strato and IONOS, answers for client questions, pitfalls and a glossary. Its domain check (`POST /api/tools/dns`, `inspectDomain` in `lib/sitecheck.mjs`) asks DNS over HTTPS for nameservers, website, mail provider, DNSSEC, SPF/DMARC and common DKIM selectors, and lists the records that must exist in Cloudflare before the switch.
