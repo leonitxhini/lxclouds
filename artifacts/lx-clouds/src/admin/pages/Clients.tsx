@@ -1,9 +1,10 @@
-import { ArrowLeft, Mail, MonitorPlay, Phone, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Mail, MessagesSquare, MonitorPlay, Phone, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { cn } from "@/lib/utils";
 import { api, ApiError, euro, formatDate, statusLabels, statusOrder, useLoad, type Activity, type Client, type ClientStatus, type DemoSummary, type Task } from "../api";
 import { NewDemoModal } from "../NewDemo";
+import { NewTalkModal } from "./Talks";
 import { Badge, Btn, Card, Empty, Field, Input, Loading, Modal, PageHeader, Select, Textarea, useToast } from "../ui";
 
 const statusTone: Record<ClientStatus, "grey" | "accent" | "amber" | "green" | "red"> = { lead: "grey", contact: "accent", offer: "amber", won: "green", lost: "red" };
@@ -154,7 +155,7 @@ export function Clients() {
   );
 }
 
-type Detail = { client: Client; activities: Activity[]; tasks: Task[]; demos: DemoSummary[]; boards: { id: number; title: string; updated_at: string; items: number }[]; folios: { id: number; title: string; updated_at: string; shared: number }[] };
+type Detail = { client: Client; activities: Activity[]; tasks: Task[]; demos: DemoSummary[]; boards: { id: number; title: string; updated_at: string; items: number }[]; folios: { id: number; title: string; updated_at: string; shared: number }[]; talks?: { id: number; title: string; updated_at: string }[] };
 const kinds = { note: "Notiz", call: "Anruf", meeting: "Termin", email: "E-Mail", system: "System" } as Record<string, string>;
 
 export function ClientDetail({ id }: { id: number }) {
@@ -162,6 +163,7 @@ export function ClientDetail({ id }: { id: number }) {
   const [, navigate] = useLocation();
   const toast = useToast();
   const [newDemo, setNewDemo] = useState(false);
+  const [newTalk, setNewTalk] = useState(false);
   const [kind, setKind] = useState("note");
 
   if (error) return <p className="py-20 text-center text-red-600">{error.message}</p>;
@@ -233,6 +235,10 @@ export function ClientDetail({ id }: { id: number }) {
             E-Mail
           </a>
         )}
+        <Btn variant="outline" onClick={() => setNewTalk(true)}>
+          <MessagesSquare className="size-4" aria-hidden="true" />
+          Gespräch starten
+        </Btn>
         <Btn variant="accent" onClick={() => setNewDemo(true)}>
           <MonitorPlay className="size-4" aria-hidden="true" />
           Demo erstellen
@@ -300,6 +306,22 @@ export function ClientDetail({ id }: { id: number }) {
               </ul>
             )}
           </Card>
+
+          {(data.talks?.length ?? 0) > 0 && (
+            <Card className="p-5">
+              <h2 className="text-[15px] font-semibold">Gespräche</h2>
+              <ul className="mt-3 divide-y divide-ink/[0.06]">
+                {data.talks!.map((t) => (
+                  <li key={t.id}>
+                    <Link href={`/gespraeche/${t.id}`} className="group block py-2.5">
+                      <span className="block truncate text-[14.5px] font-medium group-hover:text-accent-ink">{t.title}</span>
+                      <span className="block text-[12.5px] text-faint">Geändert {formatDate(t.updated_at, true)}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           {data.folios.length > 0 && (
             <Card className="p-5">
@@ -402,6 +424,7 @@ export function ClientDetail({ id }: { id: number }) {
       </div>
 
       <NewDemoModal open={newDemo} onClose={() => setNewDemo(false)} client={client} template={templateFor(client.industry)} />
+      <NewTalkModal open={newTalk} onClose={() => setNewTalk(false)} client={client} />
     </>
   );
 }

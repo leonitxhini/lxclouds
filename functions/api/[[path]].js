@@ -223,7 +223,7 @@ async function createClient(request, env) {
 }
 
 async function getClient(env, id) {
-  const [client, activities, tasks, demos, projects, boards, folios] = await env.DB.batch([
+  const [client, activities, tasks, demos, projects, boards, folios, talks] = await env.DB.batch([
     env.DB.prepare("SELECT * FROM clients WHERE id = ?").bind(id),
     env.DB.prepare("SELECT * FROM activities WHERE client_id = ? ORDER BY created_at DESC, id DESC").bind(id),
     env.DB.prepare("SELECT * FROM tasks WHERE client_id = ? ORDER BY done, due IS NULL, due, id").bind(id),
@@ -231,9 +231,10 @@ async function getClient(env, id) {
     env.DB.prepare("SELECT * FROM projects WHERE client_id = ? ORDER BY id").bind(id),
     env.DB.prepare("SELECT b.id, b.title, b.updated_at, (SELECT count(*) FROM board_items i WHERE i.board_id = b.id) AS items FROM boards b WHERE b.client_id = ? ORDER BY b.updated_at DESC").bind(id),
     env.DB.prepare("SELECT id, title, updated_at, shared FROM folios WHERE client_id = ? ORDER BY updated_at DESC").bind(id),
+    env.DB.prepare("SELECT id, title, updated_at FROM talks WHERE client_id = ? ORDER BY updated_at DESC").bind(id),
   ]);
   if (!client.results[0]) throw new HttpError(404, "Diesen Kunden gibt es nicht.");
-  return json({ client: client.results[0], activities: activities.results, tasks: tasks.results, demos: demos.results, projects: projects.results, boards: boards.results, folios: folios.results });
+  return json({ client: client.results[0], activities: activities.results, tasks: tasks.results, demos: demos.results, projects: projects.results, boards: boards.results, folios: folios.results, talks: talks.results });
 }
 
 async function updateClient(request, env, id) {
@@ -475,6 +476,51 @@ async function updateBoardItem(request, env, id) {
   return json({ ok: true });
 }
 
+// ---------- client conversations ----------
+function parseTalk(value) {
+  if (!value || typeof value !== "object" || typeof value.answers !== "object" || !Array.isArray(value.todos)) throw new HttpError(400, "Das Gespräch ist beschädigt.");
+  const text = JSON.stringify(value);
+  if (text.length > 400_000) throw new HttpError(413, "Das Gespräch ist zu groß.");
+  return text;
+}
+const TALK_FIELDS = { title: (v) => str(v, 160) ?? "Gespräch", client_id: int, doc: parseTalk };
+
+async function listTalks(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT t.id, t.title, t.client_id, t.created_at, t.updated_at, c.name AS client_name FROM talks t LEFT JOIN clients c ON c.id = t.client_id ORDER BY t.updated_at DESC",
+  ).all();
+  return json({ talks: results });
+}
+
+async function getTalk(env, id) {
+  const row = await env.DB.prepare("SELECT t.*, c.name AS client_name FROM talks t LEFT JOIN clients c ON c.id = t.client_id WHERE t.id = ?").bind(id).first();
+  if (!row) throw new HttpError(404, "Dieses Gespräch gibt es nicht.");
+  return json({ talk: { ...row, doc: JSON.parse(row.doc) } });
+}
+
+async function createTalk(request, env) {
+  const body = await readJson(request);
+  const title = TALK_FIELDS.title(body.title);
+  const clientId = int(body.client_id);
+  const result = await env.DB.prepare("INSERT INTO talks (client_id, title, doc) VALUES (?, ?, ?)").bind(clientId, title, parseTalk(body.doc ?? { answers: {}, todos: [] })).run();
+  if (clientId) await env.DB.prepare("INSERT INTO activities (client_id, kind, text) VALUES (?, 'system', ?)").bind(clientId, `Gespräch angelegt: ${title}`).run();
+  return json({ id: result.meta.last_row_id }, 201);
+}
+
+async function updateTalk(request, env, id) {
+  const body = await readJson(request);
+  // like folios: a sheet open in two windows must not silently overwrite the newer one
+  if ("doc" in body) {
+    if (!body.base) throw new HttpError(409, "Diese Seite ist veraltet – bitte neu laden.");
+    const row = await env.DB.prepare("SELECT updated_at FROM talks WHERE id = ?").bind(id).first();
+    if (row && row.updated_at !== body.base) throw new HttpError(409, "Das Gespräch wurde inzwischen an anderer Stelle geändert.");
+  }
+  const { sets, values } = patch(body, TALK_FIELDS);
+  if (sets.length) await env.DB.prepare(`UPDATE talks SET ${sets.join(", ")}, updated_at = datetime('now') WHERE id = ?`).bind(...values, id).run();
+  const row = await env.DB.prepare("SELECT updated_at FROM talks WHERE id = ?").bind(id).first();
+  return json({ ok: true, updated_at: row?.updated_at ?? null });
+}
+
 // ---------- project folios ----------
 function parseFolio(value) {
   if (!value || typeof value !== "object" || !Array.isArray(value.chapters)) throw new HttpError(400, "Die Mappe ist beschädigt.");
@@ -633,7 +679,7 @@ async function tableRoute(method, table, id, request, env) {
 }
 
 async function exportAll(env) {
-  const names = ["clients", "activities", "tasks", "demos", "demo_versions", "templates", "projects", "inquiries", "media", "boards", "board_items", "folios"];
+  const names = ["clients", "activities", "tasks", "demos", "demo_versions", "templates", "projects", "inquiries", "media", "boards", "board_items", "folios", "talks"];
   const results = await env.DB.batch(names.map((n) => env.DB.prepare(`SELECT * FROM ${n}`)));
   return json(Object.fromEntries(names.map((n, i) => [n, results[i].results])), 200, {
     "Content-Disposition": `attachment; filename="lx-studio-${new Date().toISOString().slice(0, 10)}.json"`,
@@ -708,6 +754,17 @@ async function route(request, env) {
     }
   }
 
+  if (a === "talks") {
+    const id = int(b);
+    if (!b && method === "GET") return listTalks(env);
+    if (!b && method === "POST") return createTalk(request, env);
+    if (id && method === "GET") return getTalk(env, id);
+    if (id && method === "PATCH") return updateTalk(request, env, id);
+    if (id && method === "DELETE") {
+      await env.DB.prepare("DELETE FROM talks WHERE id = ?").bind(id).run();
+      return json({ ok: true });
+    }
+  }
   if (a === "folios") {
     const id = int(b);
     if (!b && method === "GET") return listFolios(env);
