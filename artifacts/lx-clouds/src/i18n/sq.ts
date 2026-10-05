@@ -67,7 +67,7 @@ export const sq: Dict = {
       {
         title: "Ndikim real",
         body: "Produkte që njerëzit i përdorin vërtet.",
-        more: ["Top 10 aplikacionet e blerjeve në Kosovë", "Vendi 1 në Google për një klient", "9.841 vizitorë në 30 ditë"],
+        more: ["Top 10 aplikacionet e blerjeve në Kosovë", "Vendi 1 në Google për një klient", "Produkte live me përdorues të vërtetë"],
       },
     ],
     pillars: [
@@ -191,7 +191,6 @@ export const sq: Dict = {
     items: [
       { value: "Top 10", label: "aplikacionet e blerjeve në Kosovë", note: "ZgjedhPlus — ueb-faqe dhe aplikacion për iPhone nga një dorë." },
       { value: "#1", label: "në Google", note: "RRON Rent a Car — që atëherë dukshëm më shumë klientë." },
-      { value: "9.841", label: "vizitorë në 30 ditë", note: "ZgjedhPlus, 5 shtator – 5 tetor 2026, statistikat e veta pa bot-e." },
       { value: "1", label: "person kontakti", note: "Koncept, dizajn, zhvillim dhe lansim — pa dorëzime ndërmjet." },
     ],
   },
@@ -355,10 +354,9 @@ export const sq: Dict = {
       },
       results: [
         { value: "Top 10", label: "aplikacionet e blerjeve në Kosovë" },
-        { value: "9.841", label: "vizitorë në 30 ditët e fundit" },
       ],
       resultsNote:
-        "Vizitorët: vizitorë unikë të ueb-faqes nga 5 shtatori deri më 5 tetor 2026, nga statistikat e vetë platformës, pa bot-e.",
+        "Renditja e aplikacionit në kategorinë Blerje në Kosovë.",
     },
     framenotion: {
       tag: "AI / SaaS kreativ",

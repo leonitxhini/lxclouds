@@ -90,7 +90,7 @@ export const en = {
       {
         title: "Real impact",
         body: "Products people actually use.",
-        more: ["Top 10 shopping apps in Kosovo", "#1 on Google for a client", "9,841 visitors in 30 days"],
+        more: ["Top 10 shopping apps in Kosovo", "#1 on Google for a client", "Live products with real users"],
       },
     ],
     pillars: [
@@ -214,7 +214,6 @@ export const en = {
     items: [
       { value: "Top 10", label: "shopping apps in Kosovo", note: "ZgjedhPlus — website and iPhone app from one hand." },
       { value: "#1", label: "on Google", note: "RRON Rent a Car — with considerably more customers since." },
-      { value: "9,841", label: "visitors in 30 days", note: "ZgjedhPlus, 5 September to 5 October 2026, own analytics without bots." },
       { value: "1", label: "contact person", note: "Concept, design, development and launch — no handovers in between." },
     ],
   },
@@ -378,10 +377,9 @@ export const en = {
       },
       results: [
         { value: "Top 10", label: "shopping apps in Kosovo" },
-        { value: "9,841", label: "visitors in the last 30 days" },
       ],
       resultsNote:
-        "Visitors: unique website visitors from 5 September to 5 October 2026, from the platform's own analytics, bots excluded.",
+        "App ranking in the Shopping category in Kosovo.",
     },
     framenotion: {
       tag: "AI / Creative SaaS",
