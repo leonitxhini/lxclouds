@@ -30,6 +30,7 @@ function Showcase({ project, flip }: { project: Project; flip: boolean }) {
           <span className="text-[13px] text-muted">{copy.category}</span>
         </div>
         <p className="mt-5 max-w-[420px] text-[16.5px] leading-[1.55] text-muted">{copy.forYou}</p>
+        {copy.results.length > 0 && (
         <ul className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-ink/[0.08] pt-6">
           {copy.results.map((r) => (
             <li key={r.label}>
@@ -40,6 +41,7 @@ function Showcase({ project, flip }: { project: Project; flip: boolean }) {
             </li>
           ))}
         </ul>
+        )}
         <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
           <Link
             href={`/work/${project.slug}`}

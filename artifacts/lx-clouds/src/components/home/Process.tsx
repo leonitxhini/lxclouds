@@ -197,7 +197,7 @@ function Collage({ stage }: { stage: number }) {
             {zgjedhplus.name} · {t.statLabel}
           </p>
           <p className="mt-[0.15em] text-[clamp(13px,2.5vw,22px)] font-semibold leading-none tracking-[-0.02em] text-accent">{t.statValue}</p>
-          <p className="mt-[0.4em] text-[clamp(6px,0.95vw,9px)] text-muted">{t.statBody("229")}</p>
+          <p className="mt-[0.4em] text-[clamp(6px,0.95vw,9px)] text-muted">{t.statBody}</p>
           <p className="mt-[9%] flex items-center gap-[0.5em] border-t border-accent/15 pt-[7%] text-[clamp(6px,0.95vw,9px)] font-medium text-ink/70">
             <span className="size-[5px] rounded-full bg-[#22c55e]" />
             {zgjedhplus.domain}

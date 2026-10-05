@@ -90,7 +90,7 @@ export const en = {
       {
         title: "Real impact",
         body: "Products people actually use.",
-        more: ["Top 10 apps in Kosovo", "#1 on Google for a client", "60,000 visitors a month"],
+        more: ["Top 10 shopping apps in Kosovo", "#1 on Google for a client", "9,841 visitors in 30 days"],
       },
     ],
     pillars: [
@@ -167,8 +167,8 @@ export const en = {
     checklist: ["Ideas", "Design", "Development", "Launch"],
     note: ["Real products.", "Real results."],
     statLabel: "live",
-    statBody: (shops: string) => `products across ${shops} shops`,
-    statValue: "1.3M+",
+    statBody: "shopping apps in Kosovo",
+    statValue: "Top 10",
     hint: "Keep scrolling",
     step: (n: number, total: number) => `Step ${n} of ${total}`,
   },
@@ -212,11 +212,9 @@ export const en = {
     title: "Proof, not promises.",
     sub: "What the work has led to so far.",
     items: [
-      { value: "Top 10", label: "apps in Kosovo", note: "ZgjedhPlus — website and iPhone app from one hand." },
+      { value: "Top 10", label: "shopping apps in Kosovo", note: "ZgjedhPlus — website and iPhone app from one hand." },
       { value: "#1", label: "on Google", note: "RRON Rent a Car — with considerably more customers since." },
-      { value: "200", label: "active subscribers", note: "FrameNotion, as reported from its billing." },
-      { value: "100", label: "SEO score in Lighthouse", note: "On ZgjedhPlus, FrameNotion and SubToAPI — so the product gets found." },
-      { value: "60,000", label: "visitors a month", note: "ZgjedhPlus, as reported from its live analytics." },
+      { value: "9,841", label: "visitors in 30 days", note: "ZgjedhPlus, 5 September to 5 October 2026, own analytics without bots." },
       { value: "1", label: "contact person", note: "Concept, design, development and launch — no handovers in between." },
     ],
   },
@@ -323,7 +321,7 @@ export const en = {
       category: "Marketplace / Price Comparison",
       blurb: "A marketplace with its own iPhone app — from an idea to the Top 10 in Kosovo.",
       summary:
-        "The price comparison platform for Kosovo and Albania: more than 1.3 million products from 229 shops in one search — with price history, price alerts and its own iPhone app.",
+        "The price comparison platform for Kosovo and Albania: the offers of both countries' online shops in one search — with price history, price alerts and its own iPhone app.",
       forYou:
         "Need a platform, a marketplace or an app? This is how far one person can take an idea: website, backend and iPhone app from a single hand — all the way into the Top 10 apps of a country.",
       role: "Concept, design, development and operations",
@@ -358,7 +356,7 @@ export const en = {
         },
         {
           title: "Built for a large catalogue",
-          body: "With more than a million listed products, list and product pages are prepared ahead of time and cached, so browsing stays fast on a phone connection.",
+          body: "With a catalogue this large, list and product pages are prepared ahead of time and cached, so browsing stays fast on a phone connection.",
         },
       ],
       features: [
@@ -379,13 +377,11 @@ export const en = {
         "search-mobile": "Search on mobile",
       },
       results: [
-        { value: "Top 10", label: "apps in Kosovo" },
-        { value: "60,000", label: "visitors a month" },
-        { value: "2.5×", label: "more visitors within one month" },
-        { value: "2", label: "platforms: website and iPhone app" },
+        { value: "Top 10", label: "shopping apps in Kosovo" },
+        { value: "9,841", label: "visitors in the last 30 days" },
       ],
       resultsNote:
-        "Monthly visitors and app ranking as reported by me from the live analytics. Growth from August to September from the platform's own tracker.",
+        "Visitors: unique website visitors from 5 September to 5 October 2026, from the platform's own analytics, bots excluded.",
     },
     framenotion: {
       tag: "AI / Creative SaaS",
@@ -446,14 +442,8 @@ export const en = {
         "home-mobile": "Landing page on mobile",
         "examples-mobile": "Examples on mobile",
       },
-      results: [
-        { value: "200", label: "active subscribers" },
-        { value: "100", label: "SEO score in Lighthouse" },
-        { value: "3", label: "subscription plans with online payment" },
-        { value: "AI", label: "writes, voices and renders the ad itself" },
-      ],
-      resultsNote:
-        "Subscriber figure as reported by me from the billing data. Lighthouse measured on the live site in October 2026, mobile and desktop.",
+      results: [],
+      resultsNote: "",
       missing:
         "The editor and account dashboard sit behind the login and are not shown here. All screens above are from the public site.",
     },
@@ -515,12 +505,7 @@ export const en = {
         "home-mobile": "Home on mobile",
         "fleet-mobile": "Fleet on mobile",
       },
-      results: [
-        { value: "#1", label: "on Google" },
-        { value: "24/7", label: "booking requests, straight to WhatsApp" },
-        { value: "2", label: "languages for locals and visitors" },
-        { value: "0", label: "developers needed to update cars and prices" },
-      ],
+      results: [{ value: "#1", label: "on Google" }],
       resultsNote:
         "Since launch the website ranks first on Google, and the business has seen considerably more customers.",
     },
@@ -582,14 +567,8 @@ export const en = {
         pricing: "Pricing",
         "home-mobile": "Landing page on mobile",
       },
-      results: [
-        { value: "5 min", label: "to the first API call" },
-        { value: "4×100", label: "Lighthouse scores on desktop" },
-        { value: "3", label: "subscription plans with online payment" },
-        { value: "Teams", label: "accounts, roles and seats built in" },
-      ],
-      resultsNote:
-        "The quickstart is built to get a first request working in five minutes. Lighthouse measured on the live site in October 2026: 100 in performance, accessibility, best practices and SEO on desktop.",
+      results: [],
+      resultsNote: "",
       missing:
         "The signed-in dashboard, API key management, playground and usage views require an account and are not shown as screenshots. The dashboard visible above is the product's own preview on its landing page.",
     },

@@ -112,7 +112,7 @@ export default function CaseStudy({ slug }: { slug: string }) {
           </Reveal>
 
           {copy.results.length > 0 && (
-            <ul className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[22px] border border-ink/[0.07] bg-ink/[0.07] lg:grid-cols-4">
+            <ul className={cn("mt-6 grid gap-px overflow-hidden rounded-[22px] border border-ink/[0.07] bg-ink/[0.07]", copy.results.length === 1 ? "grid-cols-1" : copy.results.length === 2 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-4")}>
               {copy.results.map((r, i) => (
                 <li key={r.label} className="bg-white">
                   <Reveal delay={i * 0.06} className="h-full px-5 py-6 sm:px-7 sm:py-7">
@@ -263,7 +263,7 @@ export default function CaseStudy({ slug }: { slug: string }) {
 
         <Chapter label={c.resultsLabel} title={copy.results.length ? c.resultsTitle : c.resultsTitleNone}>
           {copy.results.length > 0 && (
-            <ul className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <ul className={cn("mb-6 grid gap-4 sm:grid-cols-2", copy.results.length > 2 && "lg:grid-cols-4")}>
               {copy.results.map((r, i) => (
                 <li key={r.label}>
                   <Reveal delay={i * 0.07}>
@@ -279,7 +279,7 @@ export default function CaseStudy({ slug }: { slug: string }) {
             </ul>
           )}
           <Reveal>
-            <p className="max-w-[640px] text-[15.5px] leading-[1.6] text-muted">{copy.resultsNote}</p>
+            {copy.resultsNote && <p className="max-w-[640px] text-[15.5px] leading-[1.6] text-muted">{copy.resultsNote}</p>}
             <a
               href={project.url}
               target="_blank"

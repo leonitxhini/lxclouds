@@ -67,7 +67,7 @@ export const sq: Dict = {
       {
         title: "Ndikim real",
         body: "Produkte që njerëzit i përdorin vërtet.",
-        more: ["Top 10 aplikacionet në Kosovë", "Vendi 1 në Google për një klient", "60.000 vizitorë në muaj"],
+        more: ["Top 10 aplikacionet e blerjeve në Kosovë", "Vendi 1 në Google për një klient", "9.841 vizitorë në 30 ditë"],
       },
     ],
     pillars: [
@@ -144,8 +144,8 @@ export const sq: Dict = {
     checklist: ["Ide", "Dizajn", "Zhvillim", "Lansim"],
     note: ["Produkte reale.", "Rezultate reale."],
     statLabel: "live",
-    statBody: (shops: string) => `produkte nga ${shops} dyqane`,
-    statValue: "1,3 mln+",
+    statBody: "aplikacionet e blerjeve në Kosovë",
+    statValue: "Top 10",
     hint: "Vazhdo të lëvizësh poshtë",
     step: (n: number, total: number) => `Hapi ${n} nga ${total}`,
   },
@@ -189,11 +189,9 @@ export const sq: Dict = {
     title: "Prova, jo premtime.",
     sub: "Çfarë ka sjellë puna deri tani.",
     items: [
-      { value: "Top 10", label: "aplikacionet në Kosovë", note: "ZgjedhPlus — ueb-faqe dhe aplikacion për iPhone nga një dorë." },
+      { value: "Top 10", label: "aplikacionet e blerjeve në Kosovë", note: "ZgjedhPlus — ueb-faqe dhe aplikacion për iPhone nga një dorë." },
       { value: "#1", label: "në Google", note: "RRON Rent a Car — që atëherë dukshëm më shumë klientë." },
-      { value: "200", label: "abonentë aktivë", note: "FrameNotion, sipas faturimit të vet." },
-      { value: "100", label: "pikë SEO në Lighthouse", note: "Te ZgjedhPlus, FrameNotion dhe SubToAPI — që produkti të gjendet." },
-      { value: "60.000", label: "vizitorë në muaj", note: "ZgjedhPlus, sipas statistikave të veta live." },
+      { value: "9.841", label: "vizitorë në 30 ditë", note: "ZgjedhPlus, 5 shtator – 5 tetor 2026, statistikat e veta pa bot-e." },
       { value: "1", label: "person kontakti", note: "Koncept, dizajn, zhvillim dhe lansim — pa dorëzime ndërmjet." },
     ],
   },
@@ -300,7 +298,7 @@ export const sq: Dict = {
       category: "Treg / Krahasim çmimesh",
       blurb: "Treg online me aplikacion për iPhone — nga ideja në Top 10 në Kosovë.",
       summary:
-        "Platforma e krahasimit të çmimeve për Kosovë dhe Shqipëri: më shumë se 1,3 milion produkte nga 229 dyqane në një kërkim — me historik çmimesh, njoftime për çmim dhe aplikacion për iPhone.",
+        "Platforma e krahasimit të çmimeve për Kosovë dhe Shqipëri: ofertat e dyqaneve online të të dy vendeve në një kërkim — me historik çmimesh, njoftime për çmim dhe aplikacion për iPhone.",
       forYou:
         "Të duhet një platformë, një treg online apo një aplikacion? Ja sa larg mund ta çojë një person një ide: ueb-faqe, backend dhe aplikacion për iPhone nga një dorë — deri në Top 10 aplikacionet e një vendi.",
       role: "Koncept, dizajn, zhvillim dhe operim",
@@ -335,7 +333,7 @@ export const sq: Dict = {
         },
         {
           title: "E ndërtuar për katalog të madh",
-          body: "Me më shumë se një milion produkte të listuara, faqet e listave dhe të produkteve përgatiten paraprakisht dhe ruhen në cache, që shfletimi të mbetet i shpejtë edhe me internet mobil.",
+          body: "Me një katalog kaq të madh, faqet e listave dhe të produkteve përgatiten paraprakisht dhe ruhen në cache, që shfletimi të mbetet i shpejtë edhe me internet mobil.",
         },
       ],
       features: [
@@ -356,13 +354,11 @@ export const sq: Dict = {
         "search-mobile": "Kërkimi në telefon",
       },
       results: [
-        { value: "Top 10", label: "aplikacionet në Kosovë" },
-        { value: "60.000", label: "vizitorë në muaj" },
-        { value: "2,5×", label: "më shumë vizitorë brenda një muaji" },
-        { value: "2", label: "platforma: ueb-faqe dhe aplikacion për iPhone" },
+        { value: "Top 10", label: "aplikacionet e blerjeve në Kosovë" },
+        { value: "9.841", label: "vizitorë në 30 ditët e fundit" },
       ],
       resultsNote:
-        "Vizitorët mujorë dhe renditja e aplikacionit sipas të dhënave të mia nga statistikat live. Rritja nga gushti në shtator sipas gjurmuesit të platformës.",
+        "Vizitorët: vizitorë unikë të ueb-faqes nga 5 shtatori deri më 5 tetor 2026, nga statistikat e vetë platformës, pa bot-e.",
     },
     framenotion: {
       tag: "AI / SaaS kreativ",
@@ -423,14 +419,8 @@ export const sq: Dict = {
         "home-mobile": "Landing page në telefon",
         "examples-mobile": "Shembujt në telefon",
       },
-      results: [
-        { value: "200", label: "abonentë aktivë" },
-        { value: "100", label: "pikë SEO në Lighthouse" },
-        { value: "3", label: "plane abonimi me pagesë online" },
-        { value: "AI", label: "e shkruan, e zëron dhe e renderon vetë reklamën" },
-      ],
-      resultsNote:
-        "Numri i abonentëve sipas të dhënave të mia nga faturimi. Lighthouse i matur në faqen live, tetor 2026, në telefon dhe desktop.",
+      results: [],
+      resultsNote: "",
       missing:
         "Editori dhe paneli i llogarisë janë pas hyrjes me llogari dhe nuk shfaqen këtu. Të gjitha pamjet më lart janë nga faqja publike.",
     },
@@ -492,12 +482,7 @@ export const sq: Dict = {
         "home-mobile": "Ballina në telefon",
         "fleet-mobile": "Flota në telefon",
       },
-      results: [
-        { value: "#1", label: "në Google" },
-        { value: "24/7", label: "kërkesa për rezervim, drejt në WhatsApp" },
-        { value: "2", label: "gjuhë për vendas dhe vizitorë" },
-        { value: "0", label: "zhvillues të nevojshëm për veturat dhe çmimet" },
-      ],
+      results: [{ value: "#1", label: "në Google" }],
       resultsNote:
         "Që nga lansimi, ueb-faqja renditet e para në Google dhe biznesi ka dukshëm më shumë klientë.",
     },
@@ -559,14 +544,8 @@ export const sq: Dict = {
         pricing: "Çmimet",
         "home-mobile": "Landing page në telefon",
       },
-      results: [
-        { value: "5 min", label: "deri te thirrja e parë e API-së" },
-        { value: "4×100", label: "pikë Lighthouse në desktop" },
-        { value: "3", label: "plane abonimi me pagesë online" },
-        { value: "Ekipe", label: "llogari, role dhe vende të integruara" },
-      ],
-      resultsNote:
-        "Fillimi i shpejtë është ndërtuar që kërkesa e parë të funksionojë për pesë minuta. Lighthouse i matur në faqen live, tetor 2026: në desktop 100 në performancë, qasshmëri, praktikat më të mira dhe SEO.",
+      results: [],
+      resultsNote: "",
       missing:
         "Paneli pas hyrjes, menaxhimi i çelësave API, playground-i dhe pamjet e përdorimit kërkojnë llogari dhe nuk shfaqen si pamje ekrani. Paneli që shihet më lart është parapamja e vetë produktit në landing page.",
     },

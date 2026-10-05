@@ -67,7 +67,7 @@ export const de: Dict = {
       {
         title: "Echte Wirkung",
         body: "Produkte, die wirklich genutzt werden.",
-        more: ["Top 10 der Apps im Kosovo", "Platz 1 bei Google für einen Kunden", "60.000 Besucher im Monat"],
+        more: ["Top 10 der Shopping-Apps im Kosovo", "Platz 1 bei Google für einen Kunden", "9.841 Besucher in 30 Tagen"],
       },
     ],
     pillars: [
@@ -144,8 +144,8 @@ export const de: Dict = {
     checklist: ["Idee", "Design", "Entwicklung", "Launch"],
     note: ["Echte Produkte.", "Echte Ergebnisse."],
     statLabel: "live",
-    statBody: (shops: string) => `Produkte aus ${shops} Shops`,
-    statValue: "1,3 Mio.+",
+    statBody: "der Shopping-Apps im Kosovo",
+    statValue: "Top 10",
     hint: "Weiterscrollen",
     step: (n: number, total: number) => `Schritt ${n} von ${total}`,
   },
@@ -189,11 +189,9 @@ export const de: Dict = {
     title: "Belege statt Versprechen.",
     sub: "Was aus der Arbeit bisher geworden ist.",
     items: [
-      { value: "Top 10", label: "der Apps im Kosovo", note: "ZgjedhPlus – Website und iPhone-App aus einer Hand." },
+      { value: "Top 10", label: "der Shopping-Apps im Kosovo", note: "ZgjedhPlus – Website und iPhone-App aus einer Hand." },
       { value: "#1", label: "bei Google", note: "RRON Rent a Car – seitdem deutlich mehr Kunden." },
-      { value: "200", label: "aktive Abonnenten", note: "FrameNotion, laut eigener Abrechnung." },
-      { value: "100", label: "SEO-Wert in Lighthouse", note: "Bei ZgjedhPlus, FrameNotion und SubToAPI – damit das Produkt gefunden wird." },
-      { value: "60.000", label: "Besucher im Monat", note: "ZgjedhPlus, laut eigener Live-Statistik." },
+      { value: "9.841", label: "Besucher in 30 Tagen", note: "ZgjedhPlus, 5. September bis 5. Oktober 2026, eigene Statistik ohne Bots." },
       { value: "1", label: "Ansprechpartner", note: "Konzept, Design, Entwicklung und Launch – ohne Übergaben dazwischen." },
     ],
   },
@@ -300,7 +298,7 @@ export const de: Dict = {
       category: "Marktplatz / Preisvergleich",
       blurb: "Ein Marktplatz mit eigener iPhone-App – von der Idee in die Top 10 im Kosovo.",
       summary:
-        "Die Preisvergleichsplattform für Kosovo und Albanien: mehr als 1,3 Millionen Produkte aus 229 Shops in einer Suche – mit Preisverlauf, Preisalarm und eigener iPhone-App.",
+        "Die Preisvergleichsplattform für Kosovo und Albanien: die Angebote der Onlineshops beider Länder in einer Suche – mit Preisverlauf, Preisalarm und eigener iPhone-App.",
       forYou:
         "Sie brauchen eine Plattform, einen Marktplatz oder eine App? So weit kann eine Person eine Idee bringen: Website, Backend und iPhone-App aus einer Hand – bis in die Top 10 der Apps eines Landes.",
       role: "Konzept, Design, Entwicklung und Betrieb",
@@ -335,7 +333,7 @@ export const de: Dict = {
         },
         {
           title: "Gebaut für einen großen Katalog",
-          body: "Bei mehr als einer Million gelisteter Produkte werden Listen- und Produktseiten vorab aufbereitet und gecacht, damit das Stöbern auch mit Mobilfunkverbindung schnell bleibt.",
+          body: "Bei einem so großen Katalog werden Listen- und Produktseiten vorab aufbereitet und gecacht, damit das Stöbern auch mit Mobilfunkverbindung schnell bleibt.",
         },
       ],
       features: [
@@ -356,13 +354,11 @@ export const de: Dict = {
         "search-mobile": "Suche mobil",
       },
       results: [
-        { value: "Top 10", label: "der Apps im Kosovo" },
-        { value: "60.000", label: "Besucher im Monat" },
-        { value: "2,5×", label: "mehr Besucher innerhalb eines Monats" },
-        { value: "2", label: "Plattformen: Website und iPhone-App" },
+        { value: "Top 10", label: "der Shopping-Apps im Kosovo" },
+        { value: "9.841", label: "Besucher in den letzten 30 Tagen" },
       ],
       resultsNote:
-        "Monatliche Besucher und App-Platzierung nach eigener Angabe aus der Live-Statistik. Wachstum von August auf September laut Tracker der Plattform.",
+        "Besucher: eindeutige Besucher der Website vom 5. September bis 5. Oktober 2026, aus der eigenen Statistik der Plattform, ohne Bots.",
     },
     framenotion: {
       tag: "KI / Creative SaaS",
@@ -423,14 +419,8 @@ export const de: Dict = {
         "home-mobile": "Landingpage mobil",
         "examples-mobile": "Beispiele mobil",
       },
-      results: [
-        { value: "200", label: "aktive Abonnenten" },
-        { value: "100", label: "SEO-Wert in Lighthouse" },
-        { value: "3", label: "Abo-Tarife mit Online-Zahlung" },
-        { value: "KI", label: "schreibt, vertont und rendert die Ad selbst" },
-      ],
-      resultsNote:
-        "Abonnentenzahl nach eigener Angabe aus der Abrechnung. Lighthouse auf der Live-Seite gemessen, Oktober 2026, mobil und Desktop.",
+      results: [],
+      resultsNote: "",
       missing:
         "Editor und Konto-Dashboard liegen hinter dem Login und werden hier nicht gezeigt. Alle Screenshots oben stammen von der öffentlichen Seite.",
     },
@@ -492,12 +482,7 @@ export const de: Dict = {
         "home-mobile": "Startseite mobil",
         "fleet-mobile": "Flotte mobil",
       },
-      results: [
-        { value: "#1", label: "bei Google" },
-        { value: "24/7", label: "Buchungsanfragen, direkt auf WhatsApp" },
-        { value: "2", label: "Sprachen für Einheimische und Gäste" },
-        { value: "0", label: "Entwickler nötig, um Autos und Preise zu pflegen" },
-      ],
+      results: [{ value: "#1", label: "bei Google" }],
       resultsNote:
         "Seit dem Launch steht die Website bei Google auf Platz 1, und das Unternehmen hat deutlich mehr Kunden.",
     },
@@ -559,14 +544,8 @@ export const de: Dict = {
         pricing: "Preise",
         "home-mobile": "Landingpage mobil",
       },
-      results: [
-        { value: "5 Min.", label: "bis zum ersten API-Aufruf" },
-        { value: "4×100", label: "Lighthouse-Werte am Desktop" },
-        { value: "3", label: "Abo-Tarife mit Online-Zahlung" },
-        { value: "Teams", label: "Konten, Rollen und Plätze eingebaut" },
-      ],
-      resultsNote:
-        "Der Quickstart ist darauf ausgelegt, die erste Anfrage in fünf Minuten zum Laufen zu bringen. Lighthouse auf der Live-Seite gemessen, Oktober 2026: am Desktop 100 bei Performance, Barrierefreiheit, Best Practices und SEO.",
+      results: [],
+      resultsNote: "",
       missing:
         "Das Dashboard nach dem Login, die Schlüsselverwaltung, der Playground und die Nutzungsansichten erfordern ein Konto und werden nicht als Screenshots gezeigt. Das oben sichtbare Dashboard ist die produkteigene Vorschau auf der Landingpage.",
     },

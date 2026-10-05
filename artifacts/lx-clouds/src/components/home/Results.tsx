@@ -8,7 +8,8 @@ import { useT } from "@/i18n";
 import { asset, cn } from "@/lib/utils";
 
 /** The project each figure belongs to – same order as the copy; null for figures about the work as a whole. */
-const sources = ["zgjedhplus", "rron-rent-a-car", "framenotion", "subtoapi", "zgjedhplus", null];
+// the project each tile belongs to, in the order of results.items
+const sources = ["zgjedhplus", "rron-rent-a-car", "zgjedhplus", null];
 
 /** Splits a figure like "Top 10", "#1", "1.3M+", "1,3 Mio.+" or "1.000" into prefix, number and suffix. */
 function parseFigure(value: string) {
@@ -76,7 +77,7 @@ export function Results() {
         <p className="text-[14.5px] text-muted sm:mb-1.5">{t.sub}</p>
       </Reveal>
 
-      <ul className="mt-8 grid gap-px overflow-hidden rounded-[22px] border border-ink/[0.07] bg-ink/[0.07] sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-8 grid gap-px overflow-hidden rounded-[22px] border border-ink/[0.07] bg-ink/[0.07] sm:grid-cols-2 lg:grid-cols-4">
         {t.items.map((item, i) => {
           const slug = sources[i];
           const project = slug ? getProject(slug) : undefined;
@@ -92,7 +93,7 @@ export function Results() {
           if (!project) {
             return (
               <li key={item.label} className="bg-paper">
-                <Reveal delay={(i % 3) * 0.07} className="flex h-full flex-col bg-white px-6 pb-6 pt-7">
+                <Reveal delay={(i % 4) * 0.07} className="flex h-full flex-col bg-white px-6 pb-6 pt-7">
                   {figure}
                 </Reveal>
               </li>
@@ -100,7 +101,7 @@ export function Results() {
           }
           return (
             <li key={item.label} className="bg-paper">
-              <Reveal delay={(i % 3) * 0.07} className="h-full">
+              <Reveal delay={(i % 4) * 0.07} className="h-full">
                 <Link
                   href={`/work/${project.slug}`}
                   className="group relative flex h-full flex-col bg-white px-6 pb-6 pt-7 transition-colors duration-500 hover:bg-[#FBFAFF]"
