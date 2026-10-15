@@ -19,7 +19,18 @@ function pickLanguage({ country, cookie, userAgent }) {
   return BY_COUNTRY[country] ?? "en";
 }
 
-export async function onRequest({ request, next }) {
+/** The site is kept out of search engines (October 2026): every answer of this function says so too. */
+function noindex(response) {
+  const res = new Response(response.body, response);
+  res.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return res;
+}
+
+export async function onRequest(context) {
+  return noindex(await route(context));
+}
+
+async function route({ request, next }) {
   const { pathname } = new URL(request.url);
   // the API and uploaded images share this middleware; only pages get a language
   if (pathname.startsWith("/api/") || pathname.startsWith("/media/")) return next();

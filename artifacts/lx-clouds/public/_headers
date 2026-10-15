@@ -1,0 +1,3 @@
+# Keep lxclouds.com out of search engines (October 2026). Remove this rule and the robots meta in index.html to list it again.
+/*
+  X-Robots-Tag: noindex, nofollow

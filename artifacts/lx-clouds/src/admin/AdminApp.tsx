@@ -196,11 +196,12 @@ export default function AdminApp() {
 
   useEffect(() => {
     document.title = "LX Studio";
-    document.querySelector('meta[name="robots"]')?.remove();
+    // the admin is never indexed; the page may already carry a site-wide noindex, which stays as it is
+    const present = document.querySelector('meta[name="robots"]')?.getAttribute("content")?.includes("noindex");
     const robots = document.createElement("meta");
     robots.name = "robots";
     robots.content = "noindex, nofollow";
-    document.head.appendChild(robots);
+    if (!present) document.head.appendChild(robots);
     api<{ user: User }>("/auth/me")
       .then((r) => setUser(r.user))
       .catch(() => setUser(null));
